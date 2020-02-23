@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "CredentialSchema.proto";
+
+message PredicateValue {
+    repeated string predicateValue = 4;
+}
+
+message CredentialHashData {
+    required string a = 5;
+    required string t = 6;
+    repeated PredicateValue ps = 7;
+    repeated ElementBytesModel tLines = 8;
+}
+
+message ProofHashData {
+    repeated CredentialHashData credentials = 9;
+}
