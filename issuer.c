@@ -30,12 +30,12 @@ void issuer_keys_setup(unsigned long l, issuer_pk_t pk, issuer_sk_t sk)
     mpz_add_ui(sk->q, sk->q, 1);
   } while(mpz_probab_prime_p(sk->q, REPS_VAL));
 
-  // n = pq (should be at least 2049bits > 2048bits)
+  // n = pq (should be at least 2049 bits > 2048bits)
   mpz_mul(pk->n, sk->p, sk->q);
 
   // 2. A random quadratic residue S modulo n
-  random_n_bits(x, 1025);
-  mpz_powm_ui(pk->S, x, 2, pk->n); // no need to mod, in fact
+  random_num_exact_bits(x, 1024);
+  mpz_powm_ui(pk->S, x, 2, pk->n); // no need to mod, at most 2048 bits
   // no need to check mpz_sizeinbase(pk->S, 2) < 2048);
 
   // 3. Random x_Z, x_R1, ..., x_Rl in range [2, p'q' - 1]
@@ -44,75 +44,27 @@ void issuer_keys_setup(unsigned long l, issuer_pk_t pk, issuer_sk_t sk)
   mpz_mul(max, sk->p_apos, sk->q_apos);
   random_range(sk->x_Z, min, max);
   mpz_powm(pk->Z, pk->S, sk->x_Z, pk->n);
-  sk->x_R_c = 0;
-  sk->x_R_v = NULL;
-  pk->R_c = 0;
-  pk->R_v = NULL;
 
-  // set sk->x_R_v and pk->R_v, update sk->x_R_c and pk->R_c
-  issuer_extend_keys(l, min, max, pk, sk);
-}
+  // set x_Ri and Ri
+  sk->x_R_c = pk->R_c = l;
+  sk->x_R_v = (mpz_t *)malloc(sizeof(mpz_t) * l);
+  pk->R_v   = (mpz_t *)malloc(sizeof(mpz_t) * l);
 
-// a function to endable extension of pk and sk
-void issuer_extend_keys(unsigned long l_inc,
-			mpz_t min, mpz_t max,
-			issuer_pk_t pk, issuer_sk_t sk)
-{
-  // TODO: assert pk->R_c == sk->x_R_c;
-  if (l_inc == 0) {
-    return;
+  for (unsigned long i = 0; i < l; ++i) {
+    mpz_inits(sk->x_R_v[i], pk->R_v[i]);
+    random_range(sk->x_R_v[i], min, max);
+    mpz_powm(pk->R_v[i], pk->S, sk->x_R_v[i], pk->n);
   }
-
-  // handle first element
-  issuer_sk_x_ptr sk_x = (issuer_sk_x_ptr)malloc(sizeof(struct issuer_sk_x_s));
-  issuer_pk_R_ptr pk_R = (issuer_pk_R_ptr)malloc(sizeof(struct issuer_pk_R_s));
-  random_range(sk_x->x, min, max);
-  mpz_powm(pk_R->R, pk->S, sk_x->x, pk->n);
-
-  issuer_sk_x_ptr sk_x_head = sk_x;
-  issuer_pk_R_ptr pk_R_head = pk_R;
-  issuer_sk_x_ptr sk_x_tail = sk_x;
-  issuer_pk_R_ptr pk_R_tail = pk_R;
-
-  // handle elements in range [1:]
-  for (unsigned long i = 1; i < l_inc; ++i) {
-    issuer_sk_x_ptr sk_x = malloc(sizeof(struct issuer_sk_x_s));
-    issuer_pk_R_ptr pk_R = malloc(sizeof(struct issuer_pk_R_s));
-    random_range(sk_x->x, min, max);
-    mpz_powm(pk_R->R, pk->S, sk_x->x, pk->n);
-
-    sk_x_tail->next = sk_x;
-    pk_R_tail->next = pk_R;
-    sk_x_tail = sk_x;
-    pk_R_tail = pk_R;
-  }
-
-  sk_x_tail->next = NULL;
-  pk_R_tail->next = NULL;
-
-  // append to the current list
-  if (sk->x_R_c == 0) {
-    // assert sk->x_R_v == NULL, pk->R_v == NULL
-    sk->x_R_v = sk_x_head;
-    pk->R_v = pk_R_head;
-  } else {
-    // assert sk->x_R_v != NULL, pk->R_v != NULL
-    sk_x = sk->x_R_v;
-    pk_R = pk->R_v;
-    for (unsigned long i = 1; i < sk->x_R_c; ++i) {
-      sk_x = sk_x->next;
-      pk_R = pk_R->next;
-    }
-    sk_x->next = sk_x_head;
-    pk_R->next = pk_R_head;
-  }
-
-  sk->x_R_c += l_inc;
-  pk->R_c += l_inc;
 }
 
 // section 4.4 Non-revokation Credential Cryptographic setup
-void revok_keys_setup(pairing_t pairing, element_t g, revok_pk_t pk, revok_sk_t sk)
+// pairing: pairing parameter 
+// g      : the generator of G1
+// g_apos : the generator of G2
+// pk, sk : to be initialized element
+void revok_keys_setup(pairing_t pairing,
+		      element_t g, element_t _g_apos,
+		      revok_pk_t pk, revok_sk_t sk)
 {
   // init secret key
   element_init_Zr(sk->x, pairing);
@@ -139,7 +91,10 @@ void revok_keys_setup(pairing_t pairing, element_t g, revok_pk_t pk, revok_sk_t 
 
   element_init_G1(pk->pk, pairing);
   element_init_G2(pk->y, pairing);
-    
+  element_pow_zn(pk->pk, g, sk->sk);
+  element_pow_zn(pk->y, pk->h_caret, sk->x);
 }
 
-
+void accum_setup(accum_pk_t pk, accum_sk_t sk)
+{
+}
