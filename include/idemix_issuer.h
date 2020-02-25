@@ -18,9 +18,9 @@ struct issuer_sk_s {
   mpz_t q_apos;
   mpz_t p;
   mpz_t q;
-  mpz_t x_Z;
-  unsigned long x_R_c;
-  mpz_t *x_R_v;
+  mpz_t xZ;
+  unsigned long xR_c;
+  mpz_t *xR_v;
 };
 typedef struct issuer_sk_s *issuer_sk_ptr;
 typedef struct issuer_sk_s issuer_sk_t[1];

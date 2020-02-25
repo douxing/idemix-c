@@ -4,6 +4,7 @@
 #include <gmp.h>
 
 #define REPS_VAL 15
+#define BUF_SIZE 512 // make sure it is big
 
 enum operator {
   GREATER_THAN_OR_EQUAL_TO,

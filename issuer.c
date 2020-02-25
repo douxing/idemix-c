@@ -38,22 +38,22 @@ void issuer_keys_setup(unsigned long l, issuer_pk_t pk, issuer_sk_t sk)
   mpz_powm_ui(pk->S, x, 2, pk->n); // no need to mod, at most 2048 bits
   // no need to check mpz_sizeinbase(pk->S, 2) < 2048);
 
-  // 3. Random x_Z, x_R1, ..., x_Rl in range [2, p'q' - 1]
-  // set sk->x_Z and pk->Z
+  // 3. Random xZ, xR1, ..., xRl in range [2, p'q' - 1]
+  // set sk->xZ and pk->Z
   mpz_set_ui(min, 2);
   mpz_mul(max, sk->p_apos, sk->q_apos);
-  random_range(sk->x_Z, min, max);
-  mpz_powm(pk->Z, pk->S, sk->x_Z, pk->n);
+  random_range(sk->xZ, min, max);
+  mpz_powm(pk->Z, pk->S, sk->xZ, pk->n);
 
-  // set x_Ri and Ri
-  sk->x_R_c = pk->R_c = l;
-  sk->x_R_v = (mpz_t *)malloc(sizeof(mpz_t) * l);
+  // set xRi and Ri, formular (1) in paper
+  sk->xR_c = pk->R_c = l;
+  sk->xR_v = (mpz_t *)malloc(sizeof(mpz_t) * l);
   pk->R_v   = (mpz_t *)malloc(sizeof(mpz_t) * l);
 
   for (unsigned long i = 0; i < l; ++i) {
-    mpz_inits(sk->x_R_v[i], pk->R_v[i]);
-    random_range(sk->x_R_v[i], min, max);
-    mpz_powm(pk->R_v[i], pk->S, sk->x_R_v[i], pk->n);
+    mpz_inits(sk->xR_v[i], pk->R_v[i]);
+    random_range(sk->xR_v[i], min, max);
+    mpz_powm(pk->R_v[i], pk->S, sk->xR_v[i], pk->n);
   }
 }
 
@@ -66,6 +66,8 @@ void revok_keys_setup(pairing_t pairing,
 		      element_t g, element_t _g_apos,
 		      revok_pk_t pk, revok_sk_t sk)
 {
+  (void)_g_apos;
+  
   // init secret key
   element_init_Zr(sk->x, pairing);
   element_init_Zr(sk->sk, pairing);
