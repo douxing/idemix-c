@@ -3,6 +3,7 @@
 
 #include <pbc/pbc.h>
 
+// Chapter 4:
 struct issuer_pk_s {
   mpz_t n;  
   mpz_t S;
@@ -51,19 +52,33 @@ struct revok_sk_s {
 typedef struct revok_sk_s *revok_sk_ptr;
 typedef struct revok_sk_s revok_sk_t[1];
 
-struct accum_pk_s {};
+struct accum_pk_s {
+  element_t z; // in Gt
+};
 typedef struct accum_pk_s *accum_pk_ptr;
 typedef struct accum_pk_s accum_pk_t[1];
 
-struct accum_sk_s {};
+struct accum_sk_s {
+  element_t gamma; // in Zr
+};
 typedef struct accum_sk_s *accum_sk_ptr;
 typedef struct accum_sk_s accum_sk_t[1];
 
+struct accumulator_s {
+  unsigned long L;
+  element_t *g1_v; // in G1, total length: 2L, g1_v[L] = g (generator of G1)
+  element_t *g2_v; // in G2, total length: 2L, g2_v[L] = g_apos (generator of G2)
+  element_t z;     // in GT
+  element_t acc;   // accumulator itself, in G2, initialized to one
+  // V, how to init?
+};
+typedef struct accumulator_s *accumulator_ptr;
+typedef struct accumulator_s accumulator_t[1];
 
 // section 4.2 Primary Credential Cryptographic setup
 // attr_c: supported attribute number
 // pk, sk: un-setup keys
-void issuer_keys_setup(unsigned long l, issuer_pk_t pk, issuer_sk_t sk);
+void issuer_keys_setup(unsigned long L, issuer_pk_t pk, issuer_sk_t sk);
 
 // TODO: section 4.3
 
@@ -72,9 +87,18 @@ void revok_keys_setup(pairing_t pairing,
 		      element_t g, element_t g_apos,
 		      revok_pk_t pk, revok_sk_t sk);
 
-// section 4.4.1
-// dx: how to initialze an accumulator?
-void accum_setup(accum_pk_t pk, accum_sk_t sk);
+// section 4.4.1 New Accumulator Setup
+void accum_setup(pairing_t pairing, unsigned long L,
+		 element_t g, element_t g_apos,
+		 accum_pk_t pk, accum_sk_t sk, accumulator_t acc);
+
+// end of Chapter 4
+
+// chapter 5:
+
+
+
+// end of Chapter 5
 
 void init_CS(int attrc, char *attrv[], issuer_pk_t);
 

@@ -158,7 +158,7 @@ void sm3(const unsigned char *msg, size_t  msglen, unsigned char dgst[SM3_DIGEST
 	sm3_ctx_t ctx;
 
 	sm3_init(&ctx);
-	sm3_update(&ctx, msg, msglen);
+	sm3_update(&ctx, (void *)msg, msglen);
 	sm3_final(&ctx, dgst);
 
 	memset(&ctx, 0, sizeof(sm3_ctx_t));

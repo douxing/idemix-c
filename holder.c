@@ -39,7 +39,7 @@ void prepare_primary_credential(issuer_pk_t pk, mpz_t m1, mpz_t n0,
 
   //    Compute formular (7) page 4
   char buf[BUF_SIZE] = { 0 };
-  char c[SM3_DIGEST_LENGTH] = { 0 };
+  unsigned char c[SM3_DIGEST_LENGTH] = { 0 };
   size_t count;
   sm3_ctx_t ctx;
   sm3_init(&ctx);
