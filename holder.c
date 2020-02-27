@@ -7,9 +7,9 @@
 
 // 5.1 Holder Setup - prepares for primary credential
 // m1: currently, only m1(link secret) is needed
-void prepare_primary_credential(issuer_pk_t pk, mpz_t m1, mpz_t n0,
-				pre_prim_cred_t ppc) {
-  mpz_inits(ppc->U, ppc->v_apos_caret, ppc->m1_caret, ppc->n1);
+void issue_primary_pre_credential_prepare(issuer_pk_t pk, mpz_t m1, mpz_t n0,
+					  prim_pre_cred_prep_t ppcp) {
+  mpz_inits(ppcp->U, ppcp->v_apos_caret, ppcp->m1_caret, ppcp->n1);
   
   // no hidden attributes to set, except m1: link secret
   // 1. Generate random 2128-bit v'
@@ -26,10 +26,10 @@ void prepare_primary_credential(issuer_pk_t pk, mpz_t m1, mpz_t n0,
   mpz_inits(U_tilde, temp);
   // 3. Compute(U) taking S, Z, Ri from Pk(public key of issuer)
   // formular (5) page 4
-  mpz_powm(ppc->U, pk->S, v_apos, pk->n);
+  mpz_powm(ppcp->U, pk->S, v_apos, pk->n);
   mpz_powm(temp, pk->R_v[0], m1, pk->n);
-  mpz_mul(ppc->U, ppc->U, temp);
-  mpz_mod(ppc->U, ppc->U, pk->n);
+  mpz_mul(ppcp->U, ppcp->U, temp);
+  mpz_mod(ppcp->U, ppcp->U, pk->n);
 
   // 4. Compute formular (6) page 4
   mpz_powm(U_tilde, pk->S, v_apos_tilde, pk->n);
@@ -43,33 +43,37 @@ void prepare_primary_credential(issuer_pk_t pk, mpz_t m1, mpz_t n0,
   size_t count;
   sm3_ctx_t ctx;
   sm3_init(&ctx);
-  mpz_export(buf, &count, 1, 1, 1, 0, ppc->U);
+  mpz_export(buf, &count, 1, 1, 1, 0, ppcp->U);
   sm3_update(&ctx, buf, count);
   mpz_export(buf, &count, 1, 1, 1, 0, U_tilde);
   sm3_update(&ctx, buf, count);
   mpz_export(buf, &count, 1, 1, 1, 0, n0);
   sm3_update(&ctx, buf, count);
   sm3_final(&ctx, c);
-  mpz_import(ppc->c, SM3_DIGEST_LENGTH, 1, 1, 1, 0, c);
+  mpz_import(ppcp->c, SM3_DIGEST_LENGTH, 1, 1, 1, 0, c);
 
-  mpz_mul(temp, ppc->c, v_apos);
-  mpz_add(ppc->v_apos_caret, v_apos_tilde, temp);
+  mpz_mul(temp, ppcp->c, v_apos);
+  mpz_add(ppcp->v_apos_caret, v_apos_tilde, temp);
 
   //    Compute formular (8) page 4
-  mpz_mul(temp, ppc->c, m1);
-  mpz_add(ppc->m1_caret, m1_tilde, temp);
+  mpz_mul(temp, ppcp->c, m1);
+  mpz_add(ppcp->m1_caret, m1_tilde, temp);
 
   // 5. Generate random 80-bit nonce n1
-  random_num_exact_bits(ppc->n1, 80);
+  random_num_exact_bits(ppcp->n1, 80);
 
-  // 6. Send ppc = { U, c, v'^, m1^, n1 } to the issuer
+  // 6. Send ppcp = { U, c, v'^, m1^, n1 } to the issuer
 }
 
 // 5.1 Holder Setup - prepares for non-revokation credential
-void prepare_non_revokation_credential(pairing_t pairing, revok_pk_t pk, pre_nonrev_cred_t pnrc)
+void issue_non_revokation_pre_credential_prepare(pairing_t pairing,
+						 revok_pk_t pk,
+						 nonrev_pre_cred_prep_t nrpcp)
 {
   element_t s_apos;
   element_init_Zr(s_apos, pairing);
   element_random(s_apos);
-  element_pow_zn(pnrc->U, pk->h2, s_apos);
+  element_pow_zn(nrpcp->U, pk->h2, s_apos);
 }
+
+

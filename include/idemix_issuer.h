@@ -26,7 +26,7 @@ struct issuer_sk_s {
 typedef struct issuer_sk_s *issuer_sk_ptr;
 typedef struct issuer_sk_s issuer_sk_t[1];
 
-struct revok_pk_s {
+struct nonrev_pk_s {
   // in G1
   element_t h;
   element_t h0;
@@ -42,27 +42,27 @@ struct revok_pk_s {
   element_t pk;
   element_t y;
 };
-typedef struct revok_pk_s *revok_pk_ptr;
-typedef struct revok_pk_s revok_pk_t[1];
+typedef struct nonrev_pk_s *nonrev_pk_ptr;
+typedef struct nonrev_pk_s nonrev_pk_t[1];
 
-struct revok_sk_s {
+struct nonrev_sk_s {
   element_t sk;
   element_t x;
 };
-typedef struct revok_sk_s *revok_sk_ptr;
-typedef struct revok_sk_s revok_sk_t[1];
+typedef struct nonrev_sk_s *nonrev_sk_ptr;
+typedef struct nonrev_sk_s nonrev_sk_t[1];
 
-struct accum_pk_s {
+struct accumulator_pk_s {
   element_t z; // in Gt
 };
-typedef struct accum_pk_s *accum_pk_ptr;
-typedef struct accum_pk_s accum_pk_t[1];
+typedef struct accumulator_pk_s *accum_pk_ptr;
+typedef struct accumulator_pk_s accum_pk_t[1];
 
-struct accum_sk_s {
+struct accumulator_sk_s {
   element_t gamma; // in Zr
 };
-typedef struct accum_sk_s *accum_sk_ptr;
-typedef struct accum_sk_s accum_sk_t[1];
+typedef struct accumulator_sk_s *accum_sk_ptr;
+typedef struct accumulator_sk_s accum_sk_t[1];
 
 struct accumulator_s {
   unsigned long L;
@@ -83,9 +83,9 @@ void issuer_keys_setup(unsigned long L, issuer_pk_t pk, issuer_sk_t sk);
 // TODO: section 4.3
 
 // section 4.4 Non-revokation Credential Cryptographic setup
-void revok_keys_setup(pairing_t pairing,
-		      element_t g, element_t g_apos,
-		      revok_pk_t pk, revok_sk_t sk);
+void nonrev_keys_setup(pairing_t pairing,
+		       element_t g, element_t g_apos,
+		       nonrev_pk_t pk, nonrev_sk_t sk);
 
 // section 4.4.1 New Accumulator Setup
 void accum_setup(pairing_t pairing, unsigned long L,
@@ -96,7 +96,27 @@ void accum_setup(pairing_t pairing, unsigned long L,
 
 // chapter 5:
 
+struct primary_pre_credential_s {
+  // {mi} is in the schema
+  mpz_t A;
+  mpz_t v_apos_apos;
+  mpz_t e;
+  mpz_t s_e;
+  mpz_t c_apos;
+};
+typedef struct primary_pre_credential_s *prim_pre_cred_ptr;
+typedef struct primary_pre_credential_s prim_pre_cred_t[1];
 
+struct non_revokation_pre_credential_s {
+  element_t z; // IA = z = IDa
+  element_t sigma; // in G1
+  element_t c; // in Zr
+  element_t s_apos_apos; // in Zr
+  // wit_i ??
+  unsigned long i;
+};
+typedef struct non_revokation_pre_credential_s *nonrev_pre_cred_ptr;
+typedef struct non_revokation_pre_credential_s nonrev_pre_cred_t[1];
 
 // end of Chapter 5
 

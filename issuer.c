@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "idemix_utils.h"
+#include "idemix_schema.h"
 #include "idemix_issuer.h"
 #include "idemix_holder.h"
 
@@ -59,16 +60,16 @@ void issuer_keys_setup(unsigned long L, issuer_pk_t pk, issuer_sk_t sk)
 }
 
 // section 4.4 Non-revokation Credential Cryptographic setup
-// pairing: pairing parameter 
+// pairing: pairing parameter
 // g      : the generator of G1
 // g_apos : the generator of G2
 // pk, sk : to be initialized element
-void revok_keys_setup(pairing_t pairing,
-		      element_t g, element_t _g_apos,
-		      revok_pk_t pk, revok_sk_t sk)
+void nonrev_keys_setup(pairing_t pairing,
+		       element_t g, element_t _g_apos,
+		       nonrev_pk_t pk, nonrev_sk_t sk)
 {
   (void)_g_apos;
-  
+
   // init secret key
   element_init_Zr(sk->x, pairing);
   element_init_Zr(sk->sk, pairing);
@@ -167,47 +168,68 @@ void accum_setup(pairing_t pairing, unsigned long L,
   element_init_GT(pk->z, pairing);
   element_pairing(pk->z, g, g_apos);
   element_pow_zn(pk->z, pk->z, gamma_pow_L_plus_one);
-  
+
   // 3. set V = empty set, acc = 1
   element_init_G2(acc->acc, pairing);
 }
 
+void compute_m2(mpz_t m2, mpz_t i, mpz_t H_cop) {
+  unsigned char buf[BUF_SIZE] = { 0 };
+  unsigned char h[SM3_DIGEST_LENGTH] = { 0 };
+  size_t count;
+  sm3_ctx_t ctx;
+
+  sm3_init(&ctx);
+  mpz_export(buf, &count, 1, 1, 1, 0, i);
+  sm3_update(&ctx, buf, count);
+  mpz_export(buf, &count, 1, 1, 1, 0, H_cop);
+  sm3_update(&ctx, buf, count);
+  sm3_final(&ctx, h);
+  mpz_import(m2, SM3_DIGEST_LENGTH, 1, 1, 1, 0, h); // set m2
+}
+
 // 5.2 Primary Credential Issurance
-int issure_primary_credential(issuer_pk_t pk, pre_prim_cred_t ppc,
-			      mpz_t n0,
-			      accumulator_t acc,
-			      unsigned long i, mpz_t H_cop)
+int issue_primary_pre_credential(issuer_pk_t pk, issuer_sk_t sk,
+				 prim_pre_cred_prep_t ppc_prep,
+				 prim_pre_cred_t ppc,
+				 const schema_t schema,
+				 mpz_t n0,
+				 accumulator_t acc)
 {
   // assert index < acc->L
+  // assert schema->attr_c == pk->R_c == sk->xR_c
+  // assert schema->attr_v[0].is_hidden = 1
+  // assert schema->attr_v[1].is_hidden = 0
+  // assert schema->attr_v[2].is_hidden = 1
+  // assert schema->attr_v[2].m = 0 // currently ZERO
 
   // Issuer verifies the corretness of Holder's input:
   mpz_t U_caret, temp;
   mpz_inits(U_caret, temp);
   // 1. Compute U_caret
   // page 4 formular (9)
-  mpz_invert(U_caret, ppc->U, pk->n);
-  mpz_powm(U_caret, U_caret, ppc->c, pk->n);
-  mpz_powm(temp, pk->R_v[0], ppc->m1_caret, pk->n);
+  mpz_invert(U_caret, ppc_prep->U, pk->n);
+  mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
+  mpz_powm(temp, pk->R_v[0], ppc_prep->m1_caret, pk->n);
   mpz_mul(U_caret, U_caret, temp);
-  mpz_powm(temp, pk->S, ppc->v_apos_caret, pk->n);
+  mpz_powm(temp, pk->S, ppc_prep->v_apos_caret, pk->n);
   mpz_mul(U_caret, U_caret, temp);
 
   // 2. verify c = H(U||U_caret||n0)
-  char buf[BUF_SIZE] = { 0 };
+  unsigned char buf[BUF_SIZE] = { 0 };
   unsigned char c[SM3_DIGEST_LENGTH] = { 0 };
   size_t count;
   sm3_ctx_t ctx;
   sm3_init(&ctx);
-  mpz_export(buf, &count, 1, 1, 1, 0, ppc->U);
-  sm3_update(&ctx, (void *)buf, count);
+  mpz_export(buf, &count, 1, 1, 1, 0, ppc_prep->U);
+  sm3_update(&ctx, buf, count);
   mpz_export(buf, &count, 1, 1, 1, 0, U_caret);
-  sm3_update(&ctx, (void *)buf, count);
+  sm3_update(&ctx, buf, count);
   mpz_export(buf, &count, 1, 1, 1, 0, n0);
-  sm3_update(&ctx, (void *)buf, count);
+  sm3_update(&ctx, buf, count);
   sm3_final(&ctx, c);
-  memset(&ctx, 0, sizeof(sm3_ctx_t));
   mpz_import(temp, SM3_DIGEST_LENGTH, 1, 1, 1, 0, c); // temp = c
-  int res = mpz_cmp(ppc->c, temp);
+  int res = mpz_cmp(ppc_prep->c, temp);
   if (res != 0) {
     gmp_printf("hash differs, \nc(U) : %Z\nc(U^): %Z\n");
     return -1;
@@ -215,18 +237,141 @@ int issure_primary_credential(issuer_pk_t pk, pre_prim_cred_t ppc,
 
   // 3. Verify the length of v'^, m1^
   // ... ignore ...
+  mpz_inits(ppc->A, ppc->v_apos_apos, ppc->e, ppc->s_e, ppc->c_apos);
 
   // Issuer prepare the credential:
   // 1. Compute m2 <- H(i||H_cop)
+  //    already okay, in schema
+
+  // 2. set attributes from Ak
+  //    already okay, in schema
+
+  // 3. Generate random 2724-bit number v" with most significant bit equal 1
+  //    and random prime e such that 2^596 <= e <= 2^596 + 2^119
+  // page 5 formular (10)
+  random_num_exact_bits(ppc->v_apos_apos, 2724);
+  mpz_set_ui(temp, 0);
+  mpz_set_ui(ppc->e, 0);
+  mpz_setbit(ppc->e, 119);
+  mpz_add_ui(ppc->e, ppc->e, 1);
+  random_range(ppc->e, temp, ppc->e);
+  mpz_setbit(temp, 596);
+  mpz_add(ppc->e, temp, ppc->e);
+
+  // 4 Compute Q
+  // page 5 formular (11)
+  mpz_t Q;
+  mpz_init(Q);
+  mpz_set(Q, ppc_prep->U);
+  mpz_powm(temp, pk->S, ppc->v_apos_apos, pk->n);
+  mpz_mul(Q, Q, temp);
+  mpz_mod(Q, Q, pk->n);
+  // handle m2, ignore m1 and m3
+  mpz_powm(temp, pk->R_v[1], schema->attr_v[1].m, pk->n);
+  mpz_mul(Q, Q, temp);
+  mpz_mod(Q, Q, pk->n);
+  for (unsigned long i = 3; i < schema->attr_c; ++i) {
+    if (schema->attr_v[i].is_hidden || !mpz_sgn(schema->attr_v[i].m)) {
+      continue;
+    }
+
+    // not hidden and mi != zero
+    mpz_powm(temp, pk->R_v[i], schema->attr_v[i].m, pk->n);
+    mpz_mul(Q, Q, temp);
+    mpz_mod(Q, Q, pk->n);
+  }
+  mpz_invert(Q, Q, pk->n);
+  mpz_mul(Q, pk->Z, Q);
+  mpz_mod(Q, Q, pk->n);
+
+  // temporary variables
+  mpz_t e_inv, n_apos;
+  mpz_inits(e_inv, n_apos);
+  mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n_apos = p'q'
+  mpz_invert(e_inv, ppc->e, n_apos); // e_inv = e^-1 mod n'
+
+  // page 5 formular (12)
+  mpz_powm(ppc->A, Q, e_inv, pk->n);
+
+  // 5. Generate random r < p'q'
+  mpz_t r;
+  mpz_init(r);
+  mpz_set_ui(temp, 0);
+  random_range(r, temp, n_apos);
+
+  // 6. Compute A^ c' and s_e
+  // page 5 formular (13)
+  mpz_t A_caret;
+  mpz_init(A_caret);
+  mpz_powm(A_caret, Q, r, pk->n);
+
+  // page 5 formular (14)
   sm3_init(&ctx);
-  mpz_set_ui(temp, i);
-  mpz_export(buf, &count, 1, 1, 1, 0, temp);
+  mpz_export(buf, &count, 1, 1, 1, 0, Q);
   sm3_update(&ctx, buf, count);
-  mpz_export(buf, &count, 1, 1, 1, 0, H_cop);
+  mpz_export(buf, &count, 1, 1, 1, 0, ppc->A);
+  sm3_update(&ctx, buf, count);
+  mpz_export(buf, &count, 1, 1, 1, 0, A_caret);
+  sm3_update(&ctx, buf, count);
+  mpz_export(buf, &count, 1, 1, 1, 0, ppc_prep->n1);
   sm3_update(&ctx, buf, count);
   sm3_final(&ctx, c);
-  mpz_import(temp, SM3_DIGEST_LENGTH, 1, 1, 1, 0, c); // temp = m2
+  mpz_import(ppc->c_apos, SM3_DIGEST_LENGTH, 1, 1, 1, 0, c);
 
+  // page 5 formular (15)
+  mpz_mul(temp, ppc->c_apos, e_inv);
+  mpz_mod(temp, temp, n_apos);
+  mpz_sub(ppc->s_e, r, temp);
+  mpz_mod(ppc->s_e, ppc->s_e, n_apos);
+  
+  // 7. Send the primary pre-credential to the Holder
+ 
+  return 0;
+}
 
+// 5.3 Non-revocation Credential Issuance
+int issue_non_revokation_pre_credential(pairing_t pairing,
+					nonrev_pk_t pk, nonrev_sk_t sk,
+					nonrev_pre_cred_prep_t nrpc_prep, // holder -> issuer
+					nonrev_pre_cred_t nrpc,           // issuer -> holder
+					const schema_t schema,
+					unsigned long i, accumulator_t acc,
+					accum_pk_t accum_pk, accum_sk_t accum_sk)
+{
+  element_init_G1(nrpc->sigma, pairing);
+  element_init_Zr(nrpc->s_apos_apos, pairing);
+  element_init_Zr(nrpc->c, pairing);
+
+  // 1. Generate random numbers s", c mod q.
+  element_random(nrpc->s_apos_apos);
+  element_random(nrpc->c);
+
+  // 2. Take m2 from the primary credential he is preparing for Holder
+  element_t m2;
+  element_init_Zr(m2, pairing);
+  element_set_mpz(m2, schema->attr_v[1].m);
+  
+
+  // 3. Take A as the accumulator value for which index i was taken.
+  //    Retrieve current set of non-revoked indices V.
+  element_t A;
+  element_init_G2(A, pairing);
+  element_set(A, acc->acc);
+  
+  // 4. Compute
+  // page 5 formular (16)
+  element_t one;
+  element_init_Zr(one, pairing);
+  element_set1(one);
+  element_pow3_zn(nrpc->sigma, pk->h0, one, pk->h1, m2, nrpc_prep->U, one);
+  element_pow3_zn(nrpc->sigma, nrpc->sigma, one, acc->g1_v[i], one, pk->h2, nrpc->s_apos_apos);
+  element_t pow;
+  element_init_Zr(pow, pairing);
+  element_add(pow, sk->x, nrpc->c);
+  element_invert(pow, pow);
+  element_pow_zn(nrpc->sigma, nrpc->sigma, pow);
+  
+
+  
   return 0;
 }
