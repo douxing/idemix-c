@@ -5,5 +5,6 @@
 #include "idemix_accumulator.h"
 #include "idemix_schema.h"
 #include "idemix_issuer.h"
+#include "idemix_holder.h"
 
 #endif

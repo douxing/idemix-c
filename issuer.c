@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "idemix_utils.h"
+#include "idemix_accumulator.h"
 #include "idemix_schema.h"
 #include "idemix_issuer.h"
 #include "idemix_holder.h"
@@ -99,80 +100,6 @@ void nonrev_keys_setup(pairing_t pairing,
   element_pow_zn(pk->y, pk->h_caret, sk->x);
 }
 
-// section 4.4.1 New Accumulator Setup
-void accum_setup(pairing_t pairing, unsigned long L,
-		 element_t g, element_t g_apos,
-		 accum_pk_t pk, accum_sk_t sk, accumulator_t acc)
-{
-  // assert L >= 2;
-
-  // 1. Generate random gamma(mod q);
-  element_init_Zr(sk->gamma, pairing);
-  element_random(sk->gamma);
-
-  // 2. Computes
-  // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L
-  acc->g1_v = (element_t *)malloc(sizeof(element_t) * 2 * L);
-  acc->g2_v = (element_t *)malloc(sizeof(element_t) * 2 * L);
-
-  // acc->g1_v[0] = g^gamma
-  element_init_G1(acc->g1_v[0], pairing);
-  element_pow_zn(acc->g1_v[0], g, sk->gamma);
-  // acc->g2_v[0] = g'^gamma
-  element_init_G2(acc->g2_v[0], pairing);
-  element_pow_zn(acc->g2_v[0], g, sk->gamma);
-
-  unsigned long i = 1;
-  while (i < L) { // [1, L - 1]
-    element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
-    element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
-    ++i;
-  }
-
-  // (L+1)th element, set to the generator of the corresponding group
-  // dx: maybe useless
-  element_init_G1(acc->g1_v[L], pairing);
-  element_set(acc->g1_v[L], g);
-  element_init_G2(acc->g2_v[L], pairing);
-  element_set(acc->g2_v[L], g_apos);
-
-  // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L, continued
-  // (L+2)th element = (L)th element * g^gamma * g^gamma
-  element_init_G1(acc->g1_v[L + 1], pairing);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L - 1], acc->g1_v[0]);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L + 1], acc->g1_v[0]);
-  element_init_G2(acc->g2_v[L + 1], pairing);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L - 1], acc->g2_v[0]);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L + 1], acc->g2_v[0]);
-
-  // continue from (L+3)th element to the end
-  i = L + 2;
-  while (i < 2 * L) {
-    element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
-    element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
-    ++i;
-  }
-
-  // 2.3 z = (e(g, g'))^gamma^(L+1)
-  mpz_t L_plus_one;
-  mpz_init_set_ui(L_plus_one, L + 1);
-
-  element_t gamma_pow_L_plus_one;
-  element_init_Zr(gamma_pow_L_plus_one, pairing);
-  element_pow_mpz(gamma_pow_L_plus_one, sk->gamma, L_plus_one);
-
-  element_init_GT(pk->z, pairing);
-  element_pairing(pk->z, g, g_apos);
-  element_pow_zn(pk->z, pk->z, gamma_pow_L_plus_one);
-
-  // 3. set V = empty set, acc = 1
-  element_init_G2(acc->acc, pairing);
-}
-
 void compute_m2(mpz_t m2, mpz_t i, mpz_t H_cop) {
   unsigned char buf[BUF_SIZE] = { 0 };
   unsigned char h[SM3_DIGEST_LENGTH] = { 0 };
@@ -189,10 +116,11 @@ void compute_m2(mpz_t m2, mpz_t i, mpz_t H_cop) {
 }
 
 // 5.2 Primary Credential Issurance
-int issue_primary_pre_credential(issuer_pk_t pk, issuer_sk_t sk,
+int issue_primary_pre_credential(issuer_pk_t pk,
+				 issuer_sk_t sk,
 				 prim_pre_cred_prep_t ppc_prep,
 				 prim_pre_cred_t ppc,
-				 const schema_t schema,
+				 schema_t schema,
 				 mpz_t n0,
 				 accumulator_t acc)
 {
@@ -330,17 +258,29 @@ int issue_primary_pre_credential(issuer_pk_t pk, issuer_sk_t sk,
 }
 
 // 5.3 Non-revocation Credential Issuance
-int issue_non_revokation_pre_credential(pairing_t pairing,
-					nonrev_pk_t pk, nonrev_sk_t sk,
+int issue_non_revokation_pre_credential(nonrev_pre_cred_t nrpc,           // issuer -> holder
+					pairing_t pairing,
+					nonrev_pk_t pk,
+					nonrev_sk_t sk,
 					nonrev_pre_cred_prep_t nrpc_prep, // holder -> issuer
-					nonrev_pre_cred_t nrpc,           // issuer -> holder
-					const schema_t schema,
-					unsigned long i, accumulator_t acc,
-					accum_pk_t accum_pk, accum_sk_t accum_sk)
+					schema_t schema,
+					accumulator_t acc,
+					unsigned long i,
+					accum_pk_t accum_pk,
+					accum_sk_t accum_sk)
 {
+  // initialized pairing members
+  element_init_GT(nrpc->IA, pairing);
   element_init_G1(nrpc->sigma, pairing);
-  element_init_Zr(nrpc->s_apos_apos, pairing);
   element_init_Zr(nrpc->c, pairing);
+  element_init_Zr(nrpc->s_apos_apos, pairing);
+
+  element_init_G1(nrpc->sigma_i, pairing);
+  element_init_G2(nrpc->u_i, pairing);
+  element_init_G2(nrpc->omega, pairing);
+  
+  element_init_G1(nrpc->g_i, pairing);
+  element_init_G2(nrpc->g_apos_i, pairing);
 
   // 1. Generate random numbers s", c mod q.
   element_random(nrpc->s_apos_apos);
@@ -350,7 +290,6 @@ int issue_non_revokation_pre_credential(pairing_t pairing,
   element_t m2;
   element_init_Zr(m2, pairing);
   element_set_mpz(m2, schema->attr_v[1].m);
-  
 
   // 3. Take A as the accumulator value for which index i was taken.
   //    Retrieve current set of non-revoked indices V.
@@ -360,18 +299,21 @@ int issue_non_revokation_pre_credential(pairing_t pairing,
   
   // 4. Compute
   // page 5 formular (16)
-  element_t one;
-  element_init_Zr(one, pairing);
-  element_set1(one);
-  element_pow3_zn(nrpc->sigma, pk->h0, one, pk->h1, m2, nrpc_prep->U, one);
-  element_pow3_zn(nrpc->sigma, nrpc->sigma, one, acc->g1_v[i], one, pk->h2, nrpc->s_apos_apos);
+  element_pow2_zn(nrpc->sigma, pk->h1, m2, pk->h2, nrpc->s_apos_apos);
+  element_mul(nrpc->sigma, nrpc->sigma, pk->h0);
+  element_mul(nrpc->sigma, nrpc->sigma, nrpc_prep->U);
+  element_mul(nrpc->sigma, nrpc->sigma, acc->g1_v[i]);
   element_t pow;
   element_init_Zr(pow, pairing);
   element_add(pow, sk->x, nrpc->c);
   element_invert(pow, pow);
   element_pow_zn(nrpc->sigma, nrpc->sigma, pow);
-  
+  element_clear(pow);
 
+  compute_omega(nrpc->omega, acc, i);
   
+  // page 5 formular (17)
+
+  element_clear(A);
   return 0;
 }

@@ -67,7 +67,7 @@ void issue_primary_pre_credential_prepare(issuer_pk_t pk, mpz_t m1, mpz_t n0,
 
 // 5.1 Holder Setup - prepares for non-revokation credential
 void issue_non_revokation_pre_credential_prepare(pairing_t pairing,
-						 revok_pk_t pk,
+						 nonrev_pk_t pk,
 						 nonrev_pre_cred_prep_t nrpcp)
 {
   element_t s_apos;
