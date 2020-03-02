@@ -33,12 +33,12 @@ void compute_m2(mpz_t m2,
 
 void issue_non_revok_pre_credential
 (nr_pre_cred_t nrpc, // OUT to holder
+ accumulator_t acc, // OUT to ledger
  nr_pre_cred_prep_t nrpc_prep,
  pairing_t pairing,
  nr_pk_t pk,
  nr_sk_t sk,
  schema_t schema,
- accumulator_t acc,
  unsigned long i,
  accum_pk_t accum_pk,
  accum_sk_t accum_sk);

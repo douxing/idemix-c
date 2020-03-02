@@ -19,7 +19,7 @@ typedef struct issuer_seckey_s *iss_sk_ptr;
 typedef struct issuer_seckey_s iss_sk_t[1];
 
 struct issuer_pubkey_s {
-  mpz_t n;  
+  mpz_t n;
   mpz_t S;
   mpz_t Z;
   unsigned long R_c;
@@ -37,8 +37,8 @@ void primary_crypto_init(iss_sk_t sk,
 
 // 4.4 Non-revocation Credential Cryptographic Setup
 struct non_revok_seckey_s {
-  element_t sk;
-  element_t x;
+  element_t sk; // in Zr
+  element_t x;  // in Zr
 };
 typedef struct non_revok_seckey_s *nr_sk_ptr;
 typedef struct non_revok_seckey_s nr_sk_t[1];
@@ -89,12 +89,20 @@ unsigned long next_index(const index_vec_t v);
 int has_index(const index_vec_t v,  const unsigned long index);
 void set_index(index_vec_t v, const unsigned long index);
 void index_vec_clear(index_vec_t v);
+void index_vec_clone(index_vec_t dst, index_vec_t src);
 
-struct accumulator_pk_s {
-  element_t z; // in GT
-};
-typedef struct accumulator_pk_s *accum_pk_ptr;
-typedef struct accumulator_pk_s accum_pk_t[1];
+struct accumulator_s {
+  unsigned long L;
+  element_t g;      // generator of G1
+  element_t g_apos; // generator of G1
+  element_t *g1_v;  // in G1, total length: 2L, g1_v[L] = 1
+  element_t *g2_v;  // in G2, total length: 2L, g2_v[L] = 1
+  element_t z;      // in GT
+  element_t acc;    // accumulator itself, in G2, initialized to one
+  index_vec_t V;    // container for the index
+ };
+typedef struct accumulator_s *accumulator_ptr;
+typedef struct accumulator_s accumulator_t[1];
 
 struct accumulator_sk_s {
   element_t gamma; // in Zr
@@ -102,25 +110,23 @@ struct accumulator_sk_s {
 typedef struct accumulator_sk_s *accum_sk_ptr;
 typedef struct accumulator_sk_s accum_sk_t[1];
 
-struct accumulator_s {
-  unsigned long L;
-  element_t *g1_v; // in G1, total length: 2L, g1_v[L] = g  (generator of G1)
-  element_t *g2_v; // in G2, total length: 2L, g2_v[L] = g' (generator of G2)
-  element_t z;     // in GT
-  element_t acc;   // accumulator itself, in G2, initialized to one
-  index_vec_t V;   // container for the index
+struct accumulator_pk_s {
+  element_t z; // in GT
 };
-typedef struct accumulator_s *accumulator_ptr;
-typedef struct accumulator_s accumulator_t[1];
+typedef struct accumulator_pk_s *accum_pk_ptr;
+typedef struct accumulator_pk_s accum_pk_t[1];
 
-
-void accumulator_init(accumulator_t acc,
+void accumulator_init(accumulator_t acc, // OUT
 		      accum_sk_t sk,
 		      accum_pk_t pk,
 		      pairing_t pairing,
 		      unsigned long L,
 		      element_t g,
 		      element_t _g_apos);
+
+void accumulator_clear(accumulator_t acc);
+void accumulator_sk_clear(accum_sk_t sk);
+void accumulator_pk_clear(accum_pk_t pk);
 
 // end of 4.4.1
 // end of 4.4
@@ -143,11 +149,12 @@ typedef struct witness_s *witness_ptr;
 typedef struct witness_s witness_t[1];
 
 void witness_init(witness_t wit, pairing_t pairing);
+void witness_clear(witness_t);
 
 
 // page 5 formular (16) omega
-void compute_omega(element_t omega,
-		   const accumulator_t acc,
+void compute_omega(element_t omega, // OUT
+		   accumulator_t acc,
 		   const unsigned long i);
 
 // end of Chapter 5

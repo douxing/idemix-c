@@ -34,11 +34,13 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
   element_init_Zr(nrpc->c, pairing);
   element_init_Zr(nrpc->s_apos_apos, pairing);
 
-  element_init_G1(nrpc->sigma_i, pairing);
-  element_init_G2(nrpc->u_i, pairing);
-  element_init_G2(nrpc->omega, pairing);
-  
+  witness_init(nrpc->wit_i, pairing);
+
   element_init_G1(nrpc->g_i, pairing);
   element_init_G2(nrpc->g_apos_i, pairing);
 }
 
+void primary_credential_init(pri_cred_t pr)
+{
+  mpz_inits(pr->m1, pr->e, pr->A, pr->v);
+}

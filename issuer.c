@@ -23,7 +23,7 @@ int verify_primary_pre_credential_prepare(
   mpz_inits(U_caret, temp);
 
   // 1. Compute U_caret
-  // page 4 formular (9)
+  // page 4 Eq. (9)
   mpz_invert(U_caret, ppc_prep->U, pk->n);
   mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
   mpz_powm(temp, pk->R_v[0], ppc_prep->m1_caret, pk->n);
@@ -39,6 +39,10 @@ int verify_primary_pre_credential_prepare(
     
     retval = -1;
   }
+
+  // TODO:
+  // 3. verify that v'^ is 673-bit number
+  //    mi are 594-bit number
 
   mpz_clears(U_caret, temp);
   return retval;
@@ -62,19 +66,16 @@ void issue_primary_pre_credential
   mpz_t temp;
   mpz_init(temp);
 
-  // 3. Verify the length of v'^, m1^
-  // ... ignore ...
-
   // Issuer prepare the credential:
   // 1. Compute m2 <- H(i||H_cop)
-  //    already okay, in schema
+  //    done by caller, in schema
 
   // 2. set attributes from Ak
-  //    already okay, in schema
+  //    done by caller, in schema
 
   // 3. Generate random 2724-bit number v" with most significant bit equal 1
   //    and random prime e such that 2^596 <= e <= 2^596 + 2^119
-  // page 5 formular (10)
+  // page 5 Eq. (10)
   random_num_exact_bits(ppc->v_apos_apos, 2724);
 
   mpz_set_ui(temp, 0);
@@ -85,7 +86,7 @@ void issue_primary_pre_credential
   mpz_setbit(ppc->e, 596); // ppc->e += 2^596
 
   // 4 Compute Q
-  // page 5 formular (11)
+  // page 5 Eq. (11)
   mpz_t Q;
   mpz_init(Q);
   mpz_set(Q, ppc_prep->U);
@@ -110,7 +111,7 @@ void issue_primary_pre_credential
   mpz_mul(Q, pk->Z, Q);
   mpz_mod(Q, Q, pk->n);
 
-  // page 5 formular (12)
+  // page 5 Eq. (12)
   mpz_t e_inv, n_apos;
   mpz_inits(e_inv, n_apos);
   mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n_apos = p'q'
@@ -125,15 +126,15 @@ void issue_primary_pre_credential
   random_range(r, temp, n_apos);
 
   // 6. Compute A^ c' and s_e
-  // page 5 formular (13) A^ = Q^r
+  // page 5 Eq. (13) A^ = Q^r
   mpz_t A_caret;
   mpz_init(A_caret);
   mpz_powm(A_caret, Q, r, pk->n);
 
-  // page 5 formular (14) c' = H(Q||A||A^||n1)
+  // page 5 Eq. (14) c' = H(Q||A||A^||n1)
   sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, ppc_prep->n1);
 
-  // page 5 formular (15) s_e = r - c'e^-1
+  // page 5 Eq. (15) s_e = r - c'e^-1
   mpz_mul(temp, ppc->c_apos, e_inv);
   mpz_mod(temp, temp, n_apos);
   mpz_sub(ppc->s_e, r, temp);
@@ -167,16 +168,20 @@ void compute_m2(mpz_t m2,
 
 void issue_non_revok_pre_credential
 (nr_pre_cred_t nrpc, // OUT to holder
+ accumulator_t acc, // OUT to ledger
  nr_pre_cred_prep_t nrpc_prep,
  pairing_t pairing,
  nr_pk_t pk,
  nr_sk_t sk,
  schema_t schema,
- accumulator_t acc,
  unsigned long i,
  accum_pk_t accum_pk,
  accum_sk_t accum_sk)
 {
+  mpz_t mpz_i;
+  mpz_init(mpz_i);
+  mpz_set_ui(mpz_i, i);
+  
   // 1. Generate random numbers s", c mod q.
   element_random(nrpc->s_apos_apos);
   element_random(nrpc->c);
@@ -188,14 +193,11 @@ void issue_non_revok_pre_credential
 
   // 3. Take A as the accumulator value for which index i was taken.
   //    Retrieve current set of non-revoked indices V.
-  element_t A;
-  element_init_G2(A, pairing);
-  element_set(A, acc->acc);
-
+  // no need to Take A as temporary variable
   // V is in accumulator
   
   // 4. Compute
-  // page 5 formular (16)
+  // page 5 Eq. (16)
   element_pow2_zn(nrpc->sigma, pk->h1, m2, pk->h2, nrpc->s_apos_apos);
   element_mul(nrpc->sigma, nrpc->sigma, pk->h0);
   element_mul(nrpc->sigma, nrpc->sigma, nrpc_prep->U);
@@ -206,13 +208,36 @@ void issue_non_revok_pre_credential
   element_invert(pow, pow);
   element_pow_zn(nrpc->sigma, nrpc->sigma, pow);
 
-  compute_omega(nrpc->omega, acc, i);
+  compute_omega(nrpc->wit_i->omega, acc, i);
   
-  // page 5 formular (17)
+  // page 5 Eq. (17)
+  element_t temp;
+  element_init_Zr(temp, pairing);
+  element_pow_mpz(temp, accum_sk->gamma, mpz_i); // temp = gamma^i
+  element_pow_zn(nrpc->wit_i->u_i, pk->u, temp); // u_i
+  
+  element_add(temp, sk->sk, temp); // temp = sk + gamma^i
+  element_invert(temp, temp);      // temp = 1 / (sk + gamma^i)
+  element_pow_zn(nrpc->wit_i->sigma_i, acc->g_apos, temp); // sigma_i
 
+  // page 5 Eq. (18)
+  element_mul(acc->acc, acc->acc, acc->g2_v[acc->L - i]); // A
+  set_index(acc->V, i); // V
+
+  // page 5 Eq. (19)
+  // already set: sigma_i, u_i, omega
+  element_set(nrpc->wit_i->g_i, acc->g1_v[i]);
+  index_vec_clone(nrpc->wit_i->V, acc->V);
+
+  // set the rest members in non-revocation pre-credential
+  element_set(nrpc->IA, accum_pk->z);
+  element_set(nrpc->g_i, acc->g1_v[i]);
+  element_set(nrpc->g_apos_i, acc->g2_v[i]);
+  nrpc->i = i;
+  
   element_clear(pow);
-  element_clear(A);
   element_clear(m2);
+  mpz_clear(mpz_i);
 }
 
 // end of 5.3

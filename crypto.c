@@ -139,6 +139,7 @@ void set_index(index_vec_t v, const unsigned long i)
     memcpy(vec, v->vec, v->cap);
     memset(vec + v->cap, 0, cap - v->cap);
     v->cap = cap;
+    free(v->vec);
     v->vec = vec;
   }
 
@@ -153,7 +154,17 @@ void index_vec_clear(index_vec_t v)
   free(v->vec);
 }
 
+void index_vec_clone(index_vec_t dst, index_vec_t src)
+{
+  if (dst->cap < src->cap) {
+    free(dst->vec);
+    dst->vec = (unsigned char *)malloc(sizeof(unsigned char) * src->cap);
+  }
 
+  dst->next_index = src->next_index;
+  dst->cap = src->cap;
+  memcpy(dst->vec, src->vec, dst->cap);
+}
 
 void accumulator_init(accumulator_t acc, // OUTPUT
 		      accum_sk_t sk,     // OUTPUT
@@ -164,6 +175,10 @@ void accumulator_init(accumulator_t acc, // OUTPUT
 		      element_t g_apos)
 {
   // assert L >= 2;
+  element_init_G1(acc->g, pairing);
+  element_set(acc->g, g);
+  element_init_G2(acc->g_apos, pairing);
+  element_set(acc->g_apos, g_apos);
 
   // 1. Generate random gamma(mod q);
   element_init_Zr(sk->gamma, pairing);
@@ -193,9 +208,9 @@ void accumulator_init(accumulator_t acc, // OUTPUT
   // (L+1)th element, set to the generator of the corresponding group
   // dx: maybe useless
   element_init_G1(acc->g1_v[L], pairing);
-  element_set(acc->g1_v[L], g);
+  element_set1(acc->g1_v[L]);
   element_init_G2(acc->g2_v[L], pairing);
-  element_set(acc->g2_v[L], g_apos);
+  element_set1(acc->g2_v[L]);
 
   // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L, continued
   // (L+2)th element = (L)th element * g^gamma * g^gamma
@@ -277,8 +292,17 @@ void witness_init(witness_t wit, // OUTPUT
   index_vec_init(wit->V);
 }
 
+void witness_clear(witness_t wit)
+{
+  element_clear(wit->sigma_i);
+  element_clear(wit->u_i);
+  element_clear(wit->g_i);
+  element_clear(wit->omega);
+  index_vec_clear(wit->V);
+}
+
 void compute_omega(element_t omega, // OUTPUT
-		   const accumulator_t acc,
+		   accumulator_t acc,
 		   const unsigned long i)
 {
   element_set1(omega);

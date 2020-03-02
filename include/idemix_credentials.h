@@ -53,20 +53,15 @@ void primary_pre_credential_init(pri_pre_cred_t ppc);
 // 5.3 Non-revocation Credential Issuance:
 
 struct non_revok_pre_credential_s {
-  element_t IA; // IA = z = IDa in GT
-  element_t sigma; // in G1
-  element_t c; // in Zr
+  element_t IA;          // IA = z = IDa in GT
+  element_t sigma;       // in G1
+  element_t c;           // in Zr
   element_t s_apos_apos; // in Zr
 
-  // in witness element
-  element_t sigma_i; // in G1
-  element_t u_i;    // in G2
-  // element_t g_i; duplicated definition
-  element_t omega; // in G2
-  index_vec_t V;
+  witness_t wit_i;
 
-  element_t g_i; // in G1
-  element_t g_apos_i; // in G2
+  element_t g_i;         // in G1
+  element_t g_apos_i;    // in G2
   unsigned long i;
 };
 typedef struct non_revok_pre_credential_s *nr_pre_cred_ptr;
@@ -84,9 +79,35 @@ void compute_m2(mpz_t m2,
 // 5.4 Storing Credentials
 
 struct primary_credential_s {
+  mpz_t m1; // link secret, the only elmenet in As
+  mpz_t e;
+  mpz_t A;
+  mpz_t v;
 };
 typedef struct primary_credential_s *pri_cred_ptr;
 typedef struct primary_credential_s pri_cred_t[1];
+
+void primary_credential_init(pri_cred_t pr);
+
+struct non_revok_credential_s {
+  element_t IA;       // IA = z = IDa in GT
+  element_t sigma;    // in G1
+  element_t c;        // in Zr
+  element_t s;        // in Zr
+  
+  witness_t wit_i;
+
+  element_t g_i;      // in G1
+  element_t g_apos_i; // in G2
+  unsigned long i;
+};
+typedef struct non_revok_credential_s *nr_cred_ptr;
+typedef struct non_revok_credential_s nr_cred_t[1];
+
+void non_revok_credential_init
+(nr_cred_t nrc, // OUT
+ nr_pre_cred_t nrpc,
+ element_t s_apos);
 
 // end of 5.4
 

@@ -6,6 +6,8 @@
 #include "idemix_schema.h"
 #include "idemix_credentials.h"
 
+// Chapter 5:
+
 // 5.1 Holder Setup:
 
 // Holder Setup prepares for primary credential
@@ -20,9 +22,27 @@ void issue_primary_pre_credential_prepare
 // Holder prepares for non-revokation credential
 void issue_non_revok_pre_credential_prepare
 (nr_pre_cred_prep_t nrpc_prep, // OUT
- pairing_t pairing,
+ element_t s_apos,
  nr_pk_t pk);
 
-// end of Chapter 5.1
+// end of 5.1
+
+// 5.4 Storeing Credentials
+
+int verify_primary_pre_credential(pri_pre_cred_t ppc,
+				  iss_pk_t pk,
+				  mpz_t v,  // = v' + v"
+				  mpz_t n2, // = ???
+				  mpz_t m1);
+
+void issue_primary_credential
+(pri_cred_t pc, // OUT
+ pri_pre_cred_t ppc,
+ mpz_t v_apos); // v_apos is generated in 5.1 - 1
+
+
+// end of 5.4
+
+// end of Chapter 5
 
 #endif
