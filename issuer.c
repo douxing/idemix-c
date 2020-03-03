@@ -241,3 +241,25 @@ void issue_non_revok_pre_credential
 }
 
 // end of 5.3
+
+// end of Chapter 5
+
+// Chapter 6
+
+void revoke_index(accumulator_t acc, // OUT
+		  const unsigned long index)
+{
+  // 1. Set V = V\{i}
+  unset_index(acc->V, index);
+  
+  // 2. Compute A = A/g'_(L+1-i)
+  element_t temp;
+  element_init(temp, acc->acc->field);
+  element_invert(temp, acc->g2_v[acc->L - index]);
+  element_mul(acc->acc, acc->acc, temp);
+  element_clear(temp);
+
+  // Publish {V, A}
+}
+
+// end of Chapter 6

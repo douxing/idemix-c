@@ -81,7 +81,7 @@ void issue_non_revok_pre_credential_prepare
 int verify_primary_pre_credential(pri_pre_cred_t ppc,
 				  iss_pk_t pk,
 				  mpz_t v,  // = v' + v"
-				  mpz_t n2, //
+				  mpz_t n1, //
 				  mpz_t m1)
 {
   int retval = 0;
@@ -134,10 +134,10 @@ int verify_primary_pre_credential(pri_pre_cred_t ppc,
     mpz_add(temp, ppc->c_apos, temp);
     mpz_powm(A_caret, ppc->A, temp, pk->n);
 
-    // 6. verify c' = H(Q||A||A^||n2)
-    sm3_mpzs(temp, Q, ppc->A, A_caret, n2);
+    // 6. verify c' = H(Q||A||A^||n1)
+    sm3_mpzs(temp, Q, ppc->A, A_caret, n1);
     if (mpz_cmp(ppc->c_apos, temp)) {
-      gmp_printf("c' != H(Q||A||A^||n2)\nc': %Z\nH : %Z",
+      gmp_printf("c' != H(Q||A||A^||n1)\nc': %Z\nH : %Z",
 		 ppc->c_apos, temp);
       retval = -1;      
     }

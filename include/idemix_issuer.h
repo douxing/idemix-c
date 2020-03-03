@@ -47,6 +47,13 @@ void issue_non_revok_pre_credential
 
 // end of Chapter 5
 
+// Chapter 6:
+
+void revoke_index(accumulator_t acc, // OUT
+		  const unsigned long index);
+
+// end of Chapter 6
+
 // void init_CS(int attrc, char *attrv[], iss_pk_t);
 
 #endif

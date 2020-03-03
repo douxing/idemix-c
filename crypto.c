@@ -123,6 +123,11 @@ unsigned long next_index(const index_vec_t v)
 // return 0(flase) otherwise
 int has_index(const index_vec_t v, const unsigned long i)
 {
+  unsigned long cap = i / 8 + 1;
+  if (v->cap < cap) {
+    return 0; // already unset
+  }
+
   unsigned long byte_offset = i / 8;
   unsigned long bit_offset  = i % 8;
   
@@ -146,7 +151,20 @@ void set_index(index_vec_t v, const unsigned long i)
   unsigned long byte_offset = i / 8;
   unsigned long bit_offset  = i % 8;
   
-  v->vec[byte_offset] = 1 << bit_offset;
+  v->vec[byte_offset] |= 1 << bit_offset;
+}
+
+void unset_index(index_vec_t v, const unsigned long i)
+{
+  unsigned long cap = i / 8 + 1;
+  if (v->cap < cap) {
+    return; // already unset
+  }
+
+  unsigned long byte_offset = i / 8;
+  unsigned long bit_offset  = i % 8;
+
+  v->vec[byte_offset] &= ~(1 << bit_offset);
 }
 
 void index_vec_clear(index_vec_t v)

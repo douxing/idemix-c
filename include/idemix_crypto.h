@@ -88,6 +88,7 @@ void index_vec_init(index_vec_t v);
 unsigned long next_index(const index_vec_t v);
 int has_index(const index_vec_t v,  const unsigned long index);
 void set_index(index_vec_t v, const unsigned long index);
+void unset_index(index_vec_t v, const unsigned long index);
 void index_vec_clear(index_vec_t v);
 void index_vec_clone(index_vec_t dst, index_vec_t src);
 
@@ -98,6 +99,7 @@ struct accumulator_s {
   element_t *g1_v;  // in G1, total length: 2L, g1_v[L] = 1
   element_t *g2_v;  // in G2, total length: 2L, g2_v[L] = 1
   element_t z;      // in GT
+
   element_t acc;    // accumulator itself, in G2, initialized to one
   index_vec_t V;    // container for the index
  };
