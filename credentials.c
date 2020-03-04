@@ -40,7 +40,49 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
   element_init_G2(nrpc->g_apos_i, pairing);
 }
 
+
 void primary_credential_init(pri_cred_t pr)
 {
   mpz_inits(pr->m1, pr->e, pr->A, pr->v);
+}
+
+void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing)
+{
+  // initialized pairing members
+  element_init_GT(nrc->IA, pairing);
+  element_init_G1(nrc->sigma, pairing);
+  element_init_Zr(nrc->c, pairing);
+  element_init_Zr(nrc->s, pairing);
+
+  witness_init(nrc->wit_i, pairing);
+
+  element_init_G1(nrc->g_i, pairing);
+  element_init_G2(nrc->g_apos_i, pairing);
+}
+
+void non_revok_credential_update
+(nr_cred_t nrc, // cnr->wit_i->V as V_old
+ index_vec_t V, // new V
+ accumulator_t acc,
+ const unsigned long L)
+{
+  index_vec_ptr Vold = nrc->wit_i->V;
+
+  unsigned long max_next_index = // first iterate end
+    next_index(V) > next_index(Vold) ?
+    next_index(V) : next_index(V);
+
+  for (unsigned long j = 0; j < max_next_index; ++j) {
+    if (nrc->i != j) {
+      continue;
+    }
+
+    if (has_index(V, j) && !has_index(Vold, j)) {
+      element_mul(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
+    } else if (!has_index(V, j) && has_index(Vold, j)) {
+      element_div(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
+    }
+  }
+
+  index_vec_clone(Vold, V);
 }

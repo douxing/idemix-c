@@ -178,3 +178,10 @@ void issue_non_revok_credential
 // end of 5.4
 
 // end of Chapter 5
+
+// Chapter 7
+
+void non_rev_proof(mpz_vec_t TT)
+{}
+
+// end of Chapter 7

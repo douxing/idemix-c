@@ -70,10 +70,6 @@ typedef struct non_revok_pre_credential_s nr_pre_cred_t[1];
 void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
 				   pairing_t pairing);
 
-void compute_m2(mpz_t m2,
-		const mpz_t i,
-		const mpz_t H_cop);
-
 // end of 5.3
 
 // 5.4 Storing Credentials
@@ -104,10 +100,13 @@ struct non_revok_credential_s {
 typedef struct non_revok_credential_s *nr_cred_ptr;
 typedef struct non_revok_credential_s nr_cred_t[1];
 
-void non_revok_credential_init
-(nr_cred_t nrc, // OUT
- nr_pre_cred_t nrpc,
- element_t s_apos);
+void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing);
+
+void non_revok_credential_update
+(nr_cred_t nrc, // cnr->wit_i->V as V_old
+ index_vec_t V, // new V
+ accumulator_t acc,
+ const unsigned long L);
 
 // end of 5.4
 

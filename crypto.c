@@ -123,8 +123,7 @@ unsigned long next_index(const index_vec_t v)
 // return 0(flase) otherwise
 int has_index(const index_vec_t v, const unsigned long i)
 {
-  unsigned long cap = i / 8 + 1;
-  if (v->cap < cap) {
+  if (v->next_index <= i) {
     return 0; // already unset
   }
 
@@ -306,7 +305,7 @@ void witness_init(witness_t wit, // OUTPUT
   element_init_G2(wit->sigma_i, pairing);
   element_init_G2(wit->u_i, pairing);
   element_init_G1(wit->g_i, pairing);
-  element_init_G2(wit->omega, pairing);
+  element_init_G2(wit->w, pairing);
   index_vec_init(wit->V);
 }
 
@@ -315,19 +314,19 @@ void witness_clear(witness_t wit)
   element_clear(wit->sigma_i);
   element_clear(wit->u_i);
   element_clear(wit->g_i);
-  element_clear(wit->omega);
+  element_clear(wit->w);
   index_vec_clear(wit->V);
 }
 
-void compute_omega(element_t omega, // OUTPUT
-		   accumulator_t acc,
-		   const unsigned long i)
+void compute_w(element_t w, // OUTPUT
+	       accumulator_t acc,
+	       const unsigned long i)
 {
-  element_set1(omega);
+  element_set1(w);
   for (unsigned long j = 0; j < next_index(acc->V); ++j) {
     if (i != j) {
       unsigned long sub = acc->L + 1 - j + i;
-      element_mul(omega, omega, acc->g2_v[sub]);
+      element_mul(w, w, acc->g2_v[sub]);
     }
   }
 }
@@ -336,14 +335,13 @@ void compute_omega(element_t omega, // OUTPUT
 
 // Chapter 7:
 
-/* void compute_new_omega(element_t omega, // OUTPUT */
-/* 		       accumulator_t acc, */
-/* 		       unsigned long i, */
-/* 		       witness_t wit, */
-/* 		       index_vec_t new_V) */
-/* { */
-/*   element_set(omega, wit->omega); */
-/*   // TODO update witness */
-/* } */
+void mpz_vec_init(mpz_vec_t v, unsigned long cap)
+{
+  v->mpz_c = cap;
+  v->mpz_v = (mpz_t *)malloc(sizeof(mpz_t) * cap);
+  for (unsigned long i = 0; i < cap; ++i) {
+    mpz_init(v->mpz_v[i]);
+  }
+}
 
 // end of Chapter 7

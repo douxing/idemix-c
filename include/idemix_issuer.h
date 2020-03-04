@@ -27,10 +27,6 @@ void issue_primary_pre_credential
 
 // 5.3 Non-revocation Credential Issuance
 
-void compute_m2(mpz_t m2,
-		const mpz_t i,
-		const mpz_t H_cop);
-
 void issue_non_revok_pre_credential
 (nr_pre_cred_t nrpc, // OUT to holder
  accumulator_t acc, // OUT to ledger

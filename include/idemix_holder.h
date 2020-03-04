@@ -45,4 +45,10 @@ void issue_primary_credential
 
 // end of Chapter 5
 
+// Chapter 7
+
+
+
+// end of Chapter 7
+
 #endif

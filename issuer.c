@@ -148,24 +148,6 @@ void issue_primary_pre_credential
 
 // 5.3 Non-revocation Credential Issuance
 
-void compute_m2(mpz_t m2,
-		const mpz_t i,
-		const mpz_t H_cop)
-{
-  unsigned char buf[BUF_SIZE] = { 0 };
-  unsigned char h[SM3_DIGEST_LENGTH] = { 0 };
-  size_t count;
-  sm3_ctx_t ctx;
-
-  sm3_init(&ctx);
-  mpz_export(buf, &count, 1, 1, 1, 0, i);
-  sm3_update(&ctx, buf, count);
-  mpz_export(buf, &count, 1, 1, 1, 0, H_cop);
-  sm3_update(&ctx, buf, count);
-  sm3_final(&ctx, h);
-  mpz_import(m2, SM3_DIGEST_LENGTH, 1, 1, 1, 0, h); // set m2
-}
-
 void issue_non_revok_pre_credential
 (nr_pre_cred_t nrpc, // OUT to holder
  accumulator_t acc, // OUT to ledger
@@ -208,7 +190,7 @@ void issue_non_revok_pre_credential
   element_invert(pow, pow);
   element_pow_zn(nrpc->sigma, nrpc->sigma, pow);
 
-  compute_omega(nrpc->wit_i->omega, acc, i);
+  compute_w(nrpc->wit_i->w, acc, i);
   
   // page 5 Eq. (17)
   element_t temp;
@@ -225,7 +207,7 @@ void issue_non_revok_pre_credential
   set_index(acc->V, i); // V
 
   // page 5 Eq. (19)
-  // already set: sigma_i, u_i, omega
+  // already set: sigma_i, u_i, w
   element_set(nrpc->wit_i->g_i, acc->g1_v[i]);
   index_vec_clone(nrpc->wit_i->V, acc->V);
 

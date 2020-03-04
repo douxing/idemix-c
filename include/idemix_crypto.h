@@ -81,7 +81,7 @@ struct index_vec_s {
   unsigned long cap;        // = length of vec
   unsigned char *vec;       // bitmap of the index
 };
-typedef struct index_vex_s *index_vec_ptr;
+typedef struct index_vec_s *index_vec_ptr;
 typedef struct index_vec_s index_vec_t[1];
 
 void index_vec_init(index_vec_t v);
@@ -143,7 +143,7 @@ struct witness_s {
   element_t sigma_i; // in G2
   element_t u_i;     // in G2
   element_t g_i;     // in G1
-  element_t omega;   // in G2
+  element_t w;       // in G2
   index_vec_t V;
 };
 
@@ -154,11 +154,24 @@ void witness_init(witness_t wit, pairing_t pairing);
 void witness_clear(witness_t);
 
 
-// page 5 formular (16) omega
-void compute_omega(element_t omega, // OUT
-		   accumulator_t acc,
-		   const unsigned long i);
+// page 5 formular (16)
+void compute_w(element_t w, // OUT
+	       accumulator_t acc,
+	       const unsigned long i);
 
 // end of Chapter 5
+
+// Chapter 7
+
+struct mpz_vec_s {
+  unsigned long mpz_c;
+  mpz_t *mpz_v;
+};
+typedef struct mpz_vec_s *mpz_vec_ptr;
+typedef struct mpz_vec_s mpz_vec_t[1];
+
+void mpz_vec_init(mpz_vec_t v, unsigned long cap);
+
+// end of Chapter 7
 
 #endif
