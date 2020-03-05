@@ -62,10 +62,10 @@ void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing)
 
 void non_revok_credential_update
 (nr_cred_t nrc, // cnr->wit_i->V as V_old
- index_vec_t V, // new V
- accumulator_t acc,
- const unsigned long L)
+ accumulator_t acc)
 {
+  unsigned long L = acc->L;
+  index_vec_ptr V = acc->V;
   index_vec_ptr Vold = nrc->wit_i->V;
 
   unsigned long max_next_index = // first iterate end

@@ -1,3 +1,4 @@
+#include "idemix_random.h"
 #include "idemix_utils.h"
 #include "idemix_crypto.h"
 #include <string.h>
@@ -116,7 +117,7 @@ void compute_w(element_t w, // OUTPUT
 	       const unsigned long i)
 {
   element_set1(w);
-  for (unsigned long j = 0; j < GET_NEXT_INDEX(acc->V); ++j) {
+  for (unsigned long j = 0; j < index_vec_next_index(acc->V); ++j) {
     if (i != j) {
       unsigned long sub = acc->L + 1 - j + i;
       element_mul(w, w, acc->g2_v[sub]);

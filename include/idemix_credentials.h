@@ -105,9 +105,7 @@ void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing);
 
 void non_revok_credential_update
 (nr_cred_t nrc, // cnr->wit_i->V as V_old
- index_vec_t V, // new V
- accumulator_t acc,
- const unsigned long L);
+ accumulator_t acc);
 
 // end of 5.4
 

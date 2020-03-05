@@ -33,3 +33,4 @@ void random_prime_exact_bits(mpz_t prime, unsigned long bits)
     random_num_exact_bits(prime, bits);
   } while(mpz_probab_prime_p(prime, REPS_VAL));
 }
+

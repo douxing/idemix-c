@@ -1,3 +1,4 @@
+#include "idemix_random.h"
 #include "idemix_holder.h"
 
 #include <pbc/pbc.h>
@@ -11,10 +12,10 @@
 // m1: currently, only m1(link secret) is needed
 void issue_primary_pre_credential_prepare
 (pri_pre_cred_prep_t ppc_prep, // OUT
-				    mpz_t v_apos, // OUT for Holder itself
-				    iss_pk_t pk,
-				    mpz_t m1, // link secret
-				    mpz_t n0)
+ mpz_t v_apos, // OUT for Holder itself
+ iss_pk_t pk,
+ mpz_t m1, // link secret
+ mpz_t n0)
 {
   // no hidden attributes to set, except m1: link secret
   // 1. Generate random 2128-bit v'
@@ -179,12 +180,149 @@ void issue_non_revok_credential
 
 // Chapter 7
 
-void non_rev_proof
-(mpz_vec_t TT,
- mpz_vec_t CC
- )
+void non_revok_proof
+(nr_proof_t nrp, // OUT
+ nr_cred_t nrc,  // OUT
+ nr_pk_t pk,
+ accumulator_t acc,
+ proof_randomness_t r)
 {
+  // 1. Load Issuer's public revocation key
+  // 2. Load the non-revocation credential C_NR
+  // 3. Obtain recent V, acc
+
+  // 4. Update C_NR
+  non_revok_credential_update(nrc, acc);
+
+  // 5. Select random ... mod q
+
+  // 6. Compute
+  //    E, D, A, G, W, S, U in Eq. (22) ~ (25)
+  element_pow2_zn(nrp->E, pk->h, r->rho, pk->h_tilde, r->o); // E
+  element_pow2_zn(nrp->D, acc->g, r->r, pk->h_tilde, r->o_apos); // D
+  element_pow_zn(nrp->A, pk->h_tilde, r->rho);
+  element_mul(nrp->A, nrc->sigma, nrp->A); // A
+  element_pow_zn(nrp->G, pk->h_tilde, r->r);
+  element_mul(nrp->G, nrc->g_i, nrp->G); // G
+  element_pow_zn(nrp->W, pk->h_caret, r->r_apos);
+  element_mul(nrp->W, nrc->wit_i->w, nrp->W); // W
+  element_pow_zn(nrp->S, pk->h_caret, r->r_apos2);
+  element_mul(nrp->S, nrc->wit_i->sigma_i, nrp->S); // S
+  element_pow_zn(nrp->U, pk->h_caret, r->r_apos3);
+  element_mul(nrp->U, nrc->wit_i->u_i, nrp->U); // U
   
+  // page 7 Eq. (26) (27)
+  element_mul(nrp->m, r->rho, nrc->c);
+  element_mul(nrp->t, r->o, nrc->c);
+  element_mul(nrp->m_apos, r->r, r->r_apos2);
+  element_mul(nrp->t_apos, r->o_apos, r->r_apos2);
+
+  // page 7 Eq. (28) ~ (32)
+  element_t t, t1, t2, t3;
+
+  // T1 bar
+  element_pow2_zn(nrp->T1_bar,
+		  pk->h, r->rho_tilde,
+		  pk->h_tilde, r->o_tilde);
+
+  // T2 bar
+  element_init_same_as(t1, nrp->T2_bar);
+  element_init_same_as(t2, nrp->T2_bar);
+  element_invert(t1, pk->h);
+  element_invert(t2, pk->h_tilde);
+  element_pow3_zn(nrp->T2_bar,
+		  nrp->E, r->c_tilde,
+		  t1, r->m_tilde,
+		  t2, r->t_tilde);
+  element_clear(t1);
+  element_clear(t2);
+
+  // T3 bar
+  element_init_same_as(t, nrp->T3_bar);
+  element_init_same_as(t1, nrp->T3_bar);
+  element_init_same_as(t2, nrp->T3_bar);
+  element_init_same_as(t3, nrp->T3_bar);
+  element_pairing(t1, nrp->A, pk->h_caret);
+  element_pairing(t2, pk->h_tilde, pk->h_caret);
+  element_pairing(t3, pk->h_tilde, pk->y);
+  element_invert(t3, t3);
+  element_pow3_zn(nrp->T3_bar,
+		  t1, r->c_tilde,
+		  t2, r->r_tilde,
+		  t3, r->rho_tilde);
+  element_pairing(t1, pk->h_tilde, pk->h_caret);
+  element_invert(t1, t1);
+  element_pairing(t2, pk->h1, pk->h_caret);
+  element_invert(t2, t2);
+  element_pairing(t3, pk->h2, pk->h_caret);
+  element_invert(t3, t3);
+  element_pow3_zn(t, t1, r->m_tilde, t2, r->m2_tilde, t3, r->s_tilde);
+  element_mul(nrp->T3_bar, nrp->T3_bar, t);
+  element_clear(t);
+  element_clear(t1);
+  element_clear(t2);
+  element_clear(t3);
+
+  // T4 bar
+  element_init_same_as(t, acc->g);
+  element_init_same_as(t1, nrp->T4_bar);
+  element_init_same_as(t2, nrp->T4_bar);
+  element_pairing(t1, pk->h_tilde, acc->acc);
+  element_invert(t, t);
+  element_pairing(t2, t, pk->h_caret);
+  element_pow2_zn(nrp->T4_bar,
+		  t1, r->r_tilde,
+		  t2, r->r_apos_tilde);
+  element_clear(t);
+  element_clear(t1);
+  element_clear(t2);  
+
+  // T5 bar
+  element_pow2_zn(nrp->T5_bar,
+		  acc->g, r->r_tilde,
+		  pk->h_tilde, r->o_apos_tilde);
+
+  // T6 bar
+  element_init_same_as(t1, nrp->T6_bar);
+  element_init_same_as(t2, nrp->T6_bar);
+  element_invert(t1, acc->g);
+  element_invert(t2, pk->h_tilde);
+  element_pow3_zn(nrp->T6_bar,
+		  nrp->D, r->r_apos2,
+		  t1, r->m_apos_tilde,
+		  t2, r->t_apos_tilde);
+  element_clear(t1);
+  element_clear(t2);
+
+  // T7 bar
+  element_init_same_as(t, pk->pk);
+  element_init_same_as(t1, nrp->T7_bar);
+  element_init_same_as(t2, nrp->T7_bar);
+  element_init_same_as(t3, nrp->T7_bar);
+  element_mul(t, pk->pk, nrp->G);
+  element_pairing(t1, t, pk->h_caret);
+  element_pairing(t2, pk->h_tilde, pk->h_caret);
+  element_invert(t2, t2);
+  element_pairing(t3, pk->h_tilde, nrp->S);
+  element_pow3_zn(nrp->T7_bar,
+		  t1, r->r_apos2_tilde,
+		  t2, r->m_apos_tilde,
+		  t3, r->r_tilde);
+  element_clear(t);
+  element_clear(t1);
+  element_clear(t2);
+  element_clear(t3);
+
+  // T8 bar
+  element_init_same_as(t, acc->g);
+  element_init_same_as(t1, nrp->T8_bar);
+  element_init_same_as(t2, nrp->T8_bar);
+  element_pairing(t1, pk->h_tilde, pk->u);
+  element_invert(t, acc->g);
+  element_pairing(t2, t, pk->h_caret);
+  element_pow2_zn(nrp->T8_bar,
+		  t1, r->r_tilde,
+		  t2, r->r_apos3_tilde);
 }
 
 // end of Chapter 7

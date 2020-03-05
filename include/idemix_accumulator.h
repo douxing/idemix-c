@@ -8,7 +8,7 @@
 struct accumulator_s {
   unsigned long L;
   element_t g;      // generator of G1
-  element_t g_apos; // generator of G1
+  element_t g_apos; // generator of G2
   element_t *g1_v;  // in G1, total length: 2L, g1_v[L] = 1
   element_t *g2_v;  // in G2, total length: 2L, g2_v[L] = 1
   element_t z;      // in GT
