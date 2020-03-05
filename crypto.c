@@ -1,6 +1,5 @@
 #include "idemix_utils.h"
 #include "idemix_crypto.h"
-
 #include <string.h>
 
 // Chapter 4:
@@ -106,224 +105,18 @@ void non_revok_crypto_init(nr_sk_t sk, // OUTPUT
 
 // 4.4.1 New Accumulator Setup:
 
-void index_vec_init(index_vec_t v)
-{
-  v->next_index = 0;
-  v->cap = INDEX_VEC_INITIAL_CAPACITY / 8;
-  v->vec = (unsigned char *)malloc(sizeof(unsigned char) * v->cap);
-  memset(v->vec, 0, v->cap);
-}
-
-unsigned long next_index(const index_vec_t v)
-{
-  return v->next_index;
-}
-
-// return 1(true) if the vector contains index
-// return 0(flase) otherwise
-int has_index(const index_vec_t v, const unsigned long i)
-{
-  if (v->next_index <= i) {
-    return 0; // already unset
-  }
-
-  unsigned long byte_offset = i / 8;
-  unsigned long bit_offset  = i % 8;
-  
-  return (v->vec[byte_offset] >> bit_offset) & 0x1;
-}
-
-void set_index(index_vec_t v, const unsigned long i)
-{
-  unsigned long cap = i / 8 + 1;
-  if (v->cap < cap) {
-    // allocate more memory
-    cap = cap * 2 + 1;
-    unsigned char *vec = (unsigned char *)malloc(sizeof(unsigned char) * cap);
-    memcpy(vec, v->vec, v->cap);
-    memset(vec + v->cap, 0, cap - v->cap);
-    v->cap = cap;
-    free(v->vec);
-    v->vec = vec;
-  }
-
-  unsigned long byte_offset = i / 8;
-  unsigned long bit_offset  = i % 8;
-  
-  v->vec[byte_offset] |= 1 << bit_offset;
-}
-
-void unset_index(index_vec_t v, const unsigned long i)
-{
-  unsigned long cap = i / 8 + 1;
-  if (v->cap < cap) {
-    return; // already unset
-  }
-
-  unsigned long byte_offset = i / 8;
-  unsigned long bit_offset  = i % 8;
-
-  v->vec[byte_offset] &= ~(1 << bit_offset);
-}
-
-void index_vec_clear(index_vec_t v)
-{
-  free(v->vec);
-}
-
-void index_vec_clone(index_vec_t dst, index_vec_t src)
-{
-  if (dst->cap < src->cap) {
-    free(dst->vec);
-    dst->vec = (unsigned char *)malloc(sizeof(unsigned char) * src->cap);
-  }
-
-  dst->next_index = src->next_index;
-  dst->cap = src->cap;
-  memcpy(dst->vec, src->vec, dst->cap);
-}
-
-void accumulator_init(accumulator_t acc, // OUTPUT
-		      accum_sk_t sk,     // OUTPUT
-		      accum_pk_t pk,     // OUTPUT
-		      pairing_t pairing,
-		      unsigned long L,
-		      element_t g,
-		      element_t g_apos)
-{
-  // assert L >= 2;
-  element_init_G1(acc->g, pairing);
-  element_set(acc->g, g);
-  element_init_G2(acc->g_apos, pairing);
-  element_set(acc->g_apos, g_apos);
-
-  // 1. Generate random gamma(mod q);
-  element_init_Zr(sk->gamma, pairing);
-  element_random(sk->gamma);
-
-  // 2. Computes
-  // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L
-  acc->g1_v = (element_t *)malloc(sizeof(element_t) * 2 * L);
-  acc->g2_v = (element_t *)malloc(sizeof(element_t) * 2 * L);
-
-  // acc->g1_v[0] = g^gamma
-  element_init_G1(acc->g1_v[0], pairing);
-  element_pow_zn(acc->g1_v[0], g, sk->gamma);
-  // acc->g2_v[0] = g'^gamma
-  element_init_G2(acc->g2_v[0], pairing);
-  element_pow_zn(acc->g2_v[0], g_apos, sk->gamma);
-
-  unsigned long i = 1;
-  while (i < L) { // [1, L - 1]
-    element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
-    element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
-    ++i;
-  }
-
-  // (L+1)th element, set to the generator of the corresponding group
-  // dx: maybe useless
-  element_init_G1(acc->g1_v[L], pairing);
-  element_set1(acc->g1_v[L]);
-  element_init_G2(acc->g2_v[L], pairing);
-  element_set1(acc->g2_v[L]);
-
-  // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L, continued
-  // (L+2)th element = (L)th element * g^gamma * g^gamma
-  element_init_G1(acc->g1_v[L + 1], pairing);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L - 1], acc->g1_v[0]);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L + 1], acc->g1_v[0]);
-  element_init_G2(acc->g2_v[L + 1], pairing);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L - 1], acc->g2_v[0]);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L + 1], acc->g2_v[0]);
-
-  // continue from (L+3)th element to the end
-  i = L + 2;
-  while (i < 2 * L) {
-    element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
-    element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
-    ++i;
-  }
-
-  // 2.3 z = (e(g, g'))^gamma^(L+1)
-  mpz_t L_plus_one;
-  mpz_init_set_ui(L_plus_one, L + 1);
-
-  element_t gamma_pow_L_plus_one;
-  element_init_Zr(gamma_pow_L_plus_one, pairing);
-  element_pow_mpz(gamma_pow_L_plus_one, sk->gamma, L_plus_one);
-
-  element_init_GT(pk->z, pairing);
-  element_pairing(pk->z, g, g_apos);
-  element_pow_zn(pk->z, pk->z, gamma_pow_L_plus_one);
-
-  // 3. set V = empty set, acc = 1
-  index_vec_init(acc->V);
-  element_init_G2(acc->acc, pairing);
-
-  mpz_clear(L_plus_one);
-  element_clear(gamma_pow_L_plus_one);
-}
-
-void accumulator_clear(accumulator_t acc)
-{
-  for (unsigned i = 0; i < acc->L * 2; ++i) {
-    element_clear(acc->g1_v[i]);
-    element_clear(acc->g2_v[i]);
-  }
-  free(acc->g1_v);
-  free(acc->g2_v);
-
-  element_clear(acc->z);
-  element_clear(acc->acc);
-
-  index_vec_clear(acc->V);
-}
-
-void accumulator_sk_clear(accum_sk_t sk)
-{
-  element_clear(sk->gamma);
-}
-
-void accumulator_pk_clear(accum_pk_t pk)
-{
-  element_clear(pk->z);
-}
-
 // end of 4.4.1
 // end of 4.4
 // end of Chapter 4
 
 // Chapter 5:
 
-void witness_init(witness_t wit, // OUTPUT
-		  pairing_t pairing)
-{
-  element_init_G2(wit->sigma_i, pairing);
-  element_init_G2(wit->u_i, pairing);
-  element_init_G1(wit->g_i, pairing);
-  element_init_G2(wit->w, pairing);
-  index_vec_init(wit->V);
-}
-
-void witness_clear(witness_t wit)
-{
-  element_clear(wit->sigma_i);
-  element_clear(wit->u_i);
-  element_clear(wit->g_i);
-  element_clear(wit->w);
-  index_vec_clear(wit->V);
-}
-
 void compute_w(element_t w, // OUTPUT
 	       accumulator_t acc,
 	       const unsigned long i)
 {
   element_set1(w);
-  for (unsigned long j = 0; j < next_index(acc->V); ++j) {
+  for (unsigned long j = 0; j < GET_NEXT_INDEX(acc->V); ++j) {
     if (i != j) {
       unsigned long sub = acc->L + 1 - j + i;
       element_mul(w, w, acc->g2_v[sub]);
@@ -334,14 +127,5 @@ void compute_w(element_t w, // OUTPUT
 // end of Chapter 5
 
 // Chapter 7:
-
-void mpz_vec_init(mpz_vec_t v, unsigned long cap)
-{
-  v->mpz_c = cap;
-  v->mpz_v = (mpz_t *)malloc(sizeof(mpz_t) * cap);
-  for (unsigned long i = 0; i < cap; ++i) {
-    mpz_init(v->mpz_v[i]);
-  }
-}
 
 // end of Chapter 7

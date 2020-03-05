@@ -2,9 +2,10 @@
 #define __IDEMIX_HODLER_H__
 
 #include "idemix_utils.h"
-#include "idemix_crypto.h"
 #include "idemix_schema.h"
+#include "idemix_crypto.h"
 #include "idemix_credentials.h"
+#include "idemix_proofs.h"
 
 // Chapter 5:
 
@@ -46,7 +47,6 @@ void issue_primary_credential
 // end of Chapter 5
 
 // Chapter 7
-
 
 
 // end of Chapter 7

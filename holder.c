@@ -1,5 +1,3 @@
-#include "idemix_utils.h"
-#include "idemix_crypto.h"
 #include "idemix_holder.h"
 
 #include <pbc/pbc.h>
@@ -181,7 +179,12 @@ void issue_non_revok_credential
 
 // Chapter 7
 
-void non_rev_proof(mpz_vec_t TT)
-{}
+void non_rev_proof
+(mpz_vec_t TT,
+ mpz_vec_t CC
+ )
+{
+  
+}
 
 // end of Chapter 7

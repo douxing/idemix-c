@@ -4,6 +4,7 @@
 #include "idemix_utils.h"
 #include "idemix_crypto.h"
 #include "idemix_schema.h"
+#include "idemix_witness.h"
 
 // Chapter 5:
 

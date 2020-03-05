@@ -69,17 +69,17 @@ void non_revok_credential_update
   index_vec_ptr Vold = nrc->wit_i->V;
 
   unsigned long max_next_index = // first iterate end
-    next_index(V) > next_index(Vold) ?
-    next_index(V) : next_index(V);
+    index_vec_next_index(V) > index_vec_next_index(Vold) ?
+    index_vec_next_index(V) : index_vec_next_index(V);
 
   for (unsigned long j = 0; j < max_next_index; ++j) {
     if (nrc->i != j) {
       continue;
     }
 
-    if (has_index(V, j) && !has_index(Vold, j)) {
+    if (index_vec_is_set(V, j) && !index_vec_is_set(Vold, j)) {
       element_mul(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
-    } else if (!has_index(V, j) && has_index(Vold, j)) {
+    } else if (!index_vec_is_set(V, j) && index_vec_is_set(Vold, j)) {
       element_div(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
     }
   }

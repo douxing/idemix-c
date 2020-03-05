@@ -1,0 +1,11 @@
+#ifndef __IDEMIX_OPERATOR_H__
+#define __IDEMIX_OPERATOR_H__
+
+enum operator {
+  GTEATER_THAN,
+  GREATER_THAN_OR_EQUAL_TO,
+  LESS_THAN,
+  LESS_THAN_OR_EQUAL_TO,
+};
+
+#endif //__IDEMIX_OPERATOR_H__
