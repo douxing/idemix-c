@@ -3,6 +3,8 @@
 #include <pbc/pbc.h> // gmp.h included
 #include <stdarg.h>
 
+#define BUF_SIZE 512 // make sure it is big
+
 void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...)
 {
   unsigned char buf[BUF_SIZE] = { 0 };
@@ -25,4 +27,11 @@ void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...)
 
   // TODO: call sm3_buf_to_mpz
   mpz_import(dest, SM3_DIGEST_LENGTH, 1, 1, 1, 0, h);
+}
+
+void decompose_to_4_squares(mpz_t output[4], mpz_t input)
+{
+  // TODO: ...
+  (void)output;
+  (void)input;
 }

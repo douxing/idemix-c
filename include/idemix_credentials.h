@@ -1,4 +1,4 @@
-#ifndef __IDEMIX_CREDENTIALS_H__
+ #ifndef __IDEMIX_CREDENTIALS_H__
 #define __IDEMIX_CREDENTIALS_H__
 
 #include "idemix_utils.h"
@@ -14,14 +14,18 @@ struct primary_pre_credential_prepare_s {
   mpz_t U;
   mpz_t c;
   mpz_t v_apos_caret;
-  mpz_t m1_caret; // only m1(link secret) is needed
+
+  // only set hidden as mi_caret
+  schema_t schema;
+
   mpz_t n1;
 };
 typedef struct primary_pre_credential_prepare_s *pri_pre_cred_prep_ptr;
 typedef struct primary_pre_credential_prepare_s pri_pre_cred_prep_t[1];
 
 void primary_pre_credential_prepare_init
-(pri_pre_cred_prep_t ppc_prep);
+(pri_pre_cred_prep_t ppc_prep,
+ const unsigned long l);
 
 struct non_revok_pre_credential_prepare_s {
   element_t U; // in G1
@@ -29,15 +33,17 @@ struct non_revok_pre_credential_prepare_s {
 typedef struct non_revok_pre_credential_prepare_s *nr_pre_cred_prep_ptr;
 typedef struct non_revok_pre_credential_prepare_s nr_pre_cred_prep_t[1];
 
-void non_revok_pre_credential_prepare_init(nr_pre_cred_prep_t nrpc_prep, // OUT
-					   pairing_t pairing);
+void non_revok_pre_credential_prepare_init
+(nr_pre_cred_prep_t nrpc_prep, // OUT
+ pairing_t pairing);
 
 // end of Chapter 5.1
 
 // 5.2 Primary Credential Issurance:
 
 struct primary_pre_credential_s {
-  // {mi} is in the schema
+  schema_t schema; // set known mi
+
   mpz_t A;
   mpz_t e;
   mpz_t v_apos_apos;
@@ -47,7 +53,9 @@ struct primary_pre_credential_s {
 typedef struct primary_pre_credential_s *pri_pre_cred_ptr;
 typedef struct primary_pre_credential_s pri_pre_cred_t[1];
 
-void primary_pre_credential_init(pri_pre_cred_t ppc);
+void primary_pre_credential_init
+(pri_pre_cred_t ppc,
+ const unsigned long l);
 
 // end of 5.2
 
@@ -76,7 +84,8 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
 // 5.4 Storing Credentials
 
 struct primary_credential_s {
-  mpz_t m1; // link secret, the only elmenet in As
+  schema_t schema; // all members well set
+  
   mpz_t e;
   mpz_t A;
   mpz_t v;
@@ -84,7 +93,9 @@ struct primary_credential_s {
 typedef struct primary_credential_s *pri_cred_ptr;
 typedef struct primary_credential_s pri_cred_t[1];
 
-void primary_credential_init(pri_cred_t pr);
+void primary_credential_init
+(pri_cred_t pr,
+ const unsigned long l);
 
 struct non_revok_credential_s {
   element_t IA;       // IA = z = IDa in GT

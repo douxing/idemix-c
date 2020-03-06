@@ -4,6 +4,8 @@
 #include <pbc/pbc.h>
 #include "sm3.h"
 
-#define BUF_SIZE 512 // make sure it is big
+void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...);
+
+void decompose_to_4_squares(mpz_t output[4], mpz_t input);
 
 #endif

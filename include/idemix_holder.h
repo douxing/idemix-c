@@ -16,8 +16,8 @@
 void issue_primary_pre_credential_prepare
 (pri_pre_cred_prep_t ppc_prep, // OUT
  mpz_t v_apos, // OUT for Holder itself
+ schema_t schema,
  iss_pk_t pk,
- mpz_t m1,
  mpz_t n0);
 
 // Holder prepares for non-revokation credential

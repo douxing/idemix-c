@@ -1,7 +1,9 @@
 #include "idemix_utils.h"
-#include "idemix_schema.h"
 #include "idemix_crypto.h"
+#include "idemix_index_vec.h"
+#include "idemix_schema.h"
 #include "idemix_credentials.h"
+#include "idemix_random.h"
 #include "idemix_issuer.h"
 
 #include <stdlib.h>
@@ -12,11 +14,11 @@
 // 5.2 Primary Credential Issurance
 
 // call this function before 'primary_pre_credential_init'
-int verify_primary_pre_credential_prepare(
-  pri_pre_cred_prep_t ppc_prep,
-  iss_pk_t pk,
-  mpz_t n0
-) {
+int verify_primary_pre_credential_prepare
+(pri_pre_cred_prep_t ppc_prep,
+ iss_pk_t pk,
+ mpz_t n0)
+{
   int retval = 0;
   // Issuer verifies the corretness of Holder's input:
   mpz_t U_caret, temp;
@@ -26,8 +28,12 @@ int verify_primary_pre_credential_prepare(
   // page 4 Eq. (9)
   mpz_invert(U_caret, ppc_prep->U, pk->n);
   mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
-  mpz_powm(temp, pk->R_v[0], ppc_prep->m1_caret, pk->n);
-  mpz_mul(U_caret, U_caret, temp);
+  for (unsigned long i = 0; i < ppc_prep->schema->l; ++i) {
+    if (schema_attr_is_hidden(ppc_prep->schema, i)) {
+      mpz_powm(temp, pk->R_v[i], ppc_prep->schema->vec[i].m, pk->n);
+      mpz_mul(U_caret, U_caret, temp);
+    }
+  }
   mpz_powm(temp, pk->S, ppc_prep->v_apos_caret, pk->n);
   mpz_mul(U_caret, U_caret, temp);
 
@@ -49,12 +55,12 @@ int verify_primary_pre_credential_prepare(
 }
 
 void issue_primary_pre_credential
-(pri_pre_cred_t ppc, // OUT
+(pri_pre_cred_t ppc, // OUT, known attributes already set in schema
  pri_pre_cred_prep_t ppc_prep,
  iss_sk_t sk,
- iss_pk_t pk,
- schema_t schema)
+ iss_pk_t pk)
 {
+  // assert ppc->schema->l == ppc_prep->schema->l
   // assert index < acc->L
   // assert schema->attr_c == pk->R_c == sk->xR_c
   // assert schema->attr_v[0].is_hidden = 1
@@ -93,17 +99,15 @@ void issue_primary_pre_credential
   mpz_powm(temp, pk->S, ppc->v_apos_apos, pk->n);
   mpz_mul(Q, Q, temp);
   mpz_mod(Q, Q, pk->n);
-  // handle m2, ignore m1 and m3
-  mpz_powm(temp, pk->R_v[1], schema->attr_v[1].m, pk->n);
-  mpz_mul(Q, Q, temp);
-  mpz_mod(Q, Q, pk->n);
-  for (unsigned long i = 3; i < schema->attr_c; ++i) {
-    if (schema->attr_v[i].is_hidden || !mpz_sgn(schema->attr_v[i].m)) {
+  for (unsigned long i = 0; i < ppc->schema->l; ++i) {
+    if (schema_attr_is_hidden(ppc->schema, i)
+	|| !mpz_sgn(ppc->schema->vec[i].m)) {
+      // ignore hidden or zero attributes
       continue;
     }
 
-    // not hidden and mi != zero
-    mpz_powm(temp, pk->R_v[i], schema->attr_v[i].m, pk->n);
+    // not hidden and non-zero
+    mpz_powm(temp, pk->R_v[i], ppc->schema->vec[i].m, pk->n);
     mpz_mul(Q, Q, temp);
     mpz_mod(Q, Q, pk->n);
   }
@@ -155,7 +159,7 @@ void issue_non_revok_pre_credential
  pairing_t pairing,
  nr_pk_t pk,
  nr_sk_t sk,
- schema_t schema,
+ mpz_t m2,
  unsigned long i,
  accum_pk_t accum_pk,
  accum_sk_t accum_sk)
@@ -169,9 +173,7 @@ void issue_non_revok_pre_credential
   element_random(nrpc->c);
 
   // 2. Take m2 from the primary credential he is preparing for Holder
-  element_t m2;
-  element_init_Zr(m2, pairing);
-  element_set_mpz(m2, schema->attr_v[1].m);
+  //    set by the caller
 
   // 3. Take A as the accumulator value for which index i was taken.
   //    Retrieve current set of non-revoked indices V.
@@ -180,21 +182,21 @@ void issue_non_revok_pre_credential
   
   // 4. Compute
   // page 5 Eq. (16)
-  element_pow2_zn(nrpc->sigma, pk->h1, m2, pk->h2, nrpc->s_apos_apos);
+  element_t temp;
+  element_init_Zr(temp, pairing);
+  element_set_mpz(temp, m2);
+  element_pow2_zn(nrpc->sigma, pk->h1, temp, pk->h2, nrpc->s_apos_apos);
   element_mul(nrpc->sigma, nrpc->sigma, pk->h0);
   element_mul(nrpc->sigma, nrpc->sigma, nrpc_prep->U);
   element_mul(nrpc->sigma, nrpc->sigma, acc->g1_v[i]);
-  element_t pow;
-  element_init_Zr(pow, pairing);
-  element_add(pow, sk->x, nrpc->c);
-  element_invert(pow, pow);
-  element_pow_zn(nrpc->sigma, nrpc->sigma, pow);
+
+  element_add(temp, sk->x, nrpc->c);
+  element_invert(temp, temp);
+  element_pow_zn(nrpc->sigma, nrpc->sigma, temp);
 
   compute_w(nrpc->wit_i->w, acc, i);
   
   // page 5 Eq. (17)
-  element_t temp;
-  element_init_Zr(temp, pairing);
   element_pow_mpz(temp, accum_sk->gamma, mpz_i); // temp = gamma^i
   element_pow_zn(nrpc->wit_i->u_i, pk->u, temp); // u_i
   
@@ -204,7 +206,7 @@ void issue_non_revok_pre_credential
 
   // page 5 Eq. (18)
   element_mul(acc->acc, acc->acc, acc->g2_v[acc->L - i]); // A
-  set_index(acc->V, i); // V
+  index_vec_set(acc->V, i); // V
 
   // page 5 Eq. (19)
   // already set: sigma_i, u_i, w
@@ -217,8 +219,7 @@ void issue_non_revok_pre_credential
   element_set(nrpc->g_apos_i, acc->g2_v[i]);
   nrpc->i = i;
   
-  element_clear(pow);
-  element_clear(m2);
+  element_clear(temp);
   mpz_clear(mpz_i);
 }
 
@@ -232,7 +233,7 @@ void revoke_index(accumulator_t acc, // OUT
 		  const unsigned long index)
 {
   // 1. Set V = V\{i}
-  unset_index(acc->V, index);
+  index_vec_unset(acc->V, index);
   
   // 2. Compute A = A/g'_(L+1-i)
   element_t temp;

@@ -17,11 +17,10 @@ int verify_primary_pre_credential_prepare
  mpz_t n0);
 
 void issue_primary_pre_credential
-(pri_pre_cred_t ppc, // OUT
+(pri_pre_cred_t ppc,  // OUT, known attributes already set in schema
  pri_pre_cred_prep_t ppc_prep,
  iss_sk_t sk,
- iss_pk_t pk,
- schema_t schema);
+ iss_pk_t pk);
 
 // end of 5.2
 
@@ -34,7 +33,7 @@ void issue_non_revok_pre_credential
  pairing_t pairing,
  nr_pk_t pk,
  nr_sk_t sk,
- schema_t schema,
+ mpz_t m2,
  unsigned long i,
  accum_pk_t accum_pk,
  accum_sk_t accum_sk);
