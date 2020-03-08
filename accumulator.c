@@ -82,7 +82,7 @@ void accumulator_init(accumulator_t acc, // OUTPUT
   element_pow_zn(pk->z, pk->z, gamma_pow_L_plus_one);
 
   // 3. set V = empty set, acc = 1
-  index_vec_init(acc->V);
+  bitmap_init(acc->V);
   element_init_G2(acc->acc, pairing);
 
   mpz_clear(L_plus_one);
@@ -101,7 +101,7 @@ void accumulator_clear(accumulator_t acc)
   free(acc->g1_v);
   free(acc->g2_v);
 
-  index_vec_clear(acc->V);
+  bitmap_clear(acc->V);
   element_clear(acc->acc);
 }
 

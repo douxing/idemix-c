@@ -56,5 +56,4 @@ unsigned long schema_attr_cnt_revealed(schema_t s);
 // used in both Chapter 5 and Chapter 7
 // unsigned long schema_attr_is_hidden(schema_t s, const unsigned long i);
 
-
 #endif

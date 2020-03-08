@@ -74,20 +74,20 @@ void non_revok_credential_update
  accumulator_t acc) // latest accumulator
 {
   unsigned long L = acc->L;
-  index_vec_ptr V = acc->V;
-  index_vec_ptr Vold = nrc->wit_i->V;
+  bitmap_ptr V = acc->V;
+  bitmap_ptr Vold = nrc->wit_i->V;
 
   for (unsigned long j = 0; j < L; ++j) {
     if (nrc->i == j) {
       continue;
     }
 
-    if (index_vec_tstidx(V, j) && !index_vec_tstidx(Vold, j)) {
+    if (bitmap_tstbit(V, j) && !bitmap_tstbit(Vold, j)) {
       element_mul(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
-    } else if (!index_vec_tstidx(V, j) && index_vec_tstidx(Vold, j)) {
+    } else if (!bitmap_tstbit(V, j) && bitmap_tstbit(Vold, j)) {
       element_div(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
     }
   }
 
-  index_vec_set(Vold, V);
+  bitmap_set(Vold, V);
 }

@@ -15,7 +15,7 @@ $(TARGET_LIB): $(OBJS)
 
 .PHONY: clean
 clean:
-	-$(RM) ${TARGET_LIB} ${OBJS} $(wildcard *.*~) # $(SRCS:.c=.d)
+	-$(RM) ${TARGET_LIB} ${OBJS} $(wildcard *.*~) ${wildcard include/*.*~}
 
 .PHONY: protobuf
 protobuf:

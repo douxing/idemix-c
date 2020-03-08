@@ -2,7 +2,7 @@
 #define __IDEMIX_WITNESS_H__
 
 #include <pbc/pbc.h>
-#include "idemix_index_vec.h"
+#include "idemix_bitmap.h"
 
 // a witness belongs to an accmulator
 // an accumulator has many witnesses
@@ -12,7 +12,7 @@ struct witness_s {
   element_t u_i;     // in G2
   element_t g_i;     // in G1
   element_t w;       // in G2
-  index_vec_t V;
+  bitmap_t V;
 };
 
 typedef struct witness_s *witness_ptr;

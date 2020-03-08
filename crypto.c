@@ -117,11 +117,13 @@ void compute_w(element_t w, // OUTPUT
 	       const unsigned long i)
 {
   element_set1(w);
-  for (unsigned long j = 0; j < index_vec_next_index(acc->V); ++j) {
-    if (i != j) {
-      unsigned long sub = acc->L + 1 - j + i;
-      element_mul(w, w, acc->g2_v[sub]);
+  unsigned long j = bitmap_scan1(acc->V, 0);
+  while (j < acc->L) {
+    if (j != i) {
+      element_mul(w, w, acc->g2_v[acc->L -j + i]);
     }
+    
+    j = bitmap_scan1(acc->V, j + 1);
   }
 }
 

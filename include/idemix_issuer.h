@@ -4,7 +4,6 @@
 #include "idemix_utils.h"
 #include "idemix_crypto.h"
 #include "idemix_schema.h"
-#include "idemix_index_vec.h"
 #include "idemix_credentials.h"
 
 // chapter 5:

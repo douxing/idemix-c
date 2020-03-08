@@ -1,3 +1,4 @@
+#include "idemix_bitmap.h"
 #include "idemix_crypto.h"
 #include "idemix_random.h"
 #include "idemix_issuer.h"
@@ -188,12 +189,12 @@ void issue_non_revok_pre_credential
 
   // page 5 Eq. (18)
   element_mul(acc->acc, acc->acc, acc->g2_v[acc->L - i]); // A
-  index_vec_setidx(acc->V, i); // V
+  bitmap_setbit(acc->V, i); // V
 
   // page 5 Eq. (19)
   // already set: sigma_i, u_i, w
   element_set(nrpc->wit_i->g_i, acc->g1_v[i]);
-  index_vec_set(nrpc->wit_i->V, acc->V);
+  bitmap_set(nrpc->wit_i->V, acc->V);
 
   // set the rest members in non-revocation pre-credential
   element_set(nrpc->IA, accum_pk->z);
@@ -215,7 +216,7 @@ void revoke_index(accumulator_t acc, // OUT
 		  const unsigned long index)
 {
   // 1. Set V = V\{i}
-  index_vec_clridx(acc->V, index);
+  bitmap_clrbit(acc->V, index);
   
   // 2. Compute A = A/g'_(L+1-i)
   element_t temp;

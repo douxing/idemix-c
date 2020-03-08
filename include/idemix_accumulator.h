@@ -3,7 +3,7 @@
 
 #include <pbc/pbc.h>
 
-#include "idemix_index_vec.h"
+#include "idemix_bitmap.h"
 
 struct accumulator_s {
   unsigned long L;
@@ -13,7 +13,7 @@ struct accumulator_s {
   element_t *g1_v;  // in G1, total length: 2L, g1_v[L] = 1
   element_t *g2_v;  // in G2, total length: 2L, g2_v[L] = 1
 
-  index_vec_t V;    // container for the index
+  bitmap_t V;    // container for the index
   element_t acc;    // accumulator itself, in G2, initialized to one
 };
 typedef struct accumulator_s *accumulator_ptr;

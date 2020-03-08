@@ -7,7 +7,7 @@ void witness_init(witness_t wit, // OUTPUT
   element_init_G2(wit->u_i, pairing);
   element_init_G1(wit->g_i, pairing);
   element_init_G2(wit->w, pairing);
-  index_vec_init(wit->V);
+  bitmap_init(wit->V);
 }
 
 void witness_clear(witness_t wit)
@@ -16,5 +16,5 @@ void witness_clear(witness_t wit)
   element_clear(wit->u_i);
   element_clear(wit->g_i);
   element_clear(wit->w);
-  index_vec_clear(wit->V);
+  bitmap_clear(wit->V);
 }
