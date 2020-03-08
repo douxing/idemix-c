@@ -110,21 +110,21 @@ int verify_primary_pre_credential(pri_pre_cred_t ppc,
 				  mpz_t n1, //
 				  mpz_t m1)
 {
-  int retval = 0;
-  mpz_t temp, Q, A_caret;
-  mpz_inits(temp, Q, A_caret);
-
   // 2. verify e is prime and satisfies Eq. (10)
   if (!mpz_probab_prime_p(ppc->e, REPS_VAL)) {
     gmp_printf("e is not prime: %Z", ppc->e);
     return -1;
   }
 
+  int retval = 0;
+  mpz_t temp, Q, A_caret;
+  mpz_inits(temp, Q, A_caret);
+
   {
     mpz_set_ui(temp, 0);
     mpz_setbit(temp, 596);
     if (mpz_cmp(ppc->e, temp) < 0) {
-      gmp_printf("e < 2^596: %Z", ppc->e);
+      gmp_printf("e < 2^596: %Zd\n", ppc->e);
       retval = -1;
     }
   }
@@ -132,7 +132,7 @@ int verify_primary_pre_credential(pri_pre_cred_t ppc,
   if (!retval) {
     mpz_setbit(temp, 119);
     if (mpz_cmp(temp, ppc->e) < 0) {
-      gmp_printf("e > 2^596 + 2^119: %Z", ppc->e);
+      gmp_printf("e > 2^596 + 2^119: %Zd\n", ppc->e);
       retval = -1;
     }
   }
@@ -149,7 +149,7 @@ int verify_primary_pre_credential(pri_pre_cred_t ppc,
     // 4. Vefiry Q = A^e
     mpz_powm(temp, ppc->A, ppc->e, pk->n); // A^e
     if (mpz_cmp(Q, temp)) {
-      gmp_printf("Q != A^e\n Q: %Z\n e: %Z", Q, ppc->e);
+      gmp_printf("Q != A^e\n Q: %Z\n e: %Zd\n", Q, ppc->e);
       retval = -1;
     }
   }
@@ -163,7 +163,7 @@ int verify_primary_pre_credential(pri_pre_cred_t ppc,
     // 6. verify c' = H(Q||A||A^||n1)
     sm3_mpzs(temp, Q, ppc->A, A_caret, n1);
     if (mpz_cmp(ppc->c_apos, temp)) {
-      gmp_printf("c' != H(Q||A||A^||n1)\nc': %Z\nH : %Z",
+      gmp_printf("c' != H(Q||A||A^||n1)\nc': %Zd\nH : %Zd\n",
 		 ppc->c_apos, temp);
       retval = -1;      
     }

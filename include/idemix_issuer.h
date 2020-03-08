@@ -19,9 +19,10 @@ int verify_primary_pre_credential_prepare
 
 void issue_primary_pre_credential
 (pri_pre_cred_t ppc,  // OUT, known attributes already set in schema
- pri_pre_cred_prep_t ppc_prep,
  iss_sk_t sk,
- iss_pk_t pk);
+ iss_pk_t pk,
+ mpz_t U,   // from pri_pre_cred_prep
+ mpz_t n1); // from pri_pre_cred_prep
 
 // end of 5.2
 

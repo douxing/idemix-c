@@ -16,7 +16,8 @@ struct primary_pre_credential_prepare_s {
   mpz_t c;
   mpz_t v_apos_caret;
 
-  attr_vec_t m_carets; // only contains hidden mi
+  // contains hidden mi_caret
+  attr_vec_t m_carets;
 
   mpz_t n1;
 };
@@ -42,7 +43,7 @@ void non_revok_pre_credential_prepare_init
 // 5.2 Primary Credential Issurance:
 
 struct primary_pre_credential_s {
-  attr_vec_t ms; // only contains known mi
+  attr_vec_t Ak; // only contains known mi
 
   mpz_t A;
   mpz_t e;
@@ -84,7 +85,7 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
 // 5.4 Storing Credentials
 
 struct primary_credential_s {
-  attr_vec_t ms; // contains all attributes in a shema
+  attr_vec_t Cs; // contains all attributes in a credential shema
   
   mpz_t e;
   mpz_t A;
@@ -115,8 +116,8 @@ typedef struct non_revok_credential_s nr_cred_t[1];
 void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing);
 
 void non_revok_credential_update
-(nr_cred_t nrc, // cnr->wit_i->V as V_old
- accumulator_t acc);
+(nr_cred_t nrc, // nrc->wit_i->V as V_old
+ accumulator_t acc); // latest accumulator
 
 // end of 5.4
 

@@ -15,9 +15,8 @@ int verify_primary_pre_credential_prepare
  iss_pk_t pk,
  mpz_t n0)
 {
+  unsigned long l = attr_vec_size(ppc_prep->m_carets);
   int retval = 0;
-  unsigned long i = 0;
-  attr_ptr attrp = NULL;
 
   // Issuer verifies the corretness of Holder's input:
   mpz_t U_caret, temp;
@@ -27,9 +26,9 @@ int verify_primary_pre_credential_prepare
   // page 4 Eq. (9)
   mpz_invert(U_caret, ppc_prep->U, pk->n);
   mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
-  for (i = 0; i < attr_vec_size(ppc_prep->av); ++i) {
-    attrp = attr_vec_attr_ptr(ppc_prep->av) + i;    
-    mpz_powm(temp, pk->R_v[attrp->i], attrp->m_caret, pk->n);
+  for (unsigned long i = 0; i < l; ++i) {
+    attr_ptr mi_caret = attr_vec_attr_ptr(ppc_prep->m_carets) + i;
+    mpz_powm(temp, pk->R_v[mi_caret->i], mi_caret->v, pk->n);
     mpz_mul(U_caret, U_caret, temp);
   }
   mpz_powm(temp, pk->S, ppc_prep->v_apos_caret, pk->n);
@@ -54,21 +53,12 @@ int verify_primary_pre_credential_prepare
 
 void issue_primary_pre_credential
 (pri_pre_cred_t ppc, // OUT, known attributes already set in schema
- pri_pre_cred_prep_t ppc_prep,
  iss_sk_t sk,
- iss_pk_t pk)
+ iss_pk_t pk,
+ mpz_t U,  // from pri_pre_cred_prep
+ mpz_t n1) // from pri_pre_cred_prep
 {
-  // assert ppc->schema->l == ppc_prep->schema->l
-  // assert index < acc->L
-  // assert schema->attr_c == pk->R_c == sk->xR_c
-  // assert schema->attr_v[0].is_hidden = 1
-  // assert schema->attr_v[1].is_hidden = 0
-  // assert schema->attr_v[2].is_hidden = 1
-  // assert schema->attr_v[2].m = 0 // currently ZERO
-
   // temporary variables;
-  unsigned long i = 0;
-  attr_ptr attrp = NULL;
   mpz_t temp;
   mpz_init(temp);
 
@@ -91,17 +81,15 @@ void issue_primary_pre_credential
   random_range(ppc->e, temp, ppc->e);
   mpz_setbit(ppc->e, 596); // ppc->e += 2^596
 
-  // 4 Compute Q
-  // page 5 Eq. (11)
+  // 4 Compute Q Eq. (11) page 5
   mpz_t Q;
-  mpz_init(Q);
-  mpz_set(Q, ppc_prep->U);
+  mpz_init_set(Q, U);
   mpz_powm(temp, pk->S, ppc->v_apos_apos, pk->n);
   mpz_mul(Q, Q, temp);
   mpz_mod(Q, Q, pk->n);
-  for (i = 0; i < attr_vec_size(ppc_prep->av); ++i) {
-    attrp = attr_vec_attr_ptr(ppc_prep->av) + i;
-    mpz_powm(temp, pk->R_v[i], attrp->m, pk->n);
+  for (unsigned long i = 0; i < attr_vec_size(ppc->Ak); ++i) {
+    attr_ptr mi_p = attr_vec_attr_ptr(ppc->Ak) + i;
+    mpz_powm(temp, pk->R_v[mi_p->i], mi_p->v, pk->n);
     mpz_mul(Q, Q, temp);
     mpz_mod(Q, Q, pk->n);
   }
@@ -130,7 +118,7 @@ void issue_primary_pre_credential
   mpz_powm(A_caret, Q, r, pk->n);
 
   // page 5 Eq. (14) c' = H(Q||A||A^||n1)
-  sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, ppc_prep->n1);
+  sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, n1);
 
   // page 5 Eq. (15) s_e = r - c'e^-1
   mpz_mul(temp, ppc->c_apos, e_inv);

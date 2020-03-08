@@ -8,7 +8,7 @@ void primary_pre_credential_prepare_init
 	    ppc_prep->c,
 	    ppc_prep->v_apos_caret,
 	    ppc_prep->n1);
-  attr_vec_init(ppc_prep->av, schema_attr_cnt_hidden(s));
+  attr_vec_init(ppc_prep->m_carets, schema_attr_cnt_hidden(s));
 }
 
 
@@ -28,7 +28,7 @@ void primary_pre_credential_init
 	    ppc->v_apos_apos,
 	    ppc->s_e,
 	    ppc->c_apos);
-  attr_vec_init(ppc->av, schema_attr_cnt_known(s));
+  attr_vec_init(ppc->Ak, schema_attr_cnt_known(s));
 }
 
 void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
@@ -52,7 +52,7 @@ void primary_credential_init
  schema_t s)
 {
   mpz_inits(pc->e, pc->A, pc->v);
-  attr_vec_init(pc->av, s->l);
+  attr_vec_init(pc->Cs, s->l);
 }
 
 void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing)
@@ -70,28 +70,24 @@ void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing)
 }
 
 void non_revok_credential_update
-(nr_cred_t nrc, // cnr->wit_i->V as V_old
- accumulator_t acc)
+(nr_cred_t nrc, // nrc->wit_i->V as V_old
+ accumulator_t acc) // latest accumulator
 {
   unsigned long L = acc->L;
   index_vec_ptr V = acc->V;
   index_vec_ptr Vold = nrc->wit_i->V;
 
-  unsigned long max_next_index = // first iterate end
-    index_vec_next_index(V) > index_vec_next_index(Vold) ?
-    index_vec_next_index(V) : index_vec_next_index(V);
-
-  for (unsigned long j = 0; j < max_next_index; ++j) {
-    if (nrc->i != j) {
+  for (unsigned long j = 0; j < L; ++j) {
+    if (nrc->i == j) {
       continue;
     }
 
-    if (index_vec_is_set(V, j) && !index_vec_is_set(Vold, j)) {
+    if (index_vec_tstidx(V, j) && !index_vec_tstidx(Vold, j)) {
       element_mul(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
-    } else if (!index_vec_is_set(V, j) && index_vec_is_set(Vold, j)) {
+    } else if (!index_vec_tstidx(V, j) && index_vec_tstidx(Vold, j)) {
       element_div(nrc->wit_i->w, nrc->wit_i->w, acc->g2_v[L - j + nrc->i]);
     }
   }
 
-  index_vec_clone(Vold, V);
+  index_vec_set(Vold, V);
 }
