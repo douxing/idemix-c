@@ -2,13 +2,13 @@
 
 void primary_pre_credential_prepare_init
 (pri_pre_cred_prep_t ppc_prep,
- const unsigned long l)
+ schema_t s)
 {
   mpz_inits(ppc_prep->U,
 	    ppc_prep->c,
 	    ppc_prep->v_apos_caret,
 	    ppc_prep->n1);
-  schema_init(ppc_prep->schema, l);
+  attr_vec_init(ppc_prep->av, schema_attr_cnt_hidden(s));
 }
 
 
@@ -21,14 +21,14 @@ void non_revok_pre_credential_prepare_init
 
 void primary_pre_credential_init
 (pri_pre_cred_t ppc,
- const unsigned long l)
+ schema_t s)
 {
   mpz_inits(ppc->A,
 	    ppc->e,
 	    ppc->v_apos_apos,
 	    ppc->s_e,
 	    ppc->c_apos);
-  schema_init(ppc->schema, l);
+  attr_vec_init(ppc->av, schema_attr_cnt_known(s));
 }
 
 void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
@@ -49,10 +49,10 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
 
 void primary_credential_init
 (pri_cred_t pc,
- const unsigned long l)
+ schema_t s)
 {
   mpz_inits(pc->e, pc->A, pc->v);
-  schema_init(pc->schema, l);  
+  attr_vec_init(pc->av, s->l);
 }
 
 void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing)

@@ -71,7 +71,13 @@ typedef struct non_revok_proof_s nr_proof_t[1];
 
 void non_revok_proof_init(nr_proof_t nrp, pairing_t p);
 
-void nrp_to_vec();
+void nrp_to_C(mpz_vec_t C, // OUT
+	      nr_proof_t nrp);
+
+void nrp_to_T(mpz_vec_t T, // OUT
+	      nr_proof_t nrp);
+
+
 
 // end of Chapter 7
 

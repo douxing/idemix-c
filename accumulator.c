@@ -12,6 +12,7 @@ void accumulator_init(accumulator_t acc, // OUTPUT
 		      element_t g_apos)
 {
   // assert L >= 2;
+  acc->L = L;
   element_init_G1(acc->g, pairing);
   element_set(acc->g, g);
   element_init_G2(acc->g_apos, pairing);
@@ -90,17 +91,18 @@ void accumulator_init(accumulator_t acc, // OUTPUT
 
 void accumulator_clear(accumulator_t acc)
 {
-  for (unsigned i = 0; i < acc->L * 2; ++i) {
+  element_clear(acc->g);
+  element_clear(acc->g_apos);
+
+  for (mp_bitcnt_t i = 0; i < acc->L * 2; ++i) {
     element_clear(acc->g1_v[i]);
     element_clear(acc->g2_v[i]);
   }
   free(acc->g1_v);
   free(acc->g2_v);
 
-  element_clear(acc->z);
-  element_clear(acc->acc);
-
   index_vec_clear(acc->V);
+  element_clear(acc->acc);
 }
 
 void accumulator_sk_clear(accum_sk_t sk)

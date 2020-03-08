@@ -16,7 +16,7 @@
 void issue_primary_pre_credential_prepare
 (pri_pre_cred_prep_t ppc_prep, // OUT
  mpz_t v_apos, // OUT for Holder itself
- schema_t schema,
+ attr_vec_t Ah,
  iss_pk_t pk,
  mpz_t n0);
 
@@ -48,6 +48,12 @@ void issue_primary_credential
 
 // Chapter 7
 
+void non_revok_proof
+(nr_proof_t nrp, // OUT
+ nr_cred_t nrc,  // OUT
+ nr_pk_t pk,
+ accumulator_t acc,
+ proof_randomness_t r);
 
 // end of Chapter 7
 

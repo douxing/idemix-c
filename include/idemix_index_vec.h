@@ -1,24 +1,21 @@
 #ifndef __IDEMIX_INDEX_VEC_H__
 #define __IDEMIX_INDEX_VEC_H__
 
-#define INDEX_VEC_INITIAL_CAPACITY 1024
+#include <gmp.h>
+#include "idemix_bitmap.h"
 
-struct index_vec_s {
-  unsigned long next_index; // highest index + 1, initially 0
-  unsigned long cap;        // = length of vec
-  unsigned char *vec;       // bitmap of the index
-};
-typedef struct index_vec_s *index_vec_ptr;
-typedef struct index_vec_s index_vec_t[1];
+typedef bitmap_ptr index_vec_ptr;
+typedef bitmap_t   index_vec_t;
 
-void index_vec_init(index_vec_t v);
-void index_vec_clear(index_vec_t v);
-void index_vec_clone(index_vec_t dst, index_vec_t src);
+void (*index_vec_init)  (index_vec_t);
+void (*index_vec_clear) (index_vec_t);
+void (*index_vec_set)   (index_vec_t, index_vec_t);
 
-int  index_vec_is_set(const index_vec_t v,  const unsigned long index);
-void index_vec_set(index_vec_t v, const unsigned long index);
-void index_vec_unset(index_vec_t v, const unsigned long index);
+void (*index_vec_setidx) (index_vec_t, mp_bitcnt_t);
+void (*index_vec_clridx) (index_vec_t, mp_bitcnt_t);
+int  (*index_vec_tstidx) (const index_vec_t, mp_bitcnt_t);
 
-unsigned long index_vec_next_index(const index_vec_t v);
+mp_bitcnt_t (*index_vec_cnt0) (index_vec_t, mp_bitcnt_t);
+mp_bitcnt_t (*index_vec_cnt1) (index_vec_t, mp_bitcnt_t);
 
 #endif // __IDEMIX_INDEX_VEC_H__

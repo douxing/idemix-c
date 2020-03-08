@@ -1,1 +1,1 @@
-#include "verifier.h"
+#include "idemix_verifier.h"

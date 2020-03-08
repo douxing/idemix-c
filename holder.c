@@ -13,71 +13,71 @@
 void issue_primary_pre_credential_prepare
 (pri_pre_cred_prep_t ppc_prep, // OUT
  mpz_t v_apos, // OUT for Holder itself
- schema_t schema,
+ attr_vec_t Ah,
  iss_pk_t pk,
  mpz_t n0)
 {
-  // assert schema->l = ppc_prep->schema->l
+  // assert schema = ppc_prep->schema->l
+  
 
   // temporary variables
-  unsigned long i;
-  mpz_t temp, temp1;
-  mpz_inits(temp, temp1);
+  unsigned long l = attr_vec_size(Ah);
+  mpz_t temp;
+  mpz_inits(temp);
 
   // no hidden attributes to set, except m1: link secret
   // 1. Generate random 2128-bit v'
   random_num_exact_bits(v_apos, 2128);
 
-  // 2. Generate random 593-bit mi~ in Ah and random 673-bit v'~
-  //    assert schema->vec[0].is_hidden
-  //    set random mi~ in ppc_prep->schma
-  for (i = 0; i < schema->l; ++i) {
-    if (schema_attr_is_hidden(schema, i)) {
-      random_num_exact_bits(ppc_prep->schema->vec[i].m, 593);
-    }
-  }
+  // 2. Generate random 593-bit mi~ in Ah
+  attr_vec_t m_tildes; // generate random number later
+  attr_vec_init(m_tildes, l);
+
+  //    and Generate random 673-bit v'~
   mpz_t v_apos_tilde;
   mpz_init(v_apos_tilde);
   random_num_exact_bits(v_apos_tilde, 673);
 
+  // 2. Generate random 593-bit mi~ in Ah
   // 3. Compute(U) taking S, Z, Ri from Pk(public key of issuer)
   // Eq. (5) page 4
-  mpz_powm(ppc_prep->U, pk->S, v_apos, pk->n);
-  for (i = 0; i < schema->l; ++i) {
-    if (schema_attr_is_hidden(schema, i)) {
-      mpz_powm(temp, pk->R_v[i], schema->vec[i].m, pk->n);
-      mpz_mul(ppc_prep->U, ppc_prep->U, temp);
-      mpz_mod(ppc_prep->U, ppc_prep->U, pk->n);
-    }
-  }
-
   // 4. Compute Eq. (6) page 4
+  mpz_powm(ppc_prep->U, pk->S, v_apos, pk->n);
   mpz_t U_tilde;
   mpz_init(U_tilde);
   mpz_powm(U_tilde, pk->S, v_apos_tilde, pk->n);
-  for (i = 0; i < schema->l; ++i) {
-    if (schema_attr_is_hidden(schema, i)) {
-      mpz_powm(temp, pk->R_v[i], ppc_prep->schema->vec[i].m, pk->n);
-      mpz_mul(U_tilde, U_tilde, temp);
-      mpz_mod(U_tilde, U_tilde, pk->n);
-    }
+  for (unsigned long i = 0; i < l; ++i) {
+    attr_ptr mi = attr_vec_attr_ptr(Ah) + i;
+    attr_ptr mi_tilde = attr_vec_attr_ptr(m_tildes) + i;
+    // assert mi->i == mi_tilde->i
+    
+    // 2. Generate random 593-bits
+    random_num_exact_bits(mi_tilde->v, 593);
+    
+    // 3. Eq. (5) Compute U
+    mpz_powm(temp, pk->R_v[mi->i], mi->v, pk->n);
+    mpz_mul(ppc_prep->U, ppc_prep->U, temp);
+    mpz_mod(ppc_prep->U, ppc_prep->U, pk->n);
+
+    // 4. Eq. (6) Compute U~
+    mpz_powm(temp, pk->R_v[mi_tilde->i], mi_tilde->v, pk->n);
+    mpz_mul(U_tilde, U_tilde, temp);
+    mpz_mod(U_tilde, U_tilde, pk->n);    
   }
-
-  //    Compute Eq. (7) page 4
+  
+  // Eq. (7) page 4
   sm3_mpzs(ppc_prep->c, ppc_prep->U, U_tilde, n0);
-
   mpz_mul(temp, ppc_prep->c, v_apos);
-  mpz_add(ppc_prep->v_apos_caret, v_apos_tilde, temp);
+  mpz_add(ppc_prep->v_apos_caret, v_apos_tilde, temp);  
 
   //    Compute Eq. (8) page 4
   //    change mi~ to mi^ in ppc_prep->schema
-  for (unsigned long i = 0; i < ppc_prep->schema->l; ++i) {
-    if (schema_attr_is_hidden(schema, i)) {
-      mpz_mul(temp, ppc_prep->c, schema->vec[i].m);
-      mpz_add(ppc_prep->schema->vec[i].m,
-	      ppc_prep->schema->vec[i].m,
-	      temp);
-    }
+  for (unsigned long i = 0; i < l; ++i) {
+    attr_ptr mi = attr_vec_attr_ptr(Ah) + i;
+    attr_ptr mi_tilde = attr_vec_attr_ptr(m_tildes) + i;
+    attr_ptr mi_caret = attr_vec_attr_ptr(ppc_prep->m_carets) + i;
+    mpz_mul(temp, ppc_prep->c, mi->v);
+    mpz_add(mi_caret->v, mi_tilde->v, temp);
   }
 
   // 5. Generate random 80-bit nonce n1
@@ -86,7 +86,8 @@ void issue_primary_pre_credential_prepare
   // 6. Send ppc_prep = { U, c, v'^, m1^, n1 } to the issuer
 
   // clear intermediate variables
-  mpz_clears(temp, temp1, v_apos_tilde, U_tilde);
+  mpz_clears(temp, v_apos_tilde, U_tilde);
+  attr_vec_clear(m_tildes);
 }
 
 // prepares for non-revokation credential
@@ -351,9 +352,13 @@ void non_revok_proof
 		  t2, r->r_apos3_tilde);
 }
 
-void validity_proof
-()
+// Validity proof
+
+void prover_compute_T
+(pri_cred_t pc,
+ iss_pk_t pk)
 {
+  
 }
 
 // end of Chapter 7

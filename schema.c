@@ -1,32 +1,51 @@
-#include <stdlib.h>
 #include "idemix_schema.h"
 
-void schema_init(schema_t schema, const unsigned long l)
+void schema_init(schema_t s, const unsigned long l)
 {
-  schema->l = l;
-  schema->vec = (attribute_ptr)malloc(sizeof(attribute_t) * l);
-
-  for (unsigned long i = 0; i < l; ++i) {
-    attribute_ptr a = schema->vec + i;
-    mpz_init(a->m);
-    a->is_hidden = 0; // default to known
-    a->eq_class = 0;  // default to revealed
-  }
+  // assert l > 3
+  s->l = l;
+  mpz_init(s->map);
 }
 
-// used in Chapter 5
-unsigned long schema_attr_is_hidden(schema_t s, const unsigned long i)
+void schema_clear(schema_t s)
 {
-  return (s->vec + i)->is_hidden;
+  mpz_clear(s->map);
 }
 
-// used in Chapter 7
-unsigned long schema_attr_is_revealed(schema_t s, const unsigned long i)
+int schema_attr_is_hidden(schema_t s, unsigned long i)
 {
-  return !(s->vec + i)->eq_class;
+  // assert(i < s->l)
+  return bitmap_tstbit(s->map, i);
 }
 
-unsigned long schema_attr_eq_class(schema_t s, const unsigned long i)
+void schema_attr_set_hidden(schema_t s, unsigned long i)
 {
-  return (s->vec + i)->eq_class;
+  // assert(i < s->l)
+  bitmap_setbit(s, i);
+}
+
+unsigned long schema_attr_cnt_hidden(schema_t s)
+{
+  bitmap_cnt1(s->map, s->l);
+}
+
+
+void schema_attr_set_known(schema_t s, unsigned long i)
+{
+  bitmap_clrbit(s, i);
+}
+
+void schema_attr_set_revealed(schema_t s, unsigned long i)
+{
+  bitmap_clrbit(s, i);
+}
+
+unsigned long schema_attr_cnt_known(schema_t s)
+{
+  bitmap_cnt0(s->map, s->l);
+}
+
+unsigned long schema_attr_cnt_revealed(schema_t s)
+{
+  bitmap_cnt0(s->map, s->l);
 }

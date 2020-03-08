@@ -4,6 +4,7 @@
 #include "idemix_utils.h"
 #include "idemix_crypto.h"
 #include "idemix_schema.h"
+#include "idemix_attribute.h"
 #include "idemix_witness.h"
 
 // Chapter 5:
@@ -15,8 +16,7 @@ struct primary_pre_credential_prepare_s {
   mpz_t c;
   mpz_t v_apos_caret;
 
-  // only set hidden as mi_caret
-  schema_t schema;
+  attr_vec_t m_carets; // only contains hidden mi
 
   mpz_t n1;
 };
@@ -25,7 +25,7 @@ typedef struct primary_pre_credential_prepare_s pri_pre_cred_prep_t[1];
 
 void primary_pre_credential_prepare_init
 (pri_pre_cred_prep_t ppc_prep,
- const unsigned long l);
+ schema_t s);
 
 struct non_revok_pre_credential_prepare_s {
   element_t U; // in G1
@@ -42,7 +42,7 @@ void non_revok_pre_credential_prepare_init
 // 5.2 Primary Credential Issurance:
 
 struct primary_pre_credential_s {
-  schema_t schema; // set known mi
+  attr_vec_t ms; // only contains known mi
 
   mpz_t A;
   mpz_t e;
@@ -55,7 +55,7 @@ typedef struct primary_pre_credential_s pri_pre_cred_t[1];
 
 void primary_pre_credential_init
 (pri_pre_cred_t ppc,
- const unsigned long l);
+ schema_t s);
 
 // end of 5.2
 
@@ -84,7 +84,7 @@ void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
 // 5.4 Storing Credentials
 
 struct primary_credential_s {
-  schema_t schema; // all members well set
+  attr_vec_t ms; // contains all attributes in a shema
   
   mpz_t e;
   mpz_t A;
@@ -95,7 +95,7 @@ typedef struct primary_credential_s pri_cred_t[1];
 
 void primary_credential_init
 (pri_cred_t pr,
- const unsigned long l);
+ schema_t s);
 
 struct non_revok_credential_s {
   element_t IA;       // IA = z = IDa in GT
