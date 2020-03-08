@@ -8,7 +8,7 @@
 
 // Chapter 7
 
-struct proof_randomness_s {
+struct non_revok_proof_randomness_s {
   // page 7 - 5. Select random ... mod q
   element_t rho;
   element_t rho_apos;
@@ -35,10 +35,10 @@ struct proof_randomness_s {
   element_t r_apos2_tilde;
   element_t r_apos3_tilde;  
 };
-typedef struct proof_randomness_s *proof_randomness_ptr;
-typedef struct proof_randomness_s proof_randomness_t[1];
+typedef struct non_revok_proof_randomness_s *nr_proof_rand_ptr;
+typedef struct non_revok_proof_randomness_s nr_proof_rand_t[1];
 
-void random_proof_randomness(proof_randomness_t r, pairing_t p);
+void non_rev_proof_rand_init_with_random(nr_proof_rand_t r, pairing_t p);
 
 struct non_revok_proof_s {
   // page 7 Eq. (22)~(25), will be added to C

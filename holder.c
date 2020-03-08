@@ -212,7 +212,7 @@ void non_revok_proof
  nr_cred_t nrc,  // OUT
  nr_pk_t pk,
  accumulator_t acc,
- proof_randomness_t r)
+ nr_proof_rand_t r)
 {
   // 1. Load Issuer's public revocation key
   // 2. Load the non-revocation credential C_NR

@@ -12,6 +12,19 @@ void attr_vec_init(attr_vec_t av, unsigned long l)
   }
 }
 
+void attr_vec_init_with_random(attr_vec_t av,
+			       const unsigned long l,
+			       const unsigned long bits)
+{
+  av->l = l;
+  av->attrs = (attr_ptr)malloc(sizeof(attr_t) * l);
+  for (unsigned long i = 0; i < l; ++i) {
+    av->attrs[i].i = 0;
+    mpz_inits(av->attrs[i].v);
+    random_num_exact_bits(av->attrs[i].v, bits);
+  }
+}
+
 void attr_vec_clear(attr_vec_t av)
 {
   for (unsigned long i = 0; i < av->l; ++i) {

@@ -33,6 +33,9 @@ typedef struct attribute_vec_s *attr_vec_ptr;
 typedef struct attribute_vec_s attr_vec_t[1];
 
 void attr_vec_init(attr_vec_t av, unsigned long l);
+void attr_vec_init_with_random(attr_vec_t av,
+			       const unsigned long l,
+			       const unsigned long bits);
 void attr_vec_clear(attr_vec_t av);
 
 unsigned long attr_vec_size(attr_vec_t av);

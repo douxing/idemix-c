@@ -7,7 +7,7 @@
   element_init_Zr(e, p);			\
   element_random(e)
 
-void random_proof_randomness(proof_randomness_t r, pairing_t p)
+void non_rev_proof_rand_init_with_random(nr_proof_rand_t r, pairing_t p)
 {
   INIT_AND_RANDOM(r->rho, p);
   INIT_AND_RANDOM(r->rho_apos, p);
