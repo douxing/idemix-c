@@ -29,9 +29,16 @@ void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...)
   mpz_import(dest, SM3_DIGEST_LENGTH, 1, 1, 1, 0, h);
 }
 
-void decompose_to_4_squares(mpz_t output[4], mpz_t input)
+void decompose_to_4_squares(mpz_t delta,
+			    mpz_t u1, // OUT
+			    mpz_t u2, // OUT
+			    mpz_t u3, // OUT
+			    mpz_t u4) // OUT
 {
   // TODO: ...
-  (void)output;
-  (void)input;
+  (void)delta;
+  (void)u1;
+  (void)u2;
+  (void)u3;
+  (void)u4;
 }

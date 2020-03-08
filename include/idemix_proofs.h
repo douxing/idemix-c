@@ -5,6 +5,7 @@
 
 #include "idemix_mpz_vec.h"
 #include "idemix_accumulator.h"
+#include "idemix_predicate.h"
 
 // Chapter 7
 
@@ -71,14 +72,39 @@ typedef struct non_revok_proof_s nr_proof_t[1];
 
 void non_revok_proof_init(nr_proof_t nrp, pairing_t p);
 
-void nrp_to_C(mpz_vec_t C, // OUT
-	      nr_proof_t nrp);
+void nr_proof_to_C(mpz_vec_t C, // OUT
+		   nr_proof_t nrp);
 
-void nrp_to_T(mpz_vec_t T, // OUT
-	      nr_proof_t nrp);
+void nr_proof_to_T(mpz_vec_t T, // OUT
+		   nr_proof_t nrp);
+
+// combine randomness and value together
+struct primary_proof_s {
+  mpz_t A_apos;
+  mpz_t v_apos;
+  mpz_t e_apos;
+  mpz_t e_tilde;
+  mpz_t v_tilde;
+  mpz_t T;  
+};
+typedef struct primary_proof_s *p_proof_ptr;
+typedef struct primary_proof_s p_proof_t[1];
+
+void primary_proof_init(p_proof_t p);
+
+void p_proof_to_C(mpz_vec_t C, // OUT
+		  p_proof_t pp);
+
+void p_proof_to_T(mpz_vec_t T, // OUT
+		  p_proof_t pp);
 
 
+void predicate_to_CT(mpz_vec_t C, // OUT
+		     mpz_vec_t T, // OUT
+		     predicate_t p,
+		     iss_pk_t pk,
+		     mpz_t mj_tilde);
 
-// end of Chapter 7
+// mpz of Chapter 7
 
 #endif

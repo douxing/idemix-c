@@ -352,13 +352,45 @@ void non_revok_proof
 		  t2, r->r_apos3_tilde);
 }
 
-// Validity proof
-
-void prover_compute_T
-(pri_cred_t pc,
+// Validity proof Prover: 2.
+void primary_proof
+(p_proof_t pp, // OUT
+ pri_cred_t pc,
+ attr_vec_t Arr, // Ar_bar restricted to m in cp
  iss_pk_t pk)
 {
-  
+  mpz_t r, temp;
+  mpz_inits(r, temp);
+  random_num_exact_bits(r, 2128); // 2.1
+
+  // 2.2 Eq. (33)
+  mpz_powm(temp, pk->S, r, pk->n);
+  mpz_mul(pp->A_apos, pc->A, temp);
+
+  mpz_mul(temp, pc->e, r);
+  mpz_sub(pp->v_apos, pc->v, temp);
+
+  // 2.3
+  mpz_set_ui(temp, 0);
+  mpz_setbit(temp, 596);
+  mpz_sub(pp->e_apos, pc->e, temp);
+
+  random_num_exact_bits(pp->e_tilde, 456);  // 2.4
+  random_num_exact_bits(pp->v_tilde, 3060); // 2.5
+
+  // 2.6 Compute T Eq. (34)
+  mpz_powm(pp->T, pp->A_apos, pp->e_tilde, pk->n);
+  for (unsigned long i = 0; i < attr_vec_size(Arr); ++i) {
+    attr_ptr attrp = attr_vec_attr_ptr(Arr) + i;
+    mpz_powm(temp, pk->R_v[attrp->i], attrp->v, pk->n);
+    mpz_mul(pp->T, pp->T, temp);
+    mpz_mod(pp->T, pp->T, pk->n);
+  }
+  mpz_powm(temp, pk->S, pp->v_tilde, pk->n);
+  mpz_mul(pp->T, pp->T, temp);
+  mpz_mod(pp->T, pp->T, pk->n);
+
+  mpz_clears(r, temp);
 }
 
 // end of Chapter 7

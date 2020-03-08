@@ -6,6 +6,10 @@
 
 void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...);
 
-void decompose_to_4_squares(mpz_t output[4], mpz_t input);
+void decompose_to_4_squares(mpz_t delta,
+			    mpz_t u1,  // OUT
+			    mpz_t u2,  // OUT
+			    mpz_t u3,  // OUT
+			    mpz_t u4); // OUT
 
 #endif

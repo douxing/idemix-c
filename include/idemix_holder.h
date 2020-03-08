@@ -55,6 +55,13 @@ void non_revok_proof
  accumulator_t acc,
  nr_proof_rand_t r);
 
+void primary_proof
+(p_proof_t pp, // OUT
+ pri_cred_t pc,
+ attr_vec_t Ar, // restricted to m in cp
+ iss_pk_t pk);
+
+
 // end of Chapter 7
 
 #endif
