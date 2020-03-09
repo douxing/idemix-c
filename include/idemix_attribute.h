@@ -18,13 +18,11 @@ typedef struct attribute_s attr_t[1];
 struct attribute_vec_s {
   // number of attributes
   // in 5.1 primary pre-credential prepare - 6
-  // l = |Ah
+  // l = |Ah|
   // in 5.2 primary pre-credential - 7
   // l = |Ak|
   // in 5.4 primary credential - 7
   // l = |Cs| = |Ah| + |Ak|
-  // in 7.2
-  // l = |Ar_bar| = x4
   unsigned long l;
 
   attr_ptr attrs;
@@ -39,7 +37,7 @@ void attr_vec_init_with_random(attr_vec_t av,
 void attr_vec_clear(attr_vec_t av);
 
 unsigned long attr_vec_size(attr_vec_t av);
-attr_ptr attr_vec_attr_ptr(attr_vec_t av);
+attr_ptr attr_vec_head(attr_vec_t av);
 
 void gen_random_m_tilde(attr_vec_t av, unsigned long bits);
 

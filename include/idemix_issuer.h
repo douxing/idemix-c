@@ -12,32 +12,32 @@
 
 // call this function before 'primary_pre_credential'
 int verify_primary_pre_credential_prepare
-(pri_pre_cred_prep_t ppc_prep,
- iss_pk_t pk,
+(primary_pre_credential_prepare_t ppc_prep,
+ issuer_pk_t pk,
  mpz_t n0);
 
 void issue_primary_pre_credential
-(pri_pre_cred_t ppc,  // OUT, known attributes already set in schema
- iss_sk_t sk,
- iss_pk_t pk,
- mpz_t U,   // from pri_pre_cred_prep
- mpz_t n1); // from pri_pre_cred_prep
+(primary_pre_credential_t ppc,  // OUT, known attributes already set in schema
+ issuer_sk_t sk,
+ issuer_pk_t pk,
+ mpz_t U,   // from primary_pre_credential_prepare
+ mpz_t n1); // from primary_pre_credential_prepare
 
 // end of 5.2
 
 // 5.3 Non-revocation Credential Issuance
 
-void issue_non_revok_pre_credential
-(nr_pre_cred_t nrpc, // OUT to holder
+void issue_nonrev_pre_credential
+(nonrev_pre_credential_t nrpc, // OUT to holder
  accumulator_t acc, // OUT to ledger
- nr_pre_cred_prep_t nrpc_prep,
+ nonrev_pre_credential_prepare_t nrpc_prep,
  pairing_t pairing,
- nr_pk_t pk,
- nr_sk_t sk,
+ nonrev_pk_t pk,
+ nonrev_sk_t sk,
  mpz_t m2,
  unsigned long i,
- accum_pk_t accum_pk,
- accum_sk_t accum_sk);
+ accumulator_pk_t acc_pk,
+ accumulator_sk_t acc_sk);
 
 // end of 5.3
 
@@ -50,6 +50,6 @@ void revoke_index(accumulator_t acc, // OUT
 
 // end of Chapter 6
 
-// void init_CS(int attrc, char *attrv[], iss_pk_t);
+// void init_CS(int attrc, char *attrv[], issuer_pk_t);
 
 #endif

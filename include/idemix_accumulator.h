@@ -24,25 +24,26 @@ void accumulator_clear(accumulator_t acc);
 struct accumulator_sk_s {
   element_t gamma; // in Zr
 };
-typedef struct accumulator_sk_s *accum_sk_ptr;
-typedef struct accumulator_sk_s accum_sk_t[1];
+typedef struct accumulator_sk_s *accumulator_sk_ptr;
+typedef struct accumulator_sk_s accumulator_sk_t[1];
 
-void accumulator_sk_clear(accum_sk_t sk);
+void accumulator_sk_clear(accumulator_sk_t sk);
 
 struct accumulator_pk_s {
   element_t z; // in GT
 };
-typedef struct accumulator_pk_s *accum_pk_ptr;
-typedef struct accumulator_pk_s accum_pk_t[1];
+typedef struct accumulator_pk_s *accumulator_pk_ptr;
+typedef struct accumulator_pk_s accumulator_pk_t[1];
 
-void accumulator_pk_clear(accum_pk_t pk);
+void accumulator_pk_clear(accumulator_pk_t pk);
 
-void accumulator_init(accumulator_t acc, // OUT
-		      accum_sk_t sk,     // OUT
-		      accum_pk_t pk,     // OUT
-		      pairing_t pairing,
-		      unsigned long L,
-		      element_t g,
-		      element_t _g_apos);
+void accumulator_init_assign
+(accumulator_t acc,   // OUT
+ accumulator_sk_t sk, // OUT
+ accumulator_pk_t pk, // OUT
+ pairing_t pairing,
+ unsigned long L,
+ element_t g,
+ element_t _g_apos);
 
 #endif // __IDEMIX_ACCUMULATOR_H__

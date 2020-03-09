@@ -3,13 +3,14 @@
 
 #include <pbc/pbc.h>
 #include "sm3.h"
+#include "idemix_mpz_vec.h"
 
-void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...);
+void sm3_mpzs(mpz_t dest, mpz_ptr n, ...);
 
-void decompose_to_4_squares(mpz_t delta,
-			    mpz_t u1,  // OUT
-			    mpz_t u2,  // OUT
-			    mpz_t u3,  // OUT
-			    mpz_t u4); // OUT
+// 7.2.1 Hashing
+void sm3_TCn1(mpz_ptr dst, mpz_vec_t T, mpz_vec_t C, mpz_t n1);
+
+void decompose_to_4_squares(mpz_t u[4], // OUT
+			    mpz_t delta);
 
 #endif

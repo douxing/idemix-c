@@ -5,8 +5,8 @@
 
 // Chapter 4:
 
-void primary_crypto_init(iss_sk_t sk, // OUTPUT
-			 iss_pk_t pk, // OUTPUT
+void primary_crypto_init(issuer_sk_t sk, // OUTPUT
+			 issuer_pk_t pk, // OUTPUT
 			 const unsigned long L)
 {
   mpz_inits(pk->n, pk->S, pk->Z);
@@ -67,11 +67,11 @@ void primary_crypto_init(iss_sk_t sk, // OUTPUT
 // pairing: pairing parameter
 // g      : the generator of G1
 // g_apos : the generator of G2
-void non_revok_crypto_init(nr_sk_t sk, // OUTPUT
-			   nr_pk_t pk, // OUTPUT
-			   pairing_t pairing,
-			   element_t g,
-			   element_t _g_apos)
+void nonrev_crypto_init(nonrev_sk_t sk, // OUTPUT
+			nonrev_pk_t pk, // OUTPUT
+			pairing_t pairing,
+			element_t g,
+			element_t _g_apos)
 {
   (void)_g_apos;
 

@@ -3,13 +3,40 @@
 
 #include "idemix_accumulator.h"
 
-void accumulator_init(accumulator_t acc, // OUTPUT
-		      accum_sk_t sk,     // OUTPUT
-		      accum_pk_t pk,     // OUTPUT
-		      pairing_t pairing,
-		      unsigned long L,
-		      element_t g,
-		      element_t g_apos)
+void accumulator_clear(accumulator_t acc)
+{
+  element_clear(acc->g);
+  element_clear(acc->g_apos);
+
+  for (mp_bitcnt_t i = 0; i < acc->L * 2; ++i) {
+    element_clear(acc->g1_v[i]);
+    element_clear(acc->g2_v[i]);
+  }
+  free(acc->g1_v);
+  free(acc->g2_v);
+
+  bitmap_clear(acc->V);
+  element_clear(acc->acc);
+}
+
+void accumulator_sk_clear(accumulator_sk_t sk)
+{
+  element_clear(sk->gamma);
+}
+
+void accumulator_pk_clear(accumulator_pk_t pk)
+{
+  element_clear(pk->z);
+}
+
+void accumulator_init_assign
+(accumulator_t acc, // OUTPUT
+ accumulator_sk_t sk,     // OUTPUT
+ accumulator_pk_t pk,     // OUTPUT
+ pairing_t pairing,
+ unsigned long L,
+ element_t g,
+ element_t g_apos)
 {
   // assert L >= 2;
   acc->L = L;
@@ -88,30 +115,3 @@ void accumulator_init(accumulator_t acc, // OUTPUT
   mpz_clear(L_plus_one);
   element_clear(gamma_pow_L_plus_one);
 }
-
-void accumulator_clear(accumulator_t acc)
-{
-  element_clear(acc->g);
-  element_clear(acc->g_apos);
-
-  for (mp_bitcnt_t i = 0; i < acc->L * 2; ++i) {
-    element_clear(acc->g1_v[i]);
-    element_clear(acc->g2_v[i]);
-  }
-  free(acc->g1_v);
-  free(acc->g2_v);
-
-  bitmap_clear(acc->V);
-  element_clear(acc->acc);
-}
-
-void accumulator_sk_clear(accum_sk_t sk)
-{
-  element_clear(sk->gamma);
-}
-
-void accumulator_pk_clear(accum_pk_t pk)
-{
-  element_clear(pk->z);
-}
-

@@ -21,21 +21,25 @@ struct primary_pre_credential_prepare_s {
 
   mpz_t n1;
 };
-typedef struct primary_pre_credential_prepare_s *pri_pre_cred_prep_ptr;
-typedef struct primary_pre_credential_prepare_s pri_pre_cred_prep_t[1];
+typedef struct primary_pre_credential_prepare_s \
+               *primary_pre_credential_prepare_ptr;
+typedef struct primary_pre_credential_prepare_s \
+               primary_pre_credential_prepare_t[1];
 
 void primary_pre_credential_prepare_init
-(pri_pre_cred_prep_t ppc_prep,
+(primary_pre_credential_prepare_t ppc_prep,
  schema_t s);
 
-struct non_revok_pre_credential_prepare_s {
+struct nonrev_pre_credential_prepare_s {
   element_t U; // in G1
 };
-typedef struct non_revok_pre_credential_prepare_s *nr_pre_cred_prep_ptr;
-typedef struct non_revok_pre_credential_prepare_s nr_pre_cred_prep_t[1];
+typedef struct nonrev_pre_credential_prepare_s \
+               *nonrev_pre_credential_prepare_ptr;
+typedef struct nonrev_pre_credential_prepare_s \
+               nonrev_pre_credential_prepare_t[1];
 
-void non_revok_pre_credential_prepare_init
-(nr_pre_cred_prep_t nrpc_prep, // OUT
+void nonrev_pre_credential_prepare_init
+(nonrev_pre_credential_prepare_t nrpc_prep, // OUT
  pairing_t pairing);
 
 // end of Chapter 5.1
@@ -51,18 +55,20 @@ struct primary_pre_credential_s {
   mpz_t s_e;
   mpz_t c_apos;
 };
-typedef struct primary_pre_credential_s *pri_pre_cred_ptr;
-typedef struct primary_pre_credential_s pri_pre_cred_t[1];
+typedef struct primary_pre_credential_s \
+               *primary_pre_credential_ptr;
+typedef struct primary_pre_credential_s \
+               primary_pre_credential_t[1];
 
 void primary_pre_credential_init
-(pri_pre_cred_t ppc,
+(primary_pre_credential_t ppc,
  schema_t s);
 
 // end of 5.2
 
 // 5.3 Non-revocation Credential Issuance:
 
-struct non_revok_pre_credential_s {
+struct nonrev_pre_credential_s {
   element_t IA;          // IA = z = IDa in GT
   element_t sigma;       // in G1
   element_t c;           // in Zr
@@ -74,11 +80,13 @@ struct non_revok_pre_credential_s {
   element_t g_apos_i;    // in G2
   unsigned long i;
 };
-typedef struct non_revok_pre_credential_s *nr_pre_cred_ptr;
-typedef struct non_revok_pre_credential_s nr_pre_cred_t[1];
+typedef struct nonrev_pre_credential_s \
+               *nonrev_pre_credential_ptr;
+typedef struct nonrev_pre_credential_s \
+               nonrev_pre_credential_t[1];
 
-void non_revok_pre_credential_init(nr_pre_cred_t nrpc, // OUT
-				   pairing_t pairing);
+void nonrev_pre_credential_init(nonrev_pre_credential_t nrpc, // OUT
+				pairing_t pairing);
 
 // end of 5.3
 
@@ -91,14 +99,14 @@ struct primary_credential_s {
   mpz_t A;
   mpz_t v;
 };
-typedef struct primary_credential_s *pri_cred_ptr;
-typedef struct primary_credential_s pri_cred_t[1];
+typedef struct primary_credential_s *primary_credential_ptr;
+typedef struct primary_credential_s primary_credential_t[1];
 
 void primary_credential_init
-(pri_cred_t pr,
+(primary_credential_t pr,
  schema_t s);
 
-struct non_revok_credential_s {
+struct nonrev_credential_s {
   element_t IA;       // IA = z = IDa in GT
   element_t sigma;    // in G1
   element_t c;        // in Zr
@@ -110,13 +118,13 @@ struct non_revok_credential_s {
   element_t g_apos_i; // in G2
   unsigned long i;
 };
-typedef struct non_revok_credential_s *nr_cred_ptr;
-typedef struct non_revok_credential_s nr_cred_t[1];
+typedef struct nonrev_credential_s *nonrev_credential_ptr;
+typedef struct nonrev_credential_s nonrev_credential_t[1];
 
-void non_revok_credential_init(nr_cred_t nrc, pairing_t pairing);
+void nonrev_credential_init(nonrev_credential_t nrc, pairing_t pairing);
 
-void non_revok_credential_update
-(nr_cred_t nrc, // nrc->wit_i->V as V_old
+void nonrev_credential_update
+(nonrev_credential_t nrc, // nrc->wit_i->V as V_old
  accumulator_t acc); // latest accumulator
 
 // end of 5.4

@@ -12,8 +12,8 @@
 
 // call this function before 'primary_pre_credential_init'
 int verify_primary_pre_credential_prepare
-(pri_pre_cred_prep_t ppc_prep,
- iss_pk_t pk,
+(primary_pre_credential_prepare_t ppc_prep,
+ issuer_pk_t pk,
  mpz_t n0)
 {
   unsigned long l = attr_vec_size(ppc_prep->m_carets);
@@ -28,7 +28,7 @@ int verify_primary_pre_credential_prepare
   mpz_invert(U_caret, ppc_prep->U, pk->n);
   mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
   for (unsigned long i = 0; i < l; ++i) {
-    attr_ptr mi_caret = attr_vec_attr_ptr(ppc_prep->m_carets) + i;
+    attr_ptr mi_caret = attr_vec_head(ppc_prep->m_carets) + i;
     mpz_powm(temp, pk->R_v[mi_caret->i], mi_caret->v, pk->n);
     mpz_mul(U_caret, U_caret, temp);
   }
@@ -53,11 +53,11 @@ int verify_primary_pre_credential_prepare
 }
 
 void issue_primary_pre_credential
-(pri_pre_cred_t ppc, // OUT, known attributes already set in schema
- iss_sk_t sk,
- iss_pk_t pk,
- mpz_t U,  // from pri_pre_cred_prep
- mpz_t n1) // from pri_pre_cred_prep
+(primary_pre_credential_t ppc, // OUT, known attributes already set in schema
+ issuer_sk_t sk,
+ issuer_pk_t pk,
+ mpz_t U,  // from primary_pre_credential_prepare
+ mpz_t n1) // from primary_pre_credential_prepare
 {
   // temporary variables;
   mpz_t temp;
@@ -89,7 +89,7 @@ void issue_primary_pre_credential
   mpz_mul(Q, Q, temp);
   mpz_mod(Q, Q, pk->n);
   for (unsigned long i = 0; i < attr_vec_size(ppc->Ak); ++i) {
-    attr_ptr mi_p = attr_vec_attr_ptr(ppc->Ak) + i;
+    attr_ptr mi_p = attr_vec_head(ppc->Ak) + i;
     mpz_powm(temp, pk->R_v[mi_p->i], mi_p->v, pk->n);
     mpz_mul(Q, Q, temp);
     mpz_mod(Q, Q, pk->n);
@@ -135,17 +135,17 @@ void issue_primary_pre_credential
 
 // 5.3 Non-revocation Credential Issuance
 
-void issue_non_revok_pre_credential
-(nr_pre_cred_t nrpc, // OUT to holder
+void issue_nonrev_pre_credential
+(nonrev_pre_credential_t nrpc, // OUT to holder
  accumulator_t acc, // OUT to ledger
- nr_pre_cred_prep_t nrpc_prep,
+ nonrev_pre_credential_prepare_t nrpc_prep,
  pairing_t pairing,
- nr_pk_t pk,
- nr_sk_t sk,
+ nonrev_pk_t pk,
+ nonrev_sk_t sk,
  mpz_t m2,
  unsigned long i,
- accum_pk_t accum_pk,
- accum_sk_t accum_sk)
+ accumulator_pk_t acc_pk,
+ accumulator_sk_t acc_sk)
 {
   mpz_t mpz_i;
   mpz_init(mpz_i);
@@ -180,7 +180,7 @@ void issue_non_revok_pre_credential
   compute_w(nrpc->wit_i->w, acc, i);
   
   // page 5 Eq. (17)
-  element_pow_mpz(temp, accum_sk->gamma, mpz_i); // temp = gamma^i
+  element_pow_mpz(temp, acc_sk->gamma, mpz_i); // temp = gamma^i
   element_pow_zn(nrpc->wit_i->u_i, pk->u, temp); // u_i
   
   element_add(temp, sk->sk, temp); // temp = sk + gamma^i
@@ -197,7 +197,7 @@ void issue_non_revok_pre_credential
   bitmap_set(nrpc->wit_i->V, acc->V);
 
   // set the rest members in non-revocation pre-credential
-  element_set(nrpc->IA, accum_pk->z);
+  element_set(nrpc->IA, acc_pk->z);
   element_set(nrpc->g_i, acc->g1_v[i]);
   element_set(nrpc->g_apos_i, acc->g2_v[i]);
   nrpc->i = i;
