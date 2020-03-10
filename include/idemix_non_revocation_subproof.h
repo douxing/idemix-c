@@ -76,12 +76,9 @@ void nonrev_subproof_init
 (nonrev_subproof_t nrsp, // OUT
  pairing_t p);
 
-void nonrev_subproof_into_C
-(mpz_vec_t C,            // OUT
- nonrev_subproof_t nrsp);
-
-void nonrev_subproof_into_T
-(mpz_vec_t T,            // OUT
+void nonrev_subproof_into_CT
+(mpz_vec_t C, // OUT
+ mpz_vec_t T, // OUT
  nonrev_subproof_t nrsp);
 
 #endif // __IDEMIX_NON_REVOCATION_SUBPROOF_H__

@@ -208,12 +208,15 @@ void nonrev_subproof_assign
 		  t2, r->r_apos3_tilde);
 }
 
-void nonrev_subproof_to_C
+void nonrev_subproof_into_CT
 (mpz_vec_t C, // OUT
+ mpz_vec_t T, // OUT
  nonrev_subproof_t nrsp)
 {
   mpz_t t;
   mpz_init(t);
+
+  // into C
   element_to_mpz(t, nrsp->E);
   mpz_vec_append(C, t);
   element_to_mpz(t, nrsp->D);
@@ -228,14 +231,8 @@ void nonrev_subproof_to_C
   mpz_vec_append(C, t);
   element_to_mpz(t, nrsp->U);
   mpz_vec_append(C, t);
-}
 
-void nonrev_subproof_to_T
-(mpz_vec_t T, // OUT
- nonrev_subproof_t nrsp)
-{
-  mpz_t t;
-  mpz_init(t);
+  // into T
   element_to_mpz(t, nrsp->T1_bar);
   mpz_vec_append(T, t);
   element_to_mpz(t, nrsp->T2_bar);
@@ -252,4 +249,6 @@ void nonrev_subproof_to_T
   mpz_vec_append(T, t);
   element_to_mpz(t, nrsp->T8_bar);
   mpz_vec_append(T, t);
+
+  mpz_clear(t);
 }
