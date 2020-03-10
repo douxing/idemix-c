@@ -4,13 +4,14 @@
 #include <pbc/pbc.h>
 
 #include "idemix_mpz_vec.h"
-#include "idemix_accumulator.h"
+#include "idemix_crypto.h"
 #include "idemix_credentials.h"
+#include "idemix_accumulator.h"
 
 // used in 7.2.(Non-revocation proof) and 7.2.2
 
-struct nonrev_subproof_rand_s {
-  // page 7 - 5. Select random ... mod q
+struct nonrev_subproof_prepare_s {
+  // page 7 - 5. Select random ... mod q in Zr
   element_t rho;
   element_t rho_apos;
   element_t r;
@@ -20,7 +21,7 @@ struct nonrev_subproof_rand_s {
   element_t o;
   element_t o_apos;
 
-  // page 7 -  8. Generate random ... mod q 
+  // page 7 - 8. Generate random ... mod q in Zr
   element_t rho_tilde;
   element_t o_tilde;
   element_t o_apos_tilde;
@@ -34,18 +35,10 @@ struct nonrev_subproof_rand_s {
   element_t r_tilde;
   element_t r_apos_tilde;
   element_t r_apos2_tilde;
-  element_t r_apos3_tilde;  
-};
-typedef struct nonrev_subproof_rand_s *nonrev_subproof_rand_ptr;
-typedef struct nonrev_subproof_rand_s nonrev_subproof_rand_t[1];
+  element_t r_apos3_tilde;
 
-void nonrev_subproof_rand_init_random
-(nonrev_subproof_rand_t r,
- pairing_t p);
-
-struct nonrev_subproof_s {
   // page 7 Eq. (22)~(25), will be added to C
-  element_t E; // in G1 
+  element_t E; // in G1
   element_t D; // in G1
   element_t A; // in G1
   element_t G; // in G1
@@ -60,25 +53,58 @@ struct nonrev_subproof_s {
   element_t t_apos; // in Zr
 
   // page 7 Eq. (28)~(32) will be added to T
-  element_t T1_bar; // in G1
-  element_t T2_bar; // in G1
-  element_t T3_bar; // in GT
-  element_t T4_bar; // in GT
-  element_t T5_bar; // in G1
-  element_t T6_bar; // in G1
-  element_t T7_bar; // in GT
-  element_t T8_bar; // in GT
+  element_t T_bar[8]; // 1,2,5,6 in G1, 3,4,7,8 in GT
+};
+typedef struct nonrev_subproof_prepare_s *nonrev_subproof_prepare_ptr;
+typedef struct nonrev_subproof_prepare_s nonrev_subproof_prepare_t[1];
+
+void nonrev_subproof_prepare_init
+(nonrev_subproof_prepare_t nrsp_prep, // OUT
+ pairing_t pairing);
+
+void nonrev_subproof_prepare_assign
+(nonrev_subproof_prepare_t nrsp_prep,
+ nonrev_pk_t pk,
+ nonrev_credential_t nrc,
+
+ accumulator_t acc);
+
+void nonrev_subproof_prepare_into_CT
+(mpz_vec_t C, // OUT
+ mpz_vec_t T, // OUT
+ nonrev_subproof_prepare_t nrsp_prep);
+
+// dx: this is the big X at the bottom of page 8
+// 7.2.2 - 1
+struct nonrev_subproof_s {
+  element_t rho_caret;
+  element_t o_caret;
+  element_t c_caret;
+  element_t o_apos_caret;
+  element_t m_caret;
+  element_t m_apos_caret;
+  element_t t_caret;
+  element_t t_apos_caret;
+  element_t m2_caret;
+  element_t s_caret;
+  element_t r_caret;
+  element_t r_apos_caret;
+  element_t r_apos2_caret;
+  element_t r_apos3_caret;
 };
 typedef struct nonrev_subproof_s *nonrev_subproof_ptr;
 typedef struct nonrev_subproof_s nonrev_subproof_t[1];
 
 void nonrev_subproof_init
-(nonrev_subproof_t nrsp, // OUT
- pairing_t p);
+(nonrev_subproof_t nrsp,
+ pairing_t pairing);
 
-void nonrev_subproof_into_CT
-(mpz_vec_t C, // OUT
- mpz_vec_t T, // OUT
- nonrev_subproof_t nrsp);
+void nonrev_subproof_assign
+(nonrev_subproof_t nrsp,
+ mpz_t CH,
+ mpz_t m2,
+ nonrev_credential_t nrc,
+ nonrev_subproof_prepare_t nrsp_prep);
+
 
 #endif // __IDEMIX_NON_REVOCATION_SUBPROOF_H__
