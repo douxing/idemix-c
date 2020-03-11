@@ -1,5 +1,4 @@
 #include "idemix_bitmap.h"
-#include "idemix_crypto.h"
 #include "idemix_random.h"
 #include "idemix_issuer.h"
 
@@ -210,22 +209,3 @@ void issue_nonrev_pre_credential
 
 // end of Chapter 5
 
-// Chapter 6
-
-void revoke_index(accumulator_t acc, // OUT
-		  const unsigned long index)
-{
-  // 1. Set V = V\{i}
-  bitmap_clrbit(acc->V, index);
-  
-  // 2. Compute A = A/g'_(L+1-i)
-  element_t temp;
-  element_init(temp, acc->acc->field);
-  element_invert(temp, acc->g2_v[acc->L - index]);
-  element_mul(acc->acc, acc->acc, temp);
-  element_clear(temp);
-
-  // Publish {V, A}
-}
-
-// end of Chapter 6

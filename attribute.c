@@ -12,9 +12,9 @@ void attr_vec_init(attr_vec_t av, unsigned long l)
   }
 }
 
-void attr_vec_init_with_random(attr_vec_t av,
-			       const unsigned long l,
-			       const unsigned long bits)
+void attr_vec_init_random(attr_vec_t av,
+			  const unsigned long l,
+			  const unsigned long bits)
 {
   av->l = l;
   av->attrs = (attr_ptr)malloc(sizeof(attr_t) * l);
@@ -38,7 +38,7 @@ unsigned long attr_vec_size(attr_vec_t av)
   return av->l;
 }
 
-attr_ptr attr_vec_attr_ptr(attr_vec_t av)
+attr_ptr attr_vec_head(attr_vec_t av)
 {
   return av->attrs;
 }

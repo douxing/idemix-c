@@ -46,4 +46,21 @@ void accumulator_init_assign
  element_t g,
  element_t _g_apos);
 
+// Chapter 5:
+
+// page 5 formular (16)
+void compute_w(element_t w, // OUT
+	       accumulator_t acc,
+	       const unsigned long i);
+
+// end of Chapter 5
+
+// Chapter 6:
+
+void revoke_index(accumulator_t acc, // OUT
+		  const unsigned long index);
+
+// end of Chapter 6
+
+
 #endif // __IDEMIX_ACCUMULATOR_H__

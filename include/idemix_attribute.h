@@ -15,6 +15,9 @@ struct attribute_s {
 typedef struct attribute_s *attr_ptr;
 typedef struct attribute_s attr_t[1];
 
+// dx: no encapsulation of attribute for ease of use
+
+void attribute_init(attr_t a);
 struct attribute_vec_s {
   // number of attributes
   // in 5.1 primary pre-credential prepare - 6
@@ -31,14 +34,12 @@ typedef struct attribute_vec_s *attr_vec_ptr;
 typedef struct attribute_vec_s attr_vec_t[1];
 
 void attr_vec_init(attr_vec_t av, unsigned long l);
-void attr_vec_init_with_random(attr_vec_t av,
-			       const unsigned long l,
-			       const unsigned long bits);
+void attr_vec_init_random(attr_vec_t av,
+			  const unsigned long l,
+			  const unsigned long bits);
 void attr_vec_clear(attr_vec_t av);
 
 unsigned long attr_vec_size(attr_vec_t av);
 attr_ptr attr_vec_head(attr_vec_t av);
-
-void gen_random_m_tilde(attr_vec_t av, unsigned long bits);
 
 #endif // __IDEMIX_ATTRIBUTE_H__

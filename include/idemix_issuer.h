@@ -2,9 +2,11 @@
 #define __IDEMIX_ISSUER_H__
 
 #include "idemix_utils.h"
-#include "idemix_crypto.h"
 #include "idemix_schema.h"
-#include "idemix_credentials.h"
+#include "idemix_issuer_key.h"
+#include "idemix_non_revocation_key.h"
+#include "idemix_non_revocation_credential.h"
+#include "idemix_primary_credential.h"
 
 // chapter 5:
 
@@ -42,13 +44,6 @@ void issue_nonrev_pre_credential
 // end of 5.3
 
 // end of Chapter 5
-
-// Chapter 6:
-
-void revoke_index(accumulator_t acc, // OUT
-		  const unsigned long index);
-
-// end of Chapter 6
 
 // void init_CS(int attrc, char *attrv[], issuer_pk_t);
 

@@ -1,16 +1,4 @@
-#include "idemix_credentials.h"
-
-void primary_pre_credential_prepare_init
-(primary_pre_credential_prepare_t ppc_prep,
- schema_t s)
-{
-  mpz_inits(ppc_prep->U,
-	    ppc_prep->c,
-	    ppc_prep->v_apos_caret,
-	    ppc_prep->n1);
-  attr_vec_init(ppc_prep->m_carets, schema_attr_cnt_hidden(s));
-}
-
+#include "idemix_non_revocation_credential.h"
 
 void nonrev_pre_credential_prepare_init
 (nonrev_pre_credential_prepare_t nrpc_prep,
@@ -19,16 +7,10 @@ void nonrev_pre_credential_prepare_init
   element_init_G1(nrpc_prep->U, pairing);
 }
 
-void primary_pre_credential_init
-(primary_pre_credential_t ppc,
- schema_t s)
+void nonrev_pre_credential_prepare_clear
+(nonrev_pre_credential_prepare_t nrpc_prep)
 {
-  mpz_inits(ppc->A,
-	    ppc->e,
-	    ppc->v_apos_apos,
-	    ppc->s_e,
-	    ppc->c_apos);
-  attr_vec_init(ppc->Ak, schema_attr_cnt_known(s));
+  element_clear(nrpc_prep->U);
 }
 
 void nonrev_pre_credential_init(nonrev_pre_credential_t nrpc, // OUT
@@ -46,13 +28,19 @@ void nonrev_pre_credential_init(nonrev_pre_credential_t nrpc, // OUT
   element_init_G2(nrpc->g_apos_i, pairing);
 }
 
-
-void primary_credential_init
-(primary_credential_t pc,
- schema_t s)
+void nonrev_pre_credential_clear
+(nonrev_pre_credential_t nrpc)
 {
-  mpz_inits(pc->e, pc->A, pc->v);
-  attr_vec_init(pc->Cs, s->l);
+  // initialized pairing members
+  element_clear(nrpc->IA);
+  element_clear(nrpc->sigma);
+  element_clear(nrpc->c);
+  element_clear(nrpc->s_apos_apos);
+
+  witness_clear(nrpc->wit_i);
+
+  element_clear(nrpc->g_i);
+  element_clear(nrpc->g_apos_i);
 }
 
 void nonrev_credential_init(nonrev_credential_t nrc,
@@ -70,7 +58,20 @@ void nonrev_credential_init(nonrev_credential_t nrc,
   element_init_G2(nrc->g_apos_i, pairing);
 }
 
-// 7.2 item.7 page 7
+void nonrev_credential_clear(nonrev_credential_t nrc)
+{
+  element_clear(nrc->IA);
+  element_clear(nrc->sigma);
+  element_clear(nrc->c);
+  element_clear(nrc->s);
+
+  witness_clear(nrc->wit_i);
+
+  element_clear(nrc->g_i);
+  element_clear(nrc->g_apos_i);
+}
+
+// 7.2 item.4 page 7
 void nonrev_credential_update
 (nonrev_credential_t nrc, // nrc->wit_i->V as V_old
  accumulator_t acc) // latest accumulator

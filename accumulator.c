@@ -115,3 +115,42 @@ void accumulator_init_assign
   mpz_clear(L_plus_one);
   element_clear(gamma_pow_L_plus_one);
 }
+
+// Chapter 5:
+
+void compute_w(element_t w, // OUTPUT
+	       accumulator_t acc,
+	       const unsigned long i)
+{
+  element_set1(w);
+  unsigned long j = bitmap_scan1(acc->V, 0);
+  while (j < acc->L) {
+    if (j != i) {
+      element_mul(w, w, acc->g2_v[acc->L -j + i]);
+    }
+    
+    j = bitmap_scan1(acc->V, j + 1);
+  }
+}
+
+// end of Chapter 5
+
+// Chapter 6
+
+void revoke_index(accumulator_t acc, // OUT
+		  const unsigned long index)
+{
+  // 1. Set V = V\{i}
+  bitmap_clrbit(acc->V, index);
+  
+  // 2. Compute A = A/g'_(L+1-i)
+  element_t temp;
+  element_init(temp, acc->acc->field);
+  element_invert(temp, acc->g2_v[acc->L - index]);
+  element_mul(acc->acc, acc->acc, temp);
+  element_clear(temp);
+
+  // Publish {V, A}
+}
+
+// end of Chapter 6

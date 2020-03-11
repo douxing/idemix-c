@@ -13,4 +13,4 @@ void sm3_TCn1(mpz_ptr dst, mpz_vec_t T, mpz_vec_t C, mpz_t n1);
 void decompose_to_4_squares(mpz_t u[4], // OUT
 			    mpz_t delta);
 
-#endif
+#endif // __IDEMIX_UTILD_H__
