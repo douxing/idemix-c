@@ -2,6 +2,7 @@
 #define __IDEMIX_PRIMARY_CREDENTIAL_SUBPROOF_TUPLE_C_H__
 
 #include <pbc/pbc.h>
+#include "idemix_mpz_vec.h"
 #include "idemix_issuer_key.h"
 #include "idemix_primary_credential.h"
 #include "idemix_primary_credential_subproof_auxiliary.h"
@@ -33,5 +34,9 @@ void primary_credential_subproof_tuple_c_assign
  issuer_pk_t pk,
  primary_credential_t pc,
  primary_credential_subproof_auxiliary_t pcspa);
+
+void primary_credential_subproof_tuple_c_into_vec
+(mpz_vec_t v, // OUT
+ primary_credential_subproof_tuple_c_t C);
 
 #endif // __IDEMIX_PRIMARY_CREDENTIAL_SUBPROOF_TUPLE_C_H__

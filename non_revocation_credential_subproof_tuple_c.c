@@ -35,3 +35,28 @@ void nonrev_credential_subproof_tuple_c_assign
   element_pow_zn(C->U, pk->h_caret, nrcspa->r_apos3);
   element_mul(C->U, nrc->wit_i->u_i, C->U); // U
 }
+
+void nonrev_credential_subproof_tuple_c_into_vec
+(mpz_vec_t v,
+ nonrev_credential_subproof_tuple_c_t C)
+{
+  mpz_t t;
+  mpz_init(t);
+  
+  element_to_mpz(t, C->E);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->D);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->A);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->G);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->W);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->S);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, C->U);
+  mpz_vec_append(v, t);
+
+  mpz_clear(t);
+}

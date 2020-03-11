@@ -2,6 +2,7 @@
 #define __IDEMIX_PREDICATE_SUBPROOF_TUPLE_C_H__
 
 #include <pbc/pbc.h>
+#include "idemix_mpz_vec.h"
 #include "idemix_predicate_subproof_auxiliary.h"
 
 // 7.2 2. Create empty sets C
@@ -27,5 +28,9 @@ void predicate_subproof_tuple_c_assign
 (predicate_subproof_tuple_c_t C,
  issuer_pk_t pk,
  predicate_subproof_auxiliary_t pspa);
+
+void predicate_subproof_tuple_c_into_vec
+(mpz_vec_t v,
+ predicate_subproof_tuple_c_t C);
 
 #endif // __IDEMIX_PREDICATE_SUBPROOF_TUPLE_C_H__

@@ -39,3 +39,14 @@ void predicate_subproof_tuple_c_assign
   mpz_mod(C->T_delta, C->T_delta, pk->n);
   mpz_clear(t);
 }
+
+void predicate_subproof_tuple_c_into_vec
+(mpz_vec_t v,
+ predicate_subproof_tuple_c_t C)
+{
+  mpz_vec_append(v, C->T[0]);
+  mpz_vec_append(v, C->T[1]);
+  mpz_vec_append(v, C->T[2]);
+  mpz_vec_append(v, C->T[3]);
+  mpz_vec_append(v, C->T_delta);
+}

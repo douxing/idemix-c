@@ -21,3 +21,10 @@ void primary_credential_subproof_tuple_c_assign
   mpz_mul(C->A_apos, pc->A, C->A_apos);
   mpz_mod(C->A_apos, C->A_apos, pk->n); // A' = AS^r mod n
 }
+
+void primary_credential_subproof_tuple_c_into_vec
+(mpz_vec_t v, // OUT
+ primary_credential_subproof_tuple_c_t C)
+{
+  mpz_vec_append(v, C->A_apos);
+}
