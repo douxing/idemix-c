@@ -42,7 +42,7 @@ void nonrev_credential_subproof_tuple_c_into_vec
 {
   mpz_t t;
   mpz_init(t);
-  
+
   element_to_mpz(t, C->E);
   mpz_vec_append(v, t);
   element_to_mpz(t, C->D);

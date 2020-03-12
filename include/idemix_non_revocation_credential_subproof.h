@@ -2,6 +2,7 @@
 #define __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_H__
 
 #include <pbc/pbc.h>
+#include "idemix_mpz_vec.h"
 #include "idemix_non_revocation_credential.h"
 #include "idemix_non_revocation_credential_subproof_auxiliary.h"
 
@@ -38,5 +39,7 @@ void tuple_x_assign
  mpz_t m2,
  nonrev_credential_t nrc,
  nonrev_credential_subproof_auxiliary_t nrcspa);
+
+void tuple_x_into_vec(mpz_vec_t v, tuple_x_t X);
 
 #endif // __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_H__

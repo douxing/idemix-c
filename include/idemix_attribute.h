@@ -4,7 +4,10 @@
 #include <gmp.h>
 
 struct attribute_s {
-  unsigned long i; // subscript index of the m_i or m_j alike
+  // subscript index of the m_i or m_j alike
+  // also used by verfier, if hidden = 1, reveal = 0
+  unsigned long i;
+                   
 
   // can represent many attributes
   // as m:       value it self

@@ -27,12 +27,14 @@ void predicate_subproof_tuple_c_assign
 {
   mpz_t t;
   mpz_init(t);
-  for (unsigned long i = 0; i < 4; ++i) {
+  for (unsigned long i = 0; i < 4; ++i) {        // Eq. (36)
     mpz_powm(t, pk->Z, pspa->u[i], pk->n);       // Z^ui
     mpz_powm(C->T[i], pk->S, pspa->r[i], pk->n); // S^ri
     mpz_mul(C->T[i], t, C->T[i]);
     mpz_mod(C->T[i], C->T[i], pk->n);
   }
+
+  // Eq. (36)
   mpz_powm(t, pk->Z, pspa->delta, pk->n);            // Z^delta
   mpz_powm(C->T_delta, pk->S, pspa->r_delta, pk->n); // S^r_delta
   mpz_mul(C->T_delta, t, C->T_delta);

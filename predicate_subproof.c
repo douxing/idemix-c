@@ -2,21 +2,6 @@
 #include "idemix_utils.h"
 #include "idemix_predicate_subproof.h"
 
-void predicate_subproof_prepare_into_CT
-(mpz_vec_t C, // OUT
- mpz_vec_t T, // OUT
- predicate_subproof_auxiliary_t pspa)
-{
-  for (unsigned long i = 0; i < 4; ++i) {
-    mpz_vec_append(C, pspa->T[i]);
-    mpz_vec_append(T, pspa->T_bar[i]);
-  }
-
-  mpz_vec_append(C, pspa->T_delta);
-  mpz_vec_append(T, pspa->T_delta_bar);  
-  mpz_vec_append(T, pspa->Q);
-}
-
 void predicate_subproof_init
 (predicate_subproof_t psp)
 {

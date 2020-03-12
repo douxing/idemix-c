@@ -16,20 +16,12 @@ struct predicate_subproof_auxiliary_s {
   mpz_t r_delta;       // 7.2.(Validity Proof).4.3
   mpz_t r[4];          // 7.2.(Validity Proof).4.3
 
-  
-  mpz_t T[4];          // 7.2.(Validity Proof).4.4 add to C
-  mpz_t T_delta;       // 7.2.(Validity Proof).4.4 add to C
-
   mpz_t u_tilde[4];    // 7.2.(Validity Proof).4.5
 
   mpz_t r_delta_tilde; // 7.2.(Validity Proof).4.6
   mpz_t r_tilde[4];    // 7.2.(Validity Proof).4.6
 
   mpz_t alpha_tilde;   // 7.2.(Validity Proof).4.7
-
-  mpz_t T_bar[4];      // 7.2.(Validity Proof).4.8 add to T
-  mpz_t T_delta_bar;   // 7.2.(Validity Proof).4.8 add to T
-  mpz_t Q;             // 7.2.(Validity Proof).4.8 add to T
 };
 typedef struct predicate_subproof_auxiliary_s \
                *predicate_subproof_auxiliary_ptr;
@@ -39,10 +31,12 @@ typedef struct predicate_subproof_auxiliary_s \
 void predicate_subproof_auxiliary_init
 (predicate_subproof_auxiliary_t pspa);
 
+void predicate_subproof_auxiliary_clear
+(predicate_subproof_auxiliary_t pspa);
+
 void predicate_subproof_auxiliary_assign
 (predicate_subproof_auxiliary_t pspa,
- predicate_t p,
- issuer_pk_t pk);
+ predicate_t p);
 
 #endif // __IDEMIX_PREDICATE_SUBPROOF_AUXILIARY_H__
 

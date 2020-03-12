@@ -1,7 +1,6 @@
-#include "idemix_bitmap.h"
-#include "idemix_random.h"
 #include "idemix_issuer.h"
 
+/*
 #include <stdlib.h>
 #include <gmp.h>
 
@@ -206,6 +205,8 @@ void issue_nonrev_pre_credential
 }
 
 // end of 5.3
+
+*/
 
 // end of Chapter 5
 

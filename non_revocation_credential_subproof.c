@@ -81,3 +81,46 @@ void tuple_x_assign
   element_clear(eCH);
   element_clear(em2);
 }
+
+void tuple_x_into_vec(mpz_vec_t v, tuple_x_t X)
+{
+  mpz_t t;
+  mpz_init(t);
+
+  element_to_mpz(t, X->rho_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->o_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->c_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->o_apos_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->m_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->m_apos_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->t_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->t_apos_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->m2_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->s_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->r_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->r_apos_caret);
+  mpz_vec_append(v, t);
+
+  element_to_mpz(t, X->r_apos2_caret);
+  mpz_vec_append(v, t);
+  element_to_mpz(t, X->r_apos3_caret);
+  mpz_vec_append(v, t);
+
+  mpz_clear(t);
+}
