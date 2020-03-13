@@ -1,47 +1,5 @@
 #include "idemix_non_revocation_credential.h"
-
-void nonrev_pre_credential_prepare_init
-(nonrev_pre_credential_prepare_t nrpc_prep,
- pairing_t pairing)
-{
-  element_init_G1(nrpc_prep->U, pairing);
-}
-
-void nonrev_pre_credential_prepare_clear
-(nonrev_pre_credential_prepare_t nrpc_prep)
-{
-  element_clear(nrpc_prep->U);
-}
-
-void nonrev_pre_credential_init(nonrev_pre_credential_t nrpc, // OUT
-				pairing_t pairing)
-{
-  // initialized pairing members
-  element_init_GT(nrpc->IA, pairing);
-  element_init_G1(nrpc->sigma, pairing);
-  element_init_Zr(nrpc->c, pairing);
-  element_init_Zr(nrpc->s_apos_apos, pairing);
-
-  witness_init(nrpc->wit_i, pairing);
-
-  element_init_G1(nrpc->g_i, pairing);
-  element_init_G2(nrpc->g_apos_i, pairing);
-}
-
-void nonrev_pre_credential_clear
-(nonrev_pre_credential_t nrpc)
-{
-  // initialized pairing members
-  element_clear(nrpc->IA);
-  element_clear(nrpc->sigma);
-  element_clear(nrpc->c);
-  element_clear(nrpc->s_apos_apos);
-
-  witness_clear(nrpc->wit_i);
-
-  element_clear(nrpc->g_i);
-  element_clear(nrpc->g_apos_i);
-}
+#include "idemix_random.h"
 
 void nonrev_credential_init(nonrev_credential_t nrc,
 			    pairing_t pairing)
@@ -69,6 +27,23 @@ void nonrev_credential_clear(nonrev_credential_t nrc)
 
   element_clear(nrc->g_i);
   element_clear(nrc->g_apos_i);
+}
+
+void nonrev_credential_assign
+(nonrev_credential_t nrc,
+ element_t s_apos,
+ nonrev_pre_credential_t nrpc)
+{
+  element_set(nrc->IA, nrpc->IA);
+  element_set(nrc->sigma, nrpc->sigma);
+  element_set(nrc->c, nrpc->c);
+  element_add(nrc->s, s_apos, nrpc->s_apos_apos);
+
+  witness_set(nrc->wit_i, nrpc->wit_i);
+  
+  element_set(nrc->g_i, nrpc->g_i);
+  element_set(nrc->g_apos_i, nrpc->g_apos_i);
+  nrc->i = nrpc->i;
 }
 
 // 7.2 item.4 page 7

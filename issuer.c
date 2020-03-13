@@ -145,9 +145,6 @@ void issue_nonrev_pre_credential
  accumulator_pk_t acc_pk,
  accumulator_sk_t acc_sk)
 {
-  mpz_t mpz_i;
-  mpz_init(mpz_i);
-  mpz_set_ui(mpz_i, i);
   
   // 1. Generate random numbers s", c mod q.
   element_random(nrpc->s_apos_apos);
@@ -156,10 +153,6 @@ void issue_nonrev_pre_credential
   // 2. Take m2 from the primary credential he is preparing for Holder
   //    set by the caller
 
-  // 3. Take A as the accumulator value for which index i was taken.
-  //    Retrieve current set of non-revoked indices V.
-  // no need to Take A as temporary variable
-  // V is in accumulator
   
   // 4. Compute
   // page 5 Eq. (16)

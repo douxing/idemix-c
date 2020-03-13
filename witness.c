@@ -18,3 +18,12 @@ void witness_clear(witness_t wit)
   element_clear(wit->w);
   bitmap_clear(wit->V);
 }
+
+void witness_set(witness_t dst, witness_t src)
+{
+  element_set(dst->sigma_i, src->sigma_i);
+  element_set(dst->u_i, src->u_i);
+  element_set(dst->g_i, src->g_i);
+  element_set(dst->w, src->w);
+  bitmap_set(dst->V, src->V);
+}

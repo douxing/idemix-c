@@ -29,7 +29,7 @@ void sm3_mpzs(mpz_ptr dest, mpz_ptr n, ...)
   mpz_import(dest, SM3_DIGEST_LENGTH, 1, 1, 1, 0, h);
 }
 
-void sm3_TCn1(mpz_ptr dst, mpz_vec_t T, mpz_vec_t C, mpz_t n1)
+void sm3_TCn(mpz_ptr dst, mpz_vec_t T, mpz_vec_t C, mpz_t n1)
 {
   unsigned char buf[BUF_SIZE] = { 0 };
   size_t count;

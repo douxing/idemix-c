@@ -20,5 +20,6 @@ typedef struct witness_s witness_t[1];
 
 void witness_init(witness_t wit, pairing_t pairing);
 void witness_clear(witness_t);
+void witness_set(witness_t dst, witness_t src);
 
 #endif // __IDEMIX_WITNESS_H__
