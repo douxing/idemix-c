@@ -11,7 +11,7 @@ void primary_credential_subcheck_t_into_vec
   // assert(pk->R_c == attr_vec_size(v) + attr_vec_size(pcsp->m_carets));
 
   mpz_t t, t1, t2;
-  mpz_inits(t, t1, t2);
+  mpz_inits(t, t1, t2, NULL);
   
   mpz_set_ui(t1, 1);
   for (unsigned long i = 0; i < attr_vec_size(v); ++i) {
@@ -55,6 +55,6 @@ void primary_credential_subcheck_t_into_vec
 
   mpz_vec_append(T, t1);
 
-  mpz_clears(t, t1, t2);
+  mpz_clears(t, t1, t2, NULL);
 }
 

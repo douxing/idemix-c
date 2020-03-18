@@ -15,7 +15,8 @@ void predicate_subproof_init
 	    psp->r_caret[3],
 	    psp->r_delta_caret,
 	    psp->alpha_caret,
-	    psp->m_caret);
+	    psp->m_caret,
+	    NULL);
 }
 
 void predicate_subproof_assign

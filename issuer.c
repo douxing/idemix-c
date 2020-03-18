@@ -19,7 +19,7 @@ int verify_primary_pre_credential_prepare
 
   // Issuer verifies the corretness of Holder's input:
   mpz_t U_caret, temp;
-  mpz_inits(U_caret, temp);
+  mpz_inits(U_caret, temp, NULL);
 
   // 1. Compute U_caret
   // page 4 Eq. (9)
@@ -46,7 +46,7 @@ int verify_primary_pre_credential_prepare
   // 3. verify that v'^ is 673-bit number
   //    mi are 594-bit number
 
-  mpz_clears(U_caret, temp);
+  mpz_clears(U_caret, temp, NULL);
   return retval;
 }
 
@@ -98,7 +98,7 @@ void issue_primary_pre_credential
 
   // page 5 Eq. (12)
   mpz_t e_inv, n_apos;
-  mpz_inits(e_inv, n_apos);
+  mpz_inits(e_inv, n_apos, NULL);
   mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n_apos = p'q'
   mpz_invert(e_inv, ppc->e, n_apos); // e_inv = e^-1 mod n'
 
@@ -128,7 +128,7 @@ void issue_primary_pre_credential
   // 7. Send the primary pre-credential to the Holder
 
   // clear all the temporary variables
-  mpz_clears(temp, Q, e_inv, n_apos, r, A_caret);
+  mpz_clears(temp, Q, e_inv, n_apos, r, A_caret, NULL);
 }
 
 // 5.3 Non-revocation Credential Issuance

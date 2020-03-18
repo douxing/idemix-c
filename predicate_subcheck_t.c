@@ -10,7 +10,7 @@ void predicate_subcheck_t_into_vec
  predicate_subproof_t psp)
 {
   mpz_t t, t1;
-  mpz_inits(t, t1);
+  mpz_inits(t, t1, NULL);
 
   for (unsigned long i = 0; i < 4; ++i) { // Eq. (55)
     mpz_invert(t, C->T[i], pk->n);
@@ -52,6 +52,6 @@ void predicate_subcheck_t_into_vec
   mpz_mod(t, t, pk->n);
   mpz_vec_append(T, t); // append Q
 
-  mpz_clears(t, t1);
+  mpz_clears(t, t1, NULL);
 }
 

@@ -8,7 +8,8 @@ void primary_credential_subproof_init
 {
   mpz_inits(p->e_caret,
 	    p->v_caret,
-	    p->A_apos);
+	    p->A_apos,
+	    NULL);
   attr_vec_init(p->m_carets, l);
 }
 
@@ -16,7 +17,7 @@ void primary_credential_subproof_clear(primary_credential_subproof_t p)
 {
   mpz_clears(p->e_caret,
 	     p->v_caret,
-	     p->A_apos);
+	     p->A_apos, NULL);
   attr_vec_clear(p->m_carets);
 }
 

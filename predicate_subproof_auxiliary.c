@@ -1,6 +1,7 @@
 #include "idemix_predicate_subproof_auxiliary.h"
 #include "idemix_random.h"
 #include "idemix_utils.h"
+#include "decompose.h"
 
 void predicate_subproof_auxiliary_init
 (predicate_subproof_auxiliary_t pspa)
@@ -25,7 +26,8 @@ void predicate_subproof_auxiliary_init
 	    pspa->r_tilde[1],
 	    pspa->r_tilde[2],
 	    pspa->r_tilde[3],
-	    pspa->alpha_tilde);
+	    pspa->alpha_tilde,
+	    NULL);
 }
 
 void predicate_subproof_auxiliary_clear
@@ -51,10 +53,9 @@ void predicate_subproof_auxiliary_clear
 	     pspa->r_tilde[1],
 	     pspa->r_tilde[2],
 	     pspa->r_tilde[3],
-	     pspa->alpha_tilde);
+	     pspa->alpha_tilde,
+	     NULL);
 }
-
-
 
 void predicate_subproof_auxiliary_assign
 (predicate_subproof_auxiliary_t pspa,
@@ -81,7 +82,7 @@ void predicate_subproof_auxiliary_assign
   }
   // assert delta >= 0
 
-  decompose_to_4_squares(pspa->u, pspa->delta); // assgin u1 u2 u3 u4
+  decompose(pspa->u, pspa->delta); // assgin u1 u2 u3 u4
 
   random_num_exact_bits(pspa->m_tilde, 592); // 7.2.(Validity Proof).1
 

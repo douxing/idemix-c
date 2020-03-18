@@ -3,7 +3,7 @@
 void primary_credential_subproof_tuple_c_init
 (primary_credential_subproof_tuple_c_t C)
 {
-  mpz_inits(C->A_apos);
+  mpz_inits(C->A_apos, NULL);
 }
 
 void primary_credential_subproof_tuple_c_clear(primary_credential_subproof_tuple_c_t C)

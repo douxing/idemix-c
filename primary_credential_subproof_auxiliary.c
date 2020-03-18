@@ -8,7 +8,8 @@ void primary_credential_subproof_auxiliary_init
 	    pcspa->v_apos,
 	    pcspa->e_apos,
 	    pcspa->v_tilde,
-	    pcspa->e_tilde);
+	    pcspa->e_tilde,
+	    NULL);
 }
 
 void primary_credential_subproof_auxiliary_clear
@@ -18,7 +19,8 @@ void primary_credential_subproof_auxiliary_clear
 	     pcspa->v_apos,
 	     pcspa->e_apos,
 	     pcspa->v_tilde,
-	     pcspa->e_tilde);
+	     pcspa->e_tilde,
+	     NULL);
 }
 
 void primary_credential_subproof_auxiliary_assign

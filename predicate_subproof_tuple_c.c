@@ -7,7 +7,8 @@ void predicate_subproof_tuple_c_init
 	    C->T[1],
 	    C->T[2],
 	    C->T[3],
-	    C->T_delta);
+	    C->T_delta,
+	    NULL);
 }
 
 void predicate_subproof_tuple_c_clear
@@ -17,7 +18,8 @@ void predicate_subproof_tuple_c_clear
 	     C->T[1],
 	     C->T[2],
 	     C->T[3],
-	     C->T_delta);
+	     C->T_delta,
+	     NULL);
 }
 
 void predicate_subproof_tuple_c_assign

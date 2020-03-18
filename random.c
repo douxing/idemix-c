@@ -1,4 +1,5 @@
 #include "idemix_random.h"
+#include "idemix_parameters.h"
 
 void random_num_bits(mpz_t num, unsigned long bits)
 {

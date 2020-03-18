@@ -9,7 +9,7 @@ void attr_vec_init(attr_vec_t av, unsigned long l)
   av->attrs = (attr_ptr)malloc(sizeof(attr_t) * l);
   for (unsigned long i = 0; i < l; ++i) {
     av->attrs[i].i = 0;
-    mpz_inits(av->attrs[i].v);
+    mpz_inits(av->attrs[i].v, NULL);
   }
 }
 
@@ -28,7 +28,7 @@ void attr_vec_init_random(attr_vec_t av,
 void attr_vec_clear(attr_vec_t av)
 {
   for (unsigned long i = 0; i < av->l; ++i) {
-    mpz_clears(av->attrs[i].v);
+    mpz_clear(av->attrs[i].v);
   }
   free(av->attrs);
 }

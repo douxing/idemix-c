@@ -8,7 +8,7 @@ void primary_credential_subproof_t_into_vec
  primary_credential_subproof_tuple_c_t C)
 {
   mpz_t t1, t2;
-  mpz_inits(t1, t2);
+  mpz_inits(t1, t2, NULL);
 
   // Eq. (34)
   mpz_set_ui(t2, 1);
@@ -28,6 +28,6 @@ void primary_credential_subproof_t_into_vec
 
   mpz_vec_append(T, t1);
   
-  mpz_clears(t1, t2);
+  mpz_clears(t1, t2, NULL);
 }
 

@@ -5,13 +5,13 @@ void primary_credential_init
 (primary_credential_t pc,
  schema_t s) // l = |Cs| in the schema
 {
-  mpz_inits(pc->e, pc->A, pc->v);
+  mpz_inits(pc->e, pc->A, pc->v, NULL);
   attr_vec_init(pc->Cs, s->l);
 }
 
 void primary_credential_clear(primary_credential_t pc)
 {
-  mpz_inits(pc->e, pc->A, pc->v);
+  mpz_inits(pc->e, pc->A, pc->v, NULL);
   attr_vec_clear(pc->Cs);
 }
 
@@ -35,7 +35,7 @@ int primary_credential_verify
 {
   int ret = 0;
   mpz_t Q, A_caret, t;
-  mpz_inits(Q, A_caret, t);
+  mpz_inits(Q, A_caret, t, NULL);
 
   do {
     // assert pc->e == ppc->e, pc->A == ppc->A
@@ -76,6 +76,6 @@ int primary_credential_verify
     }
   } while(0);
 
-  mpz_clears(Q, A_caret, t);
+  mpz_clears(Q, A_caret, t, NULL);
   return ret;
 }

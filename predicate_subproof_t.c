@@ -7,7 +7,7 @@ void predicate_subproof_t_into_vec
  predicate_subproof_tuple_c_t C)
 {
   mpz_t t1, t2;
-  mpz_inits(t1, t2);
+  mpz_inits(t1, t2, NULL);
 
   // T1_bar ~ T4_bar Eq. (38)
   for (unsigned long i = 0; i < 4; ++i) {
@@ -37,5 +37,5 @@ void predicate_subproof_t_into_vec
   mpz_mod(t1, t1, pk->n);
   mpz_vec_append(T, t1);  
 
-  mpz_clears(t1, t2);
+  mpz_clears(t1, t2, NULL);
 }

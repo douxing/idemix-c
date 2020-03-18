@@ -8,7 +8,8 @@ void primary_pre_credential_prepare_init
   mpz_inits(ppc_prep->U,
 	    ppc_prep->c,
 	    ppc_prep->v_apos_caret,
-	    ppc_prep->n1);
+	    ppc_prep->n1,
+	    NULL);
   attr_vec_init(ppc_prep->m_carets, schema_attr_cnt_hidden(s));
 }
 
@@ -18,7 +19,8 @@ void primary_pre_credential_prepare_clear
   mpz_clears(ppc_prep->U,
 	     ppc_prep->c,
 	     ppc_prep->v_apos_caret,
-	     ppc_prep->n1);
+	     ppc_prep->n1,
+	     NULL);
   attr_vec_clear(ppc_prep->m_carets);
 
 }
@@ -32,7 +34,7 @@ void primary_pre_credential_prepare_assign
 {
   unsigned long l = attr_vec_size(Ah);
   mpz_t t, U_tilde, v_apos_tilde;
-  mpz_inits(t, U_tilde, v_apos_tilde);
+  mpz_inits(t, U_tilde, v_apos_tilde, NULL);
   attr_vec_t Ahr;
 
   // 5.1 Generate random 593-bit {mi~} i in Ah, and random 673-bit v'~
@@ -75,7 +77,7 @@ void primary_pre_credential_prepare_assign
   // 7.2 Generate random 80-bit nonce n1
   random_num_exact_bits(ppc_prep->n1, 80);
   
-  mpz_clears(t, U_tilde);
+  mpz_clears(t, U_tilde, NULL);
 }
 
 // 0 == ok else = error
@@ -86,7 +88,7 @@ int primary_pre_credential_prepare_verify
 {
   int ret = 0;
   mpz_t t, t1, U_caret;
-  mpz_inits(t, t1, U_caret);
+  mpz_inits(t, t1, U_caret, NULL);
 
   do {
     // Eq. (9)
@@ -113,6 +115,6 @@ int primary_pre_credential_prepare_verify
     // TODO
   }
   while (0);
-  mpz_clears(t, t1, U_caret);
+  mpz_clears(t, t1, U_caret, NULL);
   return ret;
 }

@@ -1,6 +1,6 @@
 // @copy https://github.com/AyrA/sm3
-#ifndef _SM3_H
-#define _SM3_H
+#ifndef __SM3_H__
+#define __SM3_H__
 
 #define SM3_DIGEST_LENGTH	32
 #define SM3_BLOCK_SIZE		64
@@ -29,4 +29,4 @@ void sm3(const unsigned char *data, size_t datalen, unsigned char digest[SM3_DIG
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // __SM3_H__

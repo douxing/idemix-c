@@ -5,8 +5,8 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
 			     issuer_pk_t pk, // OUTPUT
 			     const unsigned long L)
 {
-  mpz_inits(pk->n, pk->S, pk->Z);
-  mpz_inits(sk->p_apos, sk->q_apos, sk->p, sk->q);
+  mpz_inits(pk->n, pk->S, pk->Z, NULL);
+  mpz_inits(sk->p_apos, sk->q_apos, sk->p, sk->q, NULL);
 
   // 1. Random 1024-bit primes p',q'
   // such thatp = 2p'+ 1 and q = 2q'+ 1 are primes too.
@@ -36,7 +36,7 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
   // 3. Random xZ, xR1, ..., xRl in range [2, p'q' - 1]
   // init temporary variables
   mpz_t two, n_apos;
-  mpz_inits(two, n_apos);
+  mpz_inits(two, n_apos, NULL);
   mpz_set_ui(two, 2);
   mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n' = p'q'
 
@@ -50,12 +50,12 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
   pk->R_v  = (mpz_t *)malloc(sizeof(mpz_t) * L);
 
   for (unsigned long i = 0; i < L; ++i) {
-    mpz_inits(sk->xR_v[i], pk->R_v[i]);
+    mpz_inits(sk->xR_v[i], pk->R_v[i], NULL);
     random_range(sk->xR_v[i], two, n_apos);
     mpz_powm(pk->R_v[i], pk->S, sk->xR_v[i], pk->n);
   }
 
-  mpz_clears(two, n_apos);
+  mpz_clears(two, n_apos, NULL);
 }
 
 

@@ -2,9 +2,7 @@
 #define __IDEMIX_RANDOM_H__
 
 #include <pbc/pbc.h>
-
-// dx: change this to fine tune the probability of a prime
-#define REPS_VAL 15
+#include "idemix_parameters.h"
 
 void random_num_bits(mpz_t num, unsigned long bits);
 void random_num_exact_bits(mpz_t num, unsigned long bits);

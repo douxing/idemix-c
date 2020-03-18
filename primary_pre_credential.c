@@ -9,7 +9,8 @@ void primary_pre_credential_init
 	    ppc->e,
 	    ppc->v_apos_apos,
 	    ppc->s_e,
-	    ppc->c_apos);
+	    ppc->c_apos,
+	    NULL);
   attr_vec_init(ppc->Ak, schema_attr_cnt_known(s));
 }
 
@@ -20,7 +21,8 @@ void primary_pre_credential_clear
 	     ppc->e,
 	     ppc->v_apos_apos,
 	     ppc->s_e,
-	     ppc->c_apos);
+	     ppc->c_apos,
+	     NULL);
   attr_vec_clear(ppc->Ak);
 }
 
@@ -71,7 +73,7 @@ void primary_pre_credential_assign
 
   // page 5 Eq. (12)
   mpz_t e_inv, n_apos;
-  mpz_inits(e_inv, n_apos);
+  mpz_inits(e_inv, n_apos, NULL);
   mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n_apos = p'q'
   mpz_invert(e_inv, ppc->e, n_apos); // e_inv = e^-1 mod n'
 
@@ -101,5 +103,5 @@ void primary_pre_credential_assign
   // 7. Send the primary pre-credential to the Holder
 
   // clear all the temporary variables
-  mpz_clears(temp, Q, e_inv, n_apos, r, A_caret);
+  mpz_clears(temp, Q, e_inv, n_apos, r, A_caret, NULL);
 }
