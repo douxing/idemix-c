@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_pre_credential_prepare.h"
+#include "idemix_nonrev_pre_credential_prepare.h"
 
 void nonrev_pre_credential_prepare_init
 (nonrev_pre_credential_prepare_t nrpc_prep,

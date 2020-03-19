@@ -1,6 +1,6 @@
-#include "idemix_non_revocation_credential_subcheck_t.h"
+#include "idemix_nonrev_credential_subcheck_dump_t.h"
 
-void nonrev_credential_subproof_t_into_vec
+void nonrev_credential_subcheck_dump_t
 (mpz_vec_t T,
  pairing_t pairing,
  mpz_t CH,

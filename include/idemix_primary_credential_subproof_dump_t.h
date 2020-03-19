@@ -9,7 +9,7 @@
 #include "idemix_primary_credential_subproof_tuple_c.h"
 
 
-void primary_credential_subproof_t_into_vec
+void primary_credential_subproof_dump_t
 (mpz_vec_t T,
  issuer_pk_t pk,
  attr_vec_t m_tildes,  // intersection(Cs, Ar)

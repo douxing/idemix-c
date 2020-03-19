@@ -9,7 +9,7 @@
 #include "idemix_predicate_subproof.h"
 
 // Eq. (55) (56) (57)
-void predicate_subcheck_t_into_vec
+void predicate_subcheck_dump_t
 (mpz_vec_t T,
  issuer_pk_t pk,
  mpz_t CH,

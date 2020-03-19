@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_pre_credential.h"
+#include "idemix_nonrev_pre_credential.h"
 
 void nonrev_pre_credential_init(nonrev_pre_credential_t nrpc, // OUT
 				pairing_t pairing)

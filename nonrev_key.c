@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_key.h"
+#include "idemix_nonrev_key.h"
 #include "idemix_random.h"
 #include "idemix_bitmap.h"
 

@@ -1,12 +1,12 @@
-#ifndef __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_TUPLE_C_H__
-#define __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_TUPLE_C_H__
+#ifndef __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_TUPLE_C_H__
+#define __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_TUPLE_C_H__
 
 #include <pbc/pbc.h>
 
 #include "idemix_mpz_vec.h"
-#include "idemix_non_revocation_key.h"
-#include "idemix_non_revocation_credential.h"
-#include "idemix_non_revocation_credential_subproof_auxiliary.h"
+#include "idemix_nonrev_key.h"
+#include "idemix_nonrev_credential.h"
+#include "idemix_nonrev_credential_subproof_auxiliary.h"
 #include "idemix_accumulator.h"
 
 // 7.2 2. Create empty sets C
@@ -45,4 +45,4 @@ void nonrev_credential_subproof_tuple_c_into_vec
 (mpz_vec_t v,
  nonrev_credential_subproof_tuple_c_t C);
 
-#endif // __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_TUPLE_C_H__
+#endif // __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_TUPLE_C_H__

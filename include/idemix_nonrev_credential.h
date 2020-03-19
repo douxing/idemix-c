@@ -1,5 +1,5 @@
-#ifndef __IDEMIX_NON_REVOCATION_CREDENTIALS_H__
-#define __IDEMIX_NON_REVOCATION_CREDENTIALS_H__
+#ifndef __IDEMIX_NONREV_CREDENTIAL_H__
+#define __IDEMIX_NONREV_CREDENTIAL_H__
 
 #include <pbc/pbc.h>
 
@@ -7,8 +7,8 @@
 #include "idemix_attribute.h"
 #include "idemix_witness.h"
 #include "idemix_accumulator.h"
-#include "idemix_non_revocation_key.h"
-#include "idemix_non_revocation_pre_credential.h"
+#include "idemix_nonrev_key.h"
+#include "idemix_nonrev_pre_credential.h"
 
 // Chapter 5:
 
@@ -48,4 +48,4 @@ void nonrev_credential_update
 
 // end of Chapter 5
 
-#endif // __IDEMIX_NON_REVOCATION_CREDENTIAL_H__
+#endif // __IDEMIX_NONREV_CREDENTIAL_H__

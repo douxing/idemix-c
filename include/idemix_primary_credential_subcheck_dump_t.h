@@ -8,7 +8,7 @@
 #include "idemix_primary_credential_subproof.h"
 
 // Eq. (54)
-void primary_credential_subcheck_t_into_vec
+void primary_credential_subcheck_dump_t
 (mpz_vec_t T,
  issuer_pk_t pk,
  mpz_t CH,

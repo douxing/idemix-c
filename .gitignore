@@ -55,7 +55,7 @@ dkms.conf
 doc/
 
 # emacs intermediate files
-**.*~
+*~
 
 # backup files
 **.backup

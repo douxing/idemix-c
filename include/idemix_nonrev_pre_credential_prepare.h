@@ -1,8 +1,8 @@
-#ifndef __IDEMIX_NON_REVOCATION_PRE_CREDENTIAL_PREPARE_H__
-#define __IDEMIX_NON_REVOCATION_PRE_CREDENTIAL_PREPARE_H__
+#ifndef __IDEMIX_NONREV_PRE_CREDENTIAL_PREPARE_H__
+#define __IDEMIX_NONREV_PRE_CREDENTIAL_PREPARE_H__
 
 #include <pbc/pbc.h>
-#include "idemix_non_revocation_key.h"
+#include "idemix_nonrev_key.h"
 
 // Chapter 5:
 
@@ -29,4 +29,4 @@ void nonrev_pre_credential_prepare_assign
 
 // end of Chapter 5.1
 
-#endif // __IDEMIX_NON_REVOCATION_PRE_CREDENTIAL_PREPARE_H__
+#endif // __IDEMIX_NONREV_PRE_CREDENTIAL_PREPARE_H__

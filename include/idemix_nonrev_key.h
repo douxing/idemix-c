@@ -1,5 +1,5 @@
-#ifndef __IDEMIX_NON_REVOCATION_KEY_H__
-#define __IDEMIX_NON_REVOCATION_KEY_H__
+#ifndef __IDEMIX_NONREV_KEY_H__
+#define __IDEMIX_NONREV_KEY_H__
 
 #include <pbc/pbc.h>
 #include "idemix_accumulator.h"
@@ -7,12 +7,12 @@
 // Chapter 4
 
 // 4.4 Non-revocation Credential Cryptographic Setup
-struct non_revocation_secret_key_s {
+struct nonrev_secret_key_s {
   element_t sk; // in Zr
   element_t x;  // in Zr
 };
-typedef struct non_revocation_secret_key_s *nonrev_sk_ptr;
-typedef struct non_revocation_secret_key_s nonrev_sk_t[1];
+typedef struct nonrev_secret_key_s *nonrev_sk_ptr;
+typedef struct nonrev_secret_key_s nonrev_sk_t[1];
 
 struct nonrev_public_key_s {
   // in G1
@@ -51,4 +51,4 @@ void nonrev_crypto_init(nonrev_sk_t sk, // OUTPUT
 
 // end of Chapter 4
 
-#endif // __IDEMIX_NON_REVOCATION_KEY_H__
+#endif // __IDEMIX_NONREV_KEY_H__

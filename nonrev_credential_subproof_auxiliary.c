@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_credential_subproof_auxiliary.h"
+#include "idemix_nonrev_credential_subproof_auxiliary.h"
 
 void nonrev_credential_subproof_auxiliary_init
 (nonrev_credential_subproof_auxiliary_t nrcspa,

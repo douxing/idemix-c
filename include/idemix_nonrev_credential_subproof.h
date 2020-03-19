@@ -1,14 +1,14 @@
-#ifndef __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_H__
-#define __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_H__
+#ifndef __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_H__
+#define __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_H__
 
 #include <pbc/pbc.h>
 #include "idemix_mpz_vec.h"
-#include "idemix_non_revocation_credential.h"
-#include "idemix_non_revocation_credential_subproof_auxiliary.h"
+#include "idemix_nonrev_credential.h"
+#include "idemix_nonrev_credential_subproof_auxiliary.h"
 
 // flourish X at the bottom of page 8
 // 7.2.2 - 1
-// dx: de facto non_revocation_subproof
+// dx: de facto nonrev_subproof
 //     have no idea why this is so called ???
 struct tuple_x_s {
   element_t rho_caret;
@@ -42,4 +42,4 @@ void tuple_x_assign
 
 void tuple_x_into_vec(mpz_vec_t v, tuple_x_t X);
 
-#endif // __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_H__
+#endif // __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_H__

@@ -1,8 +1,8 @@
-#ifndef __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_AUXILIARY_H__
-#define __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_AUXILIARY_H__
+#ifndef __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_AUXILIARY_H__
+#define __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_AUXILIARY_H__
 
 #include <pbc/pbc.h>
-#include "idemix_non_revocation_credential.h"
+#include "idemix_nonrev_credential.h"
 
 // 7.2
 // Non-revocation subproof prover's auxant data structure
@@ -55,4 +55,4 @@ void nonrev_credential_subproof_auxiliary_assign
 (nonrev_credential_subproof_auxiliary_t nrcspa,
  nonrev_credential_t nrc);
 
-#endif // __IDEMIX_NON_REVOCATION_CREDENTIAL_SUBPROOF_AUXILIARY_H__
+#endif // __IDEMIX_NONREV_CREDENTIAL_SUBPROOF_AUXILIARY_H__

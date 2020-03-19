@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_credential_subproof.h"
+#include "idemix_nonrev_credential_subproof.h"
 
 void tuple_x_init
 (tuple_x_t X,

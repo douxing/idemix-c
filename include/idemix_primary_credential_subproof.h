@@ -1,5 +1,5 @@
-#ifndef __IDEMIX_PRIMARY_SUBPROOF_H__
-#define __IDEMIX_PRIMARY_SUBPROOF_H__
+#ifndef __IDEMIX_PRIMARY_CREDENTIAL_SUBPROOF_H__
+#define __IDEMIX_PRIMARY_CREDENTIAL_SUBPROOF_H__
 
 #include <gmp.h>
 #include "idemix_attribute.h"

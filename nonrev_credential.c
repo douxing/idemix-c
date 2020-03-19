@@ -1,4 +1,4 @@
-#include "idemix_non_revocation_credential.h"
+#include "idemix_nonrev_credential.h"
 #include "idemix_random.h"
 
 void nonrev_credential_init(nonrev_credential_t nrc,
