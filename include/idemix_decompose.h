@@ -1,5 +1,5 @@
-#ifndef __SUM_OF_FOUR_SQUARES_DECOMPOSE_H__
-#define __SUM_OF_FOUR_SQUARES_DECOMPOSE_H__
+#ifndef __IDEMIX_DECOMPOSE_H__
+#define __IDEMIX_DECOMPOSE_H__
 
 #include <gmp.h>
 #include "idemix_parameters.h"
@@ -19,4 +19,4 @@ int decompose_prime(mpz_t a, mpz_t b, const mpz_t n);
 // sorted 4 square roots in incresing order
 int decompose(mpz_t fours[FOUR], mpz_t n);
 
-#endif //  __SUM_OF_FOUR_SQUARES_DECOMPOSE_H__
+#endif //  __IDEMIX_DECOMPOSE_H__

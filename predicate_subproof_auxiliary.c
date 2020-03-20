@@ -1,7 +1,6 @@
 #include "idemix_predicate_subproof_auxiliary.h"
 #include "idemix_random.h"
-#include "idemix_utils.h"
-#include "decompose.h"
+#include "idemix_decompose.h"
 
 void predicate_subproof_auxiliary_init
 (predicate_subproof_auxiliary_t pspa)

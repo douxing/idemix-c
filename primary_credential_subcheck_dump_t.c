@@ -17,7 +17,7 @@ void primary_credential_subcheck_dump_t
   for (unsigned long i = 0; i < attr_vec_size(v); ++i) {
     // revealed member
     attr_ptr ap = attr_vec_head(v) + i;
-    mpz_powm(t, pk->R_v[ap->i], ap->v, pk->n);
+    mpz_powm(t, pk->R_v + i, ap->v, pk->n);
     mpz_mul(t1, t1, t);
     mpz_mod(t1, t1, pk->n);
   }
@@ -42,7 +42,7 @@ void primary_credential_subcheck_dump_t
   for (unsigned long i = 0; i < attr_vec_size(pcsp->m_carets); ++i) {
     // hidden member
     attr_ptr ap = attr_vec_head(pcsp->m_carets) + i;
-    mpz_powm(t, pk->R_v[ap->i], ap->v, pk->n);
+    mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
     mpz_mul(t2, t2, t);
     mpz_mod(t2, t2, pk->n);
   }

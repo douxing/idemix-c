@@ -14,7 +14,7 @@ struct issuer_secret_key_s {
   mpz_t q;
   mpz_t xZ;
   unsigned long xR_c;
-  mpz_t *xR_v;
+  mpz_ptr xR_v;
 };
 typedef struct issuer_secret_key_s *issuer_sk_ptr;
 typedef struct issuer_secret_key_s issuer_sk_t[1];
@@ -24,7 +24,7 @@ struct issuer_public_key_s {
   mpz_t S;
   mpz_t Z;
   unsigned long R_c;
-  mpz_t *R_v;
+  mpz_ptr R_v;
 };
 typedef struct issuer_public_key_s *issuer_pk_ptr;
 typedef struct issuer_public_key_s issuer_pk_t[1];
@@ -33,5 +33,7 @@ typedef struct issuer_public_key_s issuer_pk_t[1];
 void issuer_keys_init_assign(issuer_sk_t sk,
 			     issuer_pk_t pk,
 			     const unsigned long L);
+void issuer_sk_clear(issuer_sk_t sk);
+void issuer_pk_clear(issuer_pk_t pk);
 
 #endif // __IDEMIX_ISSUER_KEY_H__

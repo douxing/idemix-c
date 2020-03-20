@@ -1,5 +1,4 @@
 #include "idemix_random.h"
-#include "idemix_utils.h"
 #include "idemix_predicate_subproof.h"
 
 void predicate_subproof_init

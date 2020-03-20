@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -g -I. -Iinclude
+CFLAGS = -fPIC -Wall -Wextra -g -Iinclude
 LDFLAGS = -shared
 RM = rm -f
 TARGET_LIB = idemix.so

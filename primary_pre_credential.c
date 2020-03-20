@@ -63,7 +63,7 @@ void primary_pre_credential_assign
   mpz_mod(Q, Q, pk->n);
   for (unsigned long i = 0; i < attr_vec_size(ppc->Ak); ++i) {
     attr_ptr mi_p = attr_vec_head(ppc->Ak) + i;
-    mpz_powm(temp, pk->R_v[mi_p->i], mi_p->v, pk->n);
+    mpz_powm(temp, pk->R_v + mi_p->i, mi_p->v, pk->n);
     mpz_mul(Q, Q, temp);
     mpz_mod(Q, Q, pk->n);
   }
@@ -92,7 +92,7 @@ void primary_pre_credential_assign
   mpz_powm(A_caret, Q, r, pk->n);
 
   // page 5 Eq. (14) c' = H(Q||A||A^||n1)
-  sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, ppc_prep->n1);
+  sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, ppc_prep->n1, NULL);
 
   // page 5 Eq. (15) s_e = r - c'e^-1
   mpz_mul(temp, ppc->c_apos, e_inv);

@@ -48,19 +48,19 @@ void primary_pre_credential_prepare_assign
     attr_ptr ap = attr_vec_head(Ah) + i;
 
     // Ri^mi
-    mpz_powm(t, pk->R_v[ap->i], ap->v, pk->n);
+    mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
     mpz_mul(ppc_prep->U, ppc_prep->U, t);
     mpz_mod(ppc_prep->U, ppc_prep->U, pk->n);
 
     // Ri^mi~
     attr_ptr apr = attr_vec_head(Ahr) + i;
-    mpz_powm(t, pk->R_v[ap->i], apr->v, pk->n);
+    mpz_powm(t, pk->R_v + ap->i, apr->v, pk->n);
     mpz_mul(U_tilde, U_tilde, t);
     mpz_mod(U_tilde, U_tilde, pk->n);
   }
 
   // Eq. (7)
-  sm3_mpzs(ppc_prep->c, ppc_prep->U, U_tilde, n0);
+  sm3_mpzs(ppc_prep->c, ppc_prep->U, U_tilde, n0, NULL);
   mpz_mul(t, ppc_prep->c, v_apos);
   mpz_add(ppc_prep->v_apos_caret, v_apos_tilde, t);
 
@@ -96,7 +96,7 @@ int primary_pre_credential_prepare_verify
     mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
     for (unsigned long i = 0; i < attr_vec_size(ppc_prep->m_carets); ++i) {
       attr_ptr ap = attr_vec_head(ppc_prep->m_carets) + i;
-      mpz_powm(t, pk->R_v[ap->i], ap->v, pk->n);
+      mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
       mpz_mul(U_caret, U_caret, t);
       mpz_mod(U_caret, U_caret, pk->n);
     }
@@ -104,7 +104,7 @@ int primary_pre_credential_prepare_verify
     mpz_mul(U_caret, U_caret, t);
     mpz_mod(U_caret, U_caret, pk->n);
 
-    sm3_mpzs(t, ppc_prep->U, U_caret, n0);
+    sm3_mpzs(t, ppc_prep->U, U_caret, n0, NULL);
     if (t != ppc_prep->c) {
       gmp_printf("c^ and c don't the same!");
       ret = -1;

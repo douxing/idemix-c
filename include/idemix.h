@@ -1,10 +1,12 @@
 #ifndef __IDEMIX_H__
 #define __IDEMIX_H__
 
-#include "idemix_utils.h"
-#include "idemix_random.h"
 #include "idemix_bitmap.h"
+#include "idemix_random.h"
 #include "idemix_mpz_vec.h"
+#include "idemix_sm3.h"
+#include "idemix_decompose.h"
+#include "idemix_pairing.h"
 
 #include "idemix_attribute.h"
 #include "idemix_accumulator.h"

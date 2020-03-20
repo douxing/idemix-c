@@ -1,6 +1,6 @@
 // @copy https://github.com/AyrA/sm3
-#ifndef _BYTEORDER_H
-#define _BYTEORDER_H
+#ifndef __IDEMIX_BYTEORDER_H__
+#define __IDEMIX_BYTEORDER_H__
 
 #ifdef CPU_BIGENDIAN
 
@@ -18,4 +18,4 @@
 
 #endif
 
-#endif
+#endif // __IDEMIX_BYTEORDER_H__

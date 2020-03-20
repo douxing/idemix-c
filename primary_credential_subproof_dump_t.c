@@ -14,7 +14,7 @@ void primary_credential_subproof_dump_t
   mpz_set_ui(t2, 1);
   for (unsigned long i = 0; i < attr_vec_size(m_tildes); ++i) {
     attr_ptr ap = attr_vec_head(m_tildes) + i;
-    mpz_powm(t1, pk->R_v[ap->i], ap->v, pk->n); // Rj^mj~
+    mpz_powm(t1, pk->R_v + ap->i, ap->v, pk->n); // Rj^mj~
     mpz_mul(t2, t2, t1);
     mpz_mod(t2, t2, pk->n);
   }

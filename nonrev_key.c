@@ -44,6 +44,28 @@ void nonrev_keys_init_assign(nonrev_sk_t sk, // OUTPUT
   element_pow_zn(pk->y, pk->h_caret, sk->x);
 }
 
+void nonrev_sk_clear(nonrev_sk_t sk)
+{
+  element_clear(sk->sk);
+  element_clear(sk->x);
+}
+
+
+void nonrev_pk_clear(nonrev_pk_t pk)
+{
+  element_clear(pk->h);
+  element_clear(pk->h0);
+  element_clear(pk->h1);
+  element_clear(pk->h2);
+  element_clear(pk->h_tilde);
+
+  element_clear(pk->u);
+  element_clear(pk->h_caret);
+
+  element_clear(pk->pk);
+  element_clear(pk->y);  
+}
+
 // 4.4.1 New Accumulator Setup:
 
 // end of 4.4.1

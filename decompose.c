@@ -1,4 +1,4 @@
-#include "decompose.h"
+#include "idemix_decompose.h"
 #include <assert.h>
 
 void four_squares_init(mpz_t fours[FOUR])

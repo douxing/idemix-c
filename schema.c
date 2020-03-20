@@ -1,8 +1,9 @@
 #include "idemix_schema.h"
+#include <assert.h>
 
 void schema_init(schema_t s, const unsigned long l)
 {
-  // assert l > 3
+  assert(l > 3);
   s->l = l;
   mpz_init(s->map);
 }
@@ -14,13 +15,13 @@ void schema_clear(schema_t s)
 
 int schema_attr_is_hidden(schema_t s, unsigned long i)
 {
-  // assert(i < s->l)
+  assert(i < s->l);
   return bitmap_tstbit(s->map, i);
 }
 
 void schema_attr_set_hidden(schema_t s, unsigned long i)
 {
-  // assert(i < s->l)
+  assert(i < s->l);
   bitmap_setbit(s->map, i);
 }
 

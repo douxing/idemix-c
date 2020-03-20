@@ -6,7 +6,7 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
 			     const unsigned long L)
 {
   mpz_inits(pk->n, pk->S, pk->Z, NULL);
-  mpz_inits(sk->p_apos, sk->q_apos, sk->p, sk->q, NULL);
+  mpz_inits(sk->p_apos, sk->q_apos, sk->p, sk->q, sk->xZ, NULL);
 
   // 1. Random 1024-bit primes p',q'
   // such thatp = 2p'+ 1 and q = 2q'+ 1 are primes too.
@@ -46,16 +46,40 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
 
   // set xRi and Ri, formular (1) in paper
   sk->xR_c = pk->R_c = L;
-  sk->xR_v = (mpz_t *)malloc(sizeof(mpz_t) * L);
-  pk->R_v  = (mpz_t *)malloc(sizeof(mpz_t) * L);
+  sk->xR_v = (mpz_ptr)malloc(sizeof(mpz_t) * L);
+  pk->R_v  = (mpz_ptr)malloc(sizeof(mpz_t) * L);
 
   for (unsigned long i = 0; i < L; ++i) {
-    mpz_inits(sk->xR_v[i], pk->R_v[i], NULL);
-    random_range(sk->xR_v[i], two, n_apos);
-    mpz_powm(pk->R_v[i], pk->S, sk->xR_v[i], pk->n);
+    mpz_inits(sk->xR_v + i, pk->R_v + i, NULL);
+    random_range(sk->xR_v + i, two, n_apos);
+    mpz_powm(pk->R_v + i, pk->S, sk->xR_v + i, pk->n);
   }
 
   mpz_clears(two, n_apos, NULL);
 }
 
+void issuer_sk_clear(issuer_sk_t sk)
+{
+  mpz_clears(sk->p_apos,
+	     sk->q_apos,
+	     sk->p,
+	     sk->q,
+	     sk->xZ,
+	     NULL);
+  for (unsigned long i = 0; i < sk->xR_c; ++i) {
+    mpz_clear(sk->xR_v + i);
+  }
+  free(sk->xR_v);
+}
 
+void issuer_pk_clear(issuer_pk_t pk)
+{
+  mpz_clears(pk->n,
+	     pk->S,
+	     pk->Z,
+	     NULL);
+  for (unsigned long i = 0; i < pk->R_c; ++i) {
+    mpz_clear(pk->R_v + i);
+  }
+  free(pk->R_v);
+}

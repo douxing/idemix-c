@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "idemix_random.h"
-#include "idemix_utils.h"
 #include "idemix_attribute.h"
 
 void attr_vec_init(attr_vec_t av, unsigned long l)
@@ -79,5 +78,5 @@ void compute_m2(mpz_t m2, unsigned long i, unsigned long H)
   mpz_t mi, mH;
   mpz_init_set_ui(mi, i);
   mpz_init_set_ui(mH, H);
-  sm3_mpzs(m2, mi, mH);
+  sm3_mpzs(m2, mi, mH, NULL);
 }
