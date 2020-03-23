@@ -1,6 +1,6 @@
 #include "idemix_nonrev_credential_subproof_dump_t.h"
 
-void nonrev_subproof_subproof_dump_t
+void nonrev_credential_subproof_dump_t
 (mpz_vec_t T,
  pairing_t pairing,
  nonrev_pk_t pk,

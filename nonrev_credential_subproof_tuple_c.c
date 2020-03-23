@@ -13,6 +13,18 @@ void nonrev_credential_subproof_tuple_c_init
   element_init_G2(C->U, pairing);
 }
 
+void nonrev_credential_subproof_tuple_c_clear
+(nonrev_credential_subproof_tuple_c_t C)
+{
+  element_clear(C->E);
+  element_clear(C->D);
+  element_clear(C->A);
+  element_clear(C->G);
+  element_clear(C->W);
+  element_clear(C->S);
+  element_clear(C->U);
+}
+
 void nonrev_credential_subproof_tuple_c_assign
 (nonrev_credential_subproof_tuple_c_t C,
  nonrev_pk_t pk,

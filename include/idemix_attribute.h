@@ -46,11 +46,13 @@ void attr_vec_init_random(attr_vec_t av,
 
 unsigned long attr_vec_size(attr_vec_t av);
 attr_ptr attr_vec_head(attr_vec_t av);
+
+void attr_vec_set(attr_vec_t dst, attr_vec_t src);
 void attr_vec_combine(attr_vec_t dst, attr_vec_t one, attr_vec_t two);
 
 // page 5 first paragraph
 // Compute m2 ← H(i||H) and store information about Holder
 // and the value i in a local database.
-void compute_m2(mpz_t m2, unsigned long i, unsigned long H);
+void compute_m2(mpz_ptr m2, mpz_ptr i, mpz_ptr H);
 
 #endif // __IDEMIX_ATTRIBUTE_H__

@@ -16,7 +16,7 @@ typedef struct mpz_vec_s mpz_vec_t[1];
 void mpz_vec_init(mpz_vec_t v);
 void mpz_vec_clear(mpz_vec_t v);
 
-void mpz_vec_append(mpz_vec_t v, mpz_t val);
+void mpz_vec_append(mpz_vec_t v, const mpz_t val);
 
 mpz_ptr mpz_vec_head(mpz_vec_t v);
 unsigned long mpz_vec_size(mpz_vec_t v);

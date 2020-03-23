@@ -7,14 +7,18 @@ void mpz_vec_init(mpz_vec_t v)
   v->next = 0;
   v->cap = MPZ_VEC_INITIAL_CAPACITY;
   v->v = (mpz_ptr)malloc(sizeof(mpz_t) * v->cap);
+  // dx: lazy mpz_init
 }
 
 void mpz_vec_clear(mpz_vec_t v)
 {
+  for (unsigned long i = 0; i < v->next; ++i) {
+    mpz_clear(v->v + i);
+  }
   free(v->v);
 }
 
-void mpz_vec_append(mpz_vec_t v, mpz_t val)
+void mpz_vec_append(mpz_vec_t v, const mpz_t val)
 {
   if (v->cap <= v->next) {
     unsigned long cap = v->cap * 2 + 1;
@@ -23,7 +27,7 @@ void mpz_vec_append(mpz_vec_t v, mpz_t val)
     for (unsigned long i = 0; i < v->cap; ++i) {
       // TODO: memory handler?
       mpz_init(vec + i);
-      mpz_set(vec + i, v->v + i);
+      mpz_swap(vec + i, v->v + i);
       mpz_clear(v->v + i);
     }
 

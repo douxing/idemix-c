@@ -117,7 +117,7 @@ void accumulator_init_assign
 }
 
 // Chapter 5:
-
+// initialize w
 void compute_w(element_t w, // OUTPUT
 	       accumulator_t acc,
 	       const unsigned long i)

@@ -20,18 +20,25 @@ void random_range(mpz_t num, mpz_t min, mpz_t max)
   mpz_add(num, num, min);
 }
 
+void random_prime_range(mpz_t num, mpz_t min, mpz_t max)
+{
+  do {
+    random_range(num, min, max);
+  } while(!mpz_probab_prime_p(num, REPS_VAL));
+}
+
+
 // output a prime of n bits
 void random_prime_bits(mpz_t prime, unsigned long bits)
 {
   do {
     pbc_mpz_randomb(prime, bits);
-  } while(mpz_probab_prime_p(prime, REPS_VAL));
+  } while(!mpz_probab_prime_p(prime, REPS_VAL));
 }
 
 void random_prime_exact_bits(mpz_t prime, unsigned long bits)
 {
   do {
     random_num_exact_bits(prime, bits);
-  } while(mpz_probab_prime_p(prime, REPS_VAL));
+  } while(!mpz_probab_prime_p(prime, REPS_VAL));
 }
-

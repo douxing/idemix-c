@@ -33,11 +33,12 @@ void primary_pre_credential_prepare_assign
  attr_vec_t Ah) // passed in by holder, so this is known here
 {
   unsigned long l = attr_vec_size(Ah);
+
   mpz_t t, U_tilde, v_apos_tilde;
   mpz_inits(t, U_tilde, v_apos_tilde, NULL);
-  attr_vec_t Ahr;
 
   // 5.1 Generate random 593-bit {mi~} i in Ah, and random 673-bit v'~
+  attr_vec_t Ahr;
   attr_vec_init_random(Ahr, l, 593);
   random_num_exact_bits(v_apos_tilde, 673);
   
@@ -45,22 +46,22 @@ void primary_pre_credential_prepare_assign
   mpz_powm(ppc_prep->U, pk->S, v_apos, pk->n);
   mpz_powm(U_tilde, pk->S, v_apos_tilde, pk->n);
   for (unsigned long i = 0; i < l; ++i) {
-    attr_ptr ap = attr_vec_head(Ah) + i;
-
-    // Ri^mi
+    attr_ptr ap = attr_vec_head(Ah) + i; // Ri^mi
     mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
     mpz_mul(ppc_prep->U, ppc_prep->U, t);
     mpz_mod(ppc_prep->U, ppc_prep->U, pk->n);
 
-    // Ri^mi~
-    attr_ptr apr = attr_vec_head(Ahr) + i;
+    attr_ptr apr = attr_vec_head(Ahr) + i; // Ri^mi~
     mpz_powm(t, pk->R_v + ap->i, apr->v, pk->n);
     mpz_mul(U_tilde, U_tilde, t);
     mpz_mod(U_tilde, U_tilde, pk->n);
   }
 
+  // gmp_printf("U: %Zd\nU_tilde: %Zd\nn0: %Zd\n", ppc_prep->U, U_tilde, n0);
+
   // Eq. (7)
   sm3_mpzs(ppc_prep->c, ppc_prep->U, U_tilde, n0, NULL);
+
   mpz_mul(t, ppc_prep->c, v_apos);
   mpz_add(ppc_prep->v_apos_caret, v_apos_tilde, t);
 
@@ -76,8 +77,9 @@ void primary_pre_credential_prepare_assign
 
   // 7.2 Generate random 80-bit nonce n1
   random_num_exact_bits(ppc_prep->n1, 80);
-  
-  mpz_clears(t, U_tilde, NULL);
+
+  attr_vec_clear(Ahr);
+  mpz_clears(t, U_tilde, v_apos_tilde, NULL);
 }
 
 // 0 == ok else = error
@@ -104,9 +106,36 @@ int primary_pre_credential_prepare_verify
     mpz_mul(U_caret, U_caret, t);
     mpz_mod(U_caret, U_caret, pk->n);
 
+    if (!mpz_cmp_ui(U_caret, 0)) {
+      gmp_printf("zero!!! %d\n", mpz_cmp(ppc_prep->U, pk->n));
+      mpz_invert(U_caret, ppc_prep->U, pk->n);
+      gmp_printf("initial U_caret: %Zd\nU: %Zd\nn->%Zd\n",
+		 U_caret, ppc_prep->U, pk->n);
+
+      /*
+
+      mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
+      for (unsigned long i = 0; i < attr_vec_size(ppc_prep->m_carets); ++i) {
+	attr_ptr ap = attr_vec_head(ppc_prep->m_carets) + i;
+	mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
+	mpz_mul(U_caret, U_caret, t);
+	mpz_mod(U_caret, U_caret, pk->n);
+
+	gmp_printf("%u: %u - %Zd\nt: %Zd\nU_caret: %Zd\n",
+		   i, ap->i, pk->R_v + ap->i, t, U_caret);
+      }
+      mpz_powm(t, pk->S, ppc_prep->v_apos_caret, pk->n);
+      mpz_mul(U_caret, U_caret, t);
+      mpz_mod(U_caret, U_caret, pk->n);
+      */
+    }
+
+    // gmp_printf("U: %Zd\nU_caret: %Zd\nn0: %Zd\n", ppc_prep->U, U_caret, n0);
+
     sm3_mpzs(t, ppc_prep->U, U_caret, n0, NULL);
-    if (t != ppc_prep->c) {
-      gmp_printf("c^ and c don't the same!");
+    if (mpz_cmp(t, ppc_prep->c)) {
+      gmp_printf("c^ and c don't the same:\nc^: %Zd\nc : %Zd\n",
+		 t, ppc_prep->c);
       ret = -1;
       break;
     }

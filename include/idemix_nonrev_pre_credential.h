@@ -46,4 +46,8 @@ void nonrev_pre_credential_assign
 
 // end of 5.3
 
+int nonrev_pre_credential_verify
+(const nonrev_pre_credential_t nrpc,
+ const mpz_t v_apos);
+
 #endif // __IDEMIX_NONREV_PRE_CREDENTIAL_H__

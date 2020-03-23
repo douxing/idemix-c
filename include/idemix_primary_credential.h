@@ -20,7 +20,7 @@ typedef struct primary_credential_s *primary_credential_ptr;
 typedef struct primary_credential_s primary_credential_t[1];
 
 void primary_credential_init
-(primary_credential_t pr,
+(primary_credential_t pc,
  schema_t s); // l = |Cs| in the schema
 
 void primary_credential_clear
@@ -32,11 +32,12 @@ void primary_credential_assign
  attr_vec_t Ah,
  primary_pre_credential_t ppc);
 
-int primary_credential_verify
-(primary_credential_t pc,
+int primary_pre_credential_verify
+(primary_pre_credential_t ppc,
  issuer_pk_t pk,
+ issuer_sk_t sk,
  mpz_t n1,
- primary_pre_credential_t ppc);
+ primary_credential_t pc);
 
 // end of 5.4
 

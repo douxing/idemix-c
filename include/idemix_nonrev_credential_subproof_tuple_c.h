@@ -34,6 +34,9 @@ void nonrev_credential_subproof_tuple_c_init
 (nonrev_credential_subproof_tuple_c_t C,
  pairing_t pairing);
 
+void nonrev_credential_subproof_tuple_c_clear
+(nonrev_credential_subproof_tuple_c_t C);
+
 void nonrev_credential_subproof_tuple_c_assign
 (nonrev_credential_subproof_tuple_c_t C,
  nonrev_pk_t pk,

@@ -47,6 +47,7 @@ void nonrev_credential_assign
 }
 
 // 7.2 item.4 page 7
+// update w and V
 void nonrev_credential_update
 (nonrev_credential_t nrc, // nrc->wit_i->V as V_old
  accumulator_t acc) // latest accumulator
