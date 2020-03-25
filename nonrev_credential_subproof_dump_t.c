@@ -25,7 +25,7 @@ void nonrev_credential_subproof_dump_t
   // page 7 Eq. (28) ~ (32)
   mpz_t z;
   mpz_init(z);
-  element_t t, t1, t2, t3, t4;
+  element_t t, t1, t2, t3, t4, z1, z2, z3;
 
   // T1 bar
   element_init_G1(t, pairing);
@@ -33,80 +33,78 @@ void nonrev_credential_subproof_dump_t
 		  pk->h, nrcspa->rho_tilde,
 		  pk->h_tilde, nrcspa->o_tilde);
   element_to_mpz(z, nrcspa->rho_tilde);
-  element_printf("rho_tilde: %B\nto mpz: %Zd\n", nrcspa->rho_tilde, z);
-  element_printf("T1_bar: %B\n", t);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
 
   // T2 bar
   element_init_G1(t, pairing);
-  element_init_G1(t1, pairing);
-  element_init_G1(t2, pairing);
-  element_invert(t1, pk->h);
-  element_invert(t2, pk->h_tilde);
+  element_init_Zr(z1, pairing);
+  element_init_Zr(z2, pairing);
+  element_neg(z1, nrcspa->m_tilde);
+  element_neg(z2, nrcspa->t_tilde);
   element_pow3_zn(t,
 		  C->E, nrcspa->c_tilde,
-		  t1, nrcspa->m_tilde,
-		  t2, nrcspa->t_tilde);
+		  pk->h, z1,
+		  pk->h_tilde, z2);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
-  element_clear(t1);
-  element_clear(t2);
+  element_clear(z1);
+  element_clear(z2);
 
   // T3 bar
   element_init_GT(t, pairing);
   element_init_GT(t1, pairing);
   element_init_GT(t2, pairing);
   element_init_GT(t3, pairing);
-  element_init_GT(t4, pairing);
+  element_init_Zr(z1, pairing);
+  element_init_Zr(z2, pairing);
+  element_init_Zr(z3, pairing);
+
   element_pairing(t1, C->A, pk->h_caret);
   element_pairing(t2, pk->h_tilde, pk->h_caret);
   element_pairing(t3, pk->h_tilde, pk->y);
-  element_invert(t3, t3);
-  element_pow3_zn(t4,
+  element_neg(z3, nrcspa->rho_tilde);
+  element_pow3_zn(t,
 		  t1, nrcspa->c_tilde,
 		  t2, nrcspa->r_tilde,
-		  t3, nrcspa->rho_tilde);
+		  t3, z3);
+
   element_pairing(t1, pk->h_tilde, pk->h_caret);
-  element_invert(t1, t1);
+  element_neg(z1, nrcspa->m_tilde);
   element_pairing(t2, pk->h1, pk->h_caret);
-  element_invert(t2, t2);
+  element_neg(z2, nrcspa->m2_tilde);
   element_pairing(t3, pk->h2, pk->h_caret);
-  element_invert(t3, t3);
-  element_pow3_zn(t,
-		  t1, nrcspa->m_tilde,
-		  t2, nrcspa->m2_tilde,
-		  t3, nrcspa->s_tilde);
-  element_mul(t, t, t4);
+  element_neg(z3, nrcspa->s_tilde);
+  element_pow3_zn(t1, t1, z1, t2, z2, t3, z3);
+  element_mul(t, t, t1);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
   element_clear(t2);
   element_clear(t3);
-  element_clear(t4);
+  element_clear(z1);
+  element_clear(z2);
+  element_clear(z3);
 
   // T4 bar
   element_init_G1(t, pairing);
   element_init_GT(t1, pairing);
   element_init_GT(t2, pairing);
-  element_init_GT(t3, pairing);
   element_pairing(t1, pk->h_tilde, acc->acc);
   element_invert(t, acc->g);
   element_pairing(t2, t, pk->h_caret);
-  element_pow2_zn(t3,
+  element_pow2_zn(t1,
 		  t1, nrcspa->r_tilde,
 		  t2, nrcspa->r_apos_tilde);
-  pbc_element_to_mpz(z, t3);
+  element_printf("T4 bar: %B\n", t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);
-  gmp_printf("T4: %Zd\n", z);
-  element_printf("T4: %B\n", t3);
   element_clear(t);
   element_clear(t1);
   element_clear(t2);
-  element_clear(t3);
 
   // T5 bar
   element_init_G1(t, pairing);

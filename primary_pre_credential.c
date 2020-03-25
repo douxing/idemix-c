@@ -43,7 +43,6 @@ void primary_pre_credential_assign
   //    done by caller, in schema
 
   // 2. set attributes from Ak
-  unsigned long l = attr_vec_size(ppc->Ak);
   attr_vec_set(ppc->Ak, Ak);
 
   // 3. Generate random 2724-bit number v" with most significant bit equal 1

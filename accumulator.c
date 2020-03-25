@@ -70,8 +70,7 @@ void accumulator_init_assign
     ++i;
   }
 
-  // (L+1)th element, set to the generator of the corresponding group
-  // dx: maybe useless
+  // (L+1)th element, set to identity
   element_init_G1(acc->g1_v[L], pairing);
   element_set1(acc->g1_v[L]);
   element_init_G2(acc->g2_v[L], pairing);
@@ -111,6 +110,7 @@ void accumulator_init_assign
   // 3. set V = empty set, acc = 1
   bitmap_init(acc->V);
   element_init_G2(acc->acc, pairing);
+  element_set1(acc->acc);
 
   mpz_clear(L_plus_one);
   element_clear(gamma_pow_L_plus_one);
@@ -124,6 +124,9 @@ void compute_w(element_t w, // OUTPUT
 {
   element_set1(w);
   unsigned long j = bitmap_scan1(acc->V, 0);
+  
+  element_printf("frist scan: w: %B\nj: %u\n", w, j);
+
   while (j < acc->L) {
     if (j != i) {
       element_mul(w, w, acc->g2_v[acc->L -j + i]);
