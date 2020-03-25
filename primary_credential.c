@@ -82,7 +82,7 @@ int primary_pre_credential_verify
     mpz_mod(Q, Q, pk->n);
 
     {
-      gmp_printf("in verify:\nQ: %Zd\nA: %Zd\n", Q, pc->A);
+      // gmp_printf("in verify:\nQ: %Zd\nA: %Zd\n", Q, pc->A);
     }
 
     /*
@@ -109,6 +109,7 @@ int primary_pre_credential_verify
     }
     */
 
+    /*
     {
       mpz_t n, n_apos, e, e_inv, A, Q_e_inv, A_e, one;
       mpz_inits(n, n_apos, e, e_inv, A, Q_e_inv, A_e, one, NULL);
@@ -133,6 +134,7 @@ int primary_pre_credential_verify
       
       mpz_clears(n, n_apos, e, e_inv, A, Q_e_inv, one, NULL);      
     }
+    */
 
     // 4. Verify Q = A^e page 4
     // dx: TODO: how to do this???
@@ -154,8 +156,8 @@ int primary_pre_credential_verify
     // 6. Verify c′=H(Q||A||A^||n2)
     sm3_mpzs(t, Q, pc->A, A_caret, n1, NULL);
 
-    gmp_printf("verify:\nQ : %Zd\nA : %Zd\nA^: %Zd\nn1: %Zd\n",
-	       Q, ppc->A, A_caret, n1);
+    // gmp_printf("verify:\nQ : %Zd\nA : %Zd\nA^: %Zd\nn1: %Zd\n",
+    //	       Q, ppc->A, A_caret, n1);
 
     // dx: TODO: how to check this?
     /*

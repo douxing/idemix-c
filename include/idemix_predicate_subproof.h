@@ -20,6 +20,9 @@ typedef struct predicate_subproof_s predicate_subproof_t[1];
 void predicate_subproof_init
 (predicate_subproof_t psp);
 
+void predicate_subproof_clear
+(predicate_subproof_t psp);
+
 void predicate_subproof_assign
 (predicate_subproof_t psp,
  mpz_t CH,

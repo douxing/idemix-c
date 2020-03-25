@@ -11,3 +11,8 @@ void predicate_init_assign
   mpz_init_set(p->m, m);
   mpz_init_set(p->z, z);
 }
+
+void predicate_clear(predicate_t p)
+{
+  mpz_clears(p->m, p->z, NULL);
+}

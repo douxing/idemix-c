@@ -1,4 +1,5 @@
 #include "idemix_nonrev_credential_subproof_dump_t.h"
+#include "idemix_pairing.h"
 
 void nonrev_credential_subproof_dump_t
 (mpz_vec_t T,
@@ -31,7 +32,10 @@ void nonrev_credential_subproof_dump_t
   element_pow2_zn(t,
 		  pk->h, nrcspa->rho_tilde,
 		  pk->h_tilde, nrcspa->o_tilde);
-  element_to_mpz(z, t);
+  element_to_mpz(z, nrcspa->rho_tilde);
+  element_printf("rho_tilde: %B\nto mpz: %Zd\n", nrcspa->rho_tilde, z);
+  element_printf("T1_bar: %B\n", t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
 
@@ -45,7 +49,7 @@ void nonrev_credential_subproof_dump_t
 		  C->E, nrcspa->c_tilde,
 		  t1, nrcspa->m_tilde,
 		  t2, nrcspa->t_tilde);
-  element_to_mpz(z, t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
@@ -76,7 +80,7 @@ void nonrev_credential_subproof_dump_t
 		  t2, nrcspa->m2_tilde,
 		  t3, nrcspa->s_tilde);
   element_mul(t, t, t4);
-  element_to_mpz(z, t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
@@ -95,8 +99,10 @@ void nonrev_credential_subproof_dump_t
   element_pow2_zn(t3,
 		  t1, nrcspa->r_tilde,
 		  t2, nrcspa->r_apos_tilde);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t3);
   mpz_vec_append(T, z);
+  gmp_printf("T4: %Zd\n", z);
+  element_printf("T4: %B\n", t3);
   element_clear(t);
   element_clear(t1);
   element_clear(t2);
@@ -107,7 +113,7 @@ void nonrev_credential_subproof_dump_t
   element_pow2_zn(t,
 		  acc->g, nrcspa->r_tilde,
 		  pk->h_tilde, nrcspa->o_apos_tilde);
-  element_to_mpz(z, t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
 
@@ -121,7 +127,7 @@ void nonrev_credential_subproof_dump_t
 		  C->D, nrcspa->r_apos2_tilde,
 		  t1, nrcspa->m_apos_tilde,
 		  t2, nrcspa->t_apos_tilde);
-  element_to_mpz(z, t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
@@ -142,6 +148,8 @@ void nonrev_credential_subproof_dump_t
 		  t1, nrcspa->r_apos2_tilde,
 		  t2, nrcspa->m_apos_tilde,
 		  t3, nrcspa->r_tilde);
+  pbc_element_to_mpz(z, t4);
+  mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
   element_clear(t2);
@@ -159,6 +167,8 @@ void nonrev_credential_subproof_dump_t
   element_pow2_zn(t3,
 		  t1, nrcspa->r_tilde,
 		  t2, nrcspa->r_apos3_tilde);
+  pbc_element_to_mpz(z, t3);
+  mpz_vec_append(T, z);
   element_clear(t);
   element_clear(t1);
   element_clear(t2);

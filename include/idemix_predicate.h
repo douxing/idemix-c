@@ -24,4 +24,6 @@ void predicate_init_assign
  mpz_t m,
  mpz_t z);
 
+void predicate_clear(predicate_t p);
+
 #endif // __IDEMIX_PREDICATE_H__

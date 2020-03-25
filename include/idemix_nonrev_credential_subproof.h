@@ -33,6 +33,8 @@ void tuple_x_init
 (tuple_x_t X,
  pairing_t pairing);
 
+void tuple_x_clear(tuple_x_t X);
+
 void tuple_x_assign
 (tuple_x_t X,
  mpz_t CH,

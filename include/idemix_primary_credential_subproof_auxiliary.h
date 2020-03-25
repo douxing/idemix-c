@@ -21,6 +21,12 @@ typedef struct primary_credential_subproof_auxiliary_s \
 typedef struct primary_credential_subproof_auxiliary_s \
                primary_credential_subproof_auxiliary_t[1];
 
+void primary_credential_subproof_auxiliary_init
+(primary_credential_subproof_auxiliary_t aux);
+
+void primary_credential_subproof_auxiliary_clear
+(primary_credential_subproof_auxiliary_t aux);
+
 void primary_credential_subproof_auxiliary_assign
 (primary_credential_subproof_auxiliary_t pcspa,
  primary_credential_t pc);

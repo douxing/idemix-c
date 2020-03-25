@@ -1,4 +1,5 @@
 #include "idemix_nonrev_credential_subcheck_dump_t.h"
+#include "idemix_pairing.h"
 
 void nonrev_credential_subcheck_dump_t
 (mpz_vec_t T,
@@ -15,6 +16,8 @@ void nonrev_credential_subcheck_dump_t
   element_t eCH, t, t1, t2, t3, t4;
   element_init_Zr(eCH, pairing);
   element_set_mpz(eCH, CH);
+
+  gmp_printf("CH: %Zd\n", CH);
   
   // T1^
   element_init_G1(t, pairing);
@@ -22,7 +25,10 @@ void nonrev_credential_subcheck_dump_t
 		  C->E, eCH,
 		  pk->h, X->rho_caret,
 		  pk->h_tilde, X->o_caret);
-  element_to_mpz(z, t);
+  element_to_mpz(z, X->rho_caret);
+  element_printf("rho_caret: %B\nto mpz: %Zd\n", X->rho_caret, z);
+  element_printf("T1_caret: %B\n", t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);  
   element_clear(t);
 
@@ -35,7 +41,7 @@ void nonrev_credential_subcheck_dump_t
 		  C->E, X->c_caret,
 		  t1, X->m_caret,
 		  t2, X->t_caret);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);
   element_clear(t1);
   element_clear(t2);
@@ -72,7 +78,7 @@ void nonrev_credential_subcheck_dump_t
 		  t1, X->m2_caret,
 		  t2, X->s_caret);
   element_mul(t4, t4, t3);
-  element_to_mpz(z, t4);
+  pbc_element_to_mpz(z, t4);
   mpz_vec_append(T, z);  
   element_clear(t);
   element_clear(t1);
@@ -96,7 +102,7 @@ void nonrev_credential_subcheck_dump_t
 		  t1, eCH,
 		  t2, X->r_caret,
 		  t3, X->r_apos_caret);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);  
   element_clear(t);
   element_clear(t1);
@@ -109,7 +115,7 @@ void nonrev_credential_subcheck_dump_t
 		  C->D, eCH,
 		  acc->g, X->r_caret,
 		  pk->h_tilde, X->o_apos_caret);
-  element_to_mpz(z, t);
+  pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);  
   element_clear(t);
 
@@ -122,7 +128,7 @@ void nonrev_credential_subcheck_dump_t
 		  C->D, X->r_apos2_caret,
 		  t1, X->m_apos_caret,
 		  t2, X->t_apos_caret);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);  
   element_clear(t1);
   element_clear(t2);
@@ -146,7 +152,7 @@ void nonrev_credential_subcheck_dump_t
   element_pairing(t2, pk->h_tilde, C->S);
   element_pow_zn(t2, t2, X->r_caret);
   element_mul(t1, t1, t2);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);  
   element_clear(t);
   element_clear(t1);
@@ -168,7 +174,7 @@ void nonrev_credential_subcheck_dump_t
 		  t1, eCH,
 		  t2, X->r_caret,
 		  t3, X->r_apos3_caret);
-  element_to_mpz(z, t1);
+  pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);  
   element_clear(t);
   element_clear(t1);

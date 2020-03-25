@@ -30,4 +30,3 @@ void primary_credential_subproof_dump_t
   
   mpz_clears(t1, t2, NULL);
 }
-

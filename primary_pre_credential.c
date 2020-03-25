@@ -97,8 +97,8 @@ void primary_pre_credential_assign
   // page 5 Eq. (14) c' = H(Q||A||A^||n1)
   sm3_mpzs(ppc->c_apos, Q, ppc->A, A_caret, ppc_prep->n1, NULL);
 
-  gmp_printf("assign:\nQ : %Zd\nA : %Zd\nA^: %Zd\nn1: %Zd\n",
-	     Q, ppc->A, A_caret, ppc_prep->n1);
+  // gmp_printf("assign:\nQ : %Zd\nA : %Zd\nA^: %Zd\nn1: %Zd\n",
+  //	     Q, ppc->A, A_caret, ppc_prep->n1);
 
   // page 5 Eq. (15) s_e = r - c'e^-1
   mpz_mul(temp, ppc->c_apos, e_inv);

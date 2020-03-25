@@ -18,6 +18,23 @@ void predicate_subproof_init
 	    NULL);
 }
 
+void predicate_subproof_clear
+(predicate_subproof_t psp)
+{
+  mpz_clears(psp->u_caret[0],
+	     psp->u_caret[1],
+	     psp->u_caret[2],
+	     psp->u_caret[3],
+	     psp->r_caret[0],
+	     psp->r_caret[1],
+	     psp->r_caret[2],
+	     psp->r_caret[3],
+	     psp->r_delta_caret,
+	     psp->alpha_caret,
+	     psp->m_caret,
+	     NULL);
+}
+
 void predicate_subproof_assign
 (predicate_subproof_t psp,
  mpz_t CH,

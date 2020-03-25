@@ -20,6 +20,24 @@ void tuple_x_init
   element_init_Zr(X->r_apos3_caret, pairing);
 }
 
+void tuple_x_clear(tuple_x_t X)
+{
+  element_clear(X->rho_caret);
+  element_clear(X->o_caret);
+  element_clear(X->c_caret);
+  element_clear(X->o_apos_caret);
+  element_clear(X->m_caret);
+  element_clear(X->m_apos_caret);
+  element_clear(X->t_caret);
+  element_clear(X->t_apos_caret);
+  element_clear(X->m2_caret);
+  element_clear(X->s_caret);
+  element_clear(X->r_caret);
+  element_clear(X->r_apos_caret);
+  element_clear(X->r_apos2_caret);
+  element_clear(X->r_apos3_caret);
+}
+
 void tuple_x_assign
 (tuple_x_t X,
  mpz_t CH,
@@ -44,7 +62,7 @@ void tuple_x_assign
   element_mul(t, eCH, nrc->c);
   element_sub(X->c_caret, nrcspa->c_tilde, t);
   element_mul(t, eCH, nrcspa->o_apos);
-  element_sub(X->o_caret, nrcspa->o_tilde, t);
+  element_sub(X->o_apos_caret, nrcspa->o_tilde, t);
 
   // line 3
   element_mul(t, eCH, nrcspa->m);

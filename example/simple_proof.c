@@ -182,8 +182,8 @@ int main(int argc, char *argv[]) {
   primary_credential_init(pc, schema);
   primary_credential_assign(pc, v_apos, Ah, ppc);
 
-  gmp_printf("primary credential:\nA : %Zd\ne : %Zd\n",
-	     pc->A, pc->e);
+  // gmp_printf("primary credential:\nA : %Zd\ne : %Zd\n",
+  // pc->A, pc->e);
   
   if (!primary_pre_credential_verify(ppc, iss_pk, iss_sk, ppc_prep->n1, pc)) {
     gmp_printf("primary pre credential okay\n");
@@ -197,32 +197,230 @@ int main(int argc, char *argv[]) {
   nonrev_credential_assign(nrc, s_apos, nrpc);
   
   gmp_printf("7.2 Proof preparation\n");
-  gmp_printf("Holder prepares all credential pairs to submit\n");  
+  gmp_printf("Holder prepares all credential pairs to submit\n");
   // open m4, the country code
   // and predicate 18 <= m5 < 20
 
-  gmp_printf("update CNR, oldV: %Zd, newV: %Zd\n",
-	     nrc->wit_i->V, acc->V);
-  
+  /* gmp_printf("update CNR, oldV: %Zd, newV: %Zd\n", */
+  /* 	     nrc->wit_i->V, acc->V); */
+
+  mpz_vec_t spT, spC; // T for subproof
+  mpz_vec_init(spT);
+  mpz_vec_init(spC);
+
   nonrev_credential_update(nrc, acc); // dx: nothing changed
   nonrev_credential_subproof_auxiliary_t nrcsp_aux;
   nonrev_credential_subproof_auxiliary_init(nrcsp_aux, pairing);
   nonrev_credential_subproof_auxiliary_assign(nrcsp_aux, nrc);
+
   nonrev_credential_subproof_tuple_c_t nrspC; // C for nonrev subproof
   nonrev_credential_subproof_tuple_c_init(nrspC, pairing);
   nonrev_credential_subproof_tuple_c_assign(nrspC, nr_pk, nrc, nrcsp_aux, acc);
-  mpz_vec_t spT; // T for subproof
-  mpz_vec_init(spT);
+  nonrev_credential_subproof_tuple_c_into_vec(spC, nrspC);
   nonrev_credential_subproof_dump_t(spT, pairing, nr_pk, acc, nrcsp_aux, nrspC);
-  
 
-  
+  gmp_printf("Validity proof:\n");
+  primary_credential_subproof_auxiliary_t pcsp_aux;
+  primary_credential_subproof_auxiliary_init(pcsp_aux);
+  primary_credential_subproof_auxiliary_assign(pcsp_aux, pc);
+  primary_credential_subproof_tuple_c_t pcspC;
+  primary_credential_subproof_tuple_c_init(pcspC);
+  primary_credential_subproof_tuple_c_assign(pcspC, iss_pk, pc, pcsp_aux);
+  primary_credential_subproof_tuple_c_into_vec(spC, pcspC);
 
+  attr_vec_t Ar_bar; // m_tildes
+  attr_vec_init_random(Ar_bar, 4, 592); // open m4
+  attr_vec_head(Ar_bar)[0].i = 0;
+  attr_vec_head(Ar_bar)[1].i = 1;
+  attr_vec_head(Ar_bar)[2].i = 2;
+  attr_vec_head(Ar_bar)[3].i = 4;
+  primary_credential_subproof_dump_t(spT, iss_pk, Ar_bar, pcsp_aux, pcspC);
+
+  mpz_t z5;
+  mpz_init_set_ui(z5, 20);
+  predicate_t pred;
+  predicate_init_assign(pred, LESS_THAN, m5, z5);
+  predicate_subproof_auxiliary_t pred_aux;
+  predicate_subproof_auxiliary_init(pred_aux);
+  predicate_subproof_auxiliary_assign(pred_aux, pred);
+  predicate_subproof_tuple_c_t predC;
+  predicate_subproof_tuple_c_init(predC);
+  predicate_subproof_tuple_c_assign(predC, iss_pk, pred_aux);
+  predicate_subproof_tuple_c_into_vec(spC, predC);
+  predicate_subproof_dump_t(spT, iss_pk, pred_aux, predC);
+
+  gmp_printf("7.2.1 Hashing\n");
+  mpz_t CH;
+  mpz_init(CH);
+  sm3_TCn(CH, spT, spC, ppc_prep->n1);
+
+  gmp_printf("7.2.2 final preparation\n");
+  tuple_x_t X; // subproof for non revocation
+  tuple_x_init(X, pairing);
+  tuple_x_assign(X, CH, m2, nrc, nrcsp_aux);
+  primary_credential_subproof_t pcsp;
+  primary_credential_subproof_init(pcsp, 4);
+  primary_credential_subproof_assign(pcsp,
+				     CH,
+				     Ar_bar,
+				     pc,
+				     pcsp_aux,
+				     pcspC->A_apos);
+  predicate_subproof_t predsp;
+  predicate_subproof_init(predsp);
+  predicate_subproof_assign(predsp, CH, pred, pred_aux);
+
+  for (unsigned long i = 0; i < mpz_vec_size(spT); ++i) {
+    // gmp_printf("%d: %Zd\n", i, mpz_vec_head(spT) + i);
+  }
+
+  gmp_printf("7.2.3 Sending (CH, X, PrC, PrP, C) to the Verifier\n");
+  attr_vec_t Ar;
+  attr_vec_init(Ar, 1);
+  attr_vec_head(Ar)[0].i = 3;
+  mpz_set(attr_vec_head(Ar)[0].v, m4);
+
+  mpz_vec_t checkT;
+  mpz_vec_init(checkT);
+  nonrev_credential_subcheck_dump_t(checkT,
+				    pairing,
+				    CH,
+				    acc,
+				    acc_pk,
+				    nr_pk,
+				    X,
+				    nrspC);
+  primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
+  predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
+
+  for (unsigned long i = 0; i < mpz_vec_size(checkT); ++i) {
+    gmp_printf("%d:\n%Zd\n%Zd\n",
+	       i,
+	       mpz_vec_head(spT) + i,
+	       mpz_vec_head(checkT) + i);
+  }
+
+
+  // dx test zone
+  printf("-------------------- test zone ------------------------\n");
+
+  element_t addE, powE, tt0, tt1, tt2;
+  element_init_G1(tt0, pairing);
+  element_init_G1(tt1, pairing);
+  element_init_G1(tt2, pairing);
+  element_init_G1(addE, pairing);
+  element_init_G1(powE, pairing);
+  
+  element_mul_zn(tt0, nr_pk->h, nrcsp_aux->rho);
+  element_mul_zn(tt1, nr_pk->h_tilde, nrcsp_aux->o);
+  element_add(addE, tt0, tt1);
+
+  element_pow2_zn(powE, nr_pk->h, nrcsp_aux->rho, nr_pk->h_tilde, nrcsp_aux->o);
+
+  element_printf("add E: %B\npow E: %B\nthe E: %B\n",
+		 addE, powE, nrspC->E);
+
+
+  element_t T1_bar, T1_car, eleCH, T_bar, T_car;
+  element_init_G1(T1_bar, pairing);
+  element_init_G1(T1_car, pairing);
+  element_init_G1(T_bar, pairing);
+  element_init_G1(T_car, pairing);
+  element_init_Zr(eleCH, pairing);
+  element_set_mpz(eleCH, CH);
+
+  element_printf("eCH: %B\n", eleCH);
+
+  element_t rho_caret, o_caret;
+  element_t zrt0, zrt1, zrt2;
+  element_init_Zr(rho_caret, pairing);
+  element_init_Zr(o_caret, pairing);
+  element_init_Zr(zrt0, pairing);
+  element_init_Zr(zrt1, pairing);
+  element_init_Zr(zrt2, pairing);
+
+  element_mul(rho_caret, eleCH, nrcsp_aux->rho);
+  element_sub(rho_caret, nrcsp_aux->rho_tilde, rho_caret);
+  element_printf("rho_caret: %B\nX->rho_caret: %B\n",
+		 rho_caret, X->rho_caret);
+
+  element_printf("o: %B\no_tilde: %B\n",
+		 nrcsp_aux->o, nrcsp_aux->o_tilde);
+
+  element_mul(o_caret, eleCH, nrcsp_aux->o);
+  element_sub(o_caret, nrcsp_aux->o_tilde, o_caret);
+  element_printf("o_caret: %B\nX->o_caret: %B\n",
+		 o_caret, X->o_caret);
+
+  // element_printf("zrt0: %B\nzrt1: %B\nzrt2: %B\n",
+  //		 zrt0, zrt1, zrt2);
+
+  element_pow_zn(tt0, nr_pk->h, nrcsp_aux->o_tilde);
+  element_pow_zn(tt1, nr_pk->h_tilde, nrcsp_aux->o_tilde);
+  element_mul(tt0, tt0, tt1);
+
+  element_pow2_zn(T1_bar,
+		  nr_pk->h, nrcsp_aux->o_tilde,
+		  nr_pk->h_tilde, nrcsp_aux->o_tilde);
+
+  element_printf("tt0: %B\nT1_bar: %B\n", tt0, T1_bar);
+
+  element_pow_zn(tt0, powE, eleCH);
+  element_pow_zn(tt1, nr_pk->h, X->rho_caret);
+  element_pow_zn(tt2, nr_pk->h_tilde, X->o_caret);
+  element_mul(tt0, tt0, tt1);
+  element_mul(tt0, tt0, tt2);
+
+  element_pow3_zn(T1_car,
+		  powE, eleCH,
+		  nr_pk->h, X->o_caret,
+		  nr_pk->h_tilde, X->o_caret);
+
+  element_printf("tt0: %B\n,T1_bar: %B\nT1_car: %B\n",
+		 tt0, T1_bar, T1_car);
+
+  element_clear(zrt0);
+  element_clear(zrt1);
+  element_clear(zrt2);
+
+  element_clear(rho_caret);
+  element_clear(o_caret);
+
+  element_clear(tt0);
+  element_clear(tt1);
+  element_clear(tt2);
+  element_clear(addE);
+  element_clear(powE);
+  printf("-------------------- test zone end --------------------\n");
+
+  // dx tesst zone
+
+  mpz_t CH1;
+  mpz_init(CH1);
+  sm3_TCn(CH1, checkT, spC, ppc_prep->n1);
+  gmp_printf("CH : %Zd\nCH1: %Zd\n", CH, CH1);
+  
   gmp_printf("clean up variables...\n");
+  mpz_clear(CH1);
+  mpz_vec_clear(checkT);
+  attr_vec_clear(Ar);
 
-  mpz_vec_clear(spT);
+  predicate_subproof_clear(predsp);
+  primary_credential_subproof_clear(pcsp);
+  tuple_x_clear(X);
+  mpz_clear(CH);
+
+  predicate_subproof_tuple_c_clear(predC);
+  predicate_subproof_auxiliary_clear(pred_aux);
+  predicate_clear(pred);
+  mpz_clear(z5);
+  attr_vec_clear(Ar_bar);
+  primary_credential_subproof_tuple_c_clear(pcspC);
+  primary_credential_subproof_auxiliary_clear(pcsp_aux);  
   nonrev_credential_subproof_tuple_c_clear(nrspC);
   nonrev_credential_subproof_auxiliary_clear(nrcsp_aux);
+  mpz_vec_clear(spC);
+  mpz_vec_clear(spT);
 
   nonrev_credential_clear(nrc);
   primary_credential_clear(pc);
