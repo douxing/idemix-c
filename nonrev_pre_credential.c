@@ -82,7 +82,7 @@ void nonrev_pre_credential_assign
   element_pow_zn(nrpc->wit_i->sigma_i, acc->g_apos, temp); // sigma_i
 
   // page 5 Eq. (18)
-  element_mul(acc->acc, acc->acc, acc->g2_v[acc->L - i]); // A
+  element_mul(acc->acc, acc->acc, acc->g2_v[acc->L - 1 - i]); // A
   bitmap_setbit(acc->V, i); // V
 
   // page 5 Eq. (19)

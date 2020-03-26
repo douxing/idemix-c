@@ -64,9 +64,9 @@ void accumulator_init_assign
   unsigned long i = 1;
   while (i < L) { // [1, L - 1]
     element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
+    element_pow_zn(acc->g1_v[i], acc->g1_v[i - 1], sk->gamma);
     element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
+    element_pow_zn(acc->g2_v[i], acc->g2_v[i - 1], sk->gamma);
     ++i;
   }
 
@@ -79,19 +79,19 @@ void accumulator_init_assign
   // 2.1 g1, ..., g2L and 2.2 g'1, ..., g'2L, continued
   // (L+2)th element = (L)th element * g^gamma * g^gamma
   element_init_G1(acc->g1_v[L + 1], pairing);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L - 1], acc->g1_v[0]);
-  element_mul(acc->g1_v[L + 1], acc->g1_v[L + 1], acc->g1_v[0]);
+  element_pow_zn(acc->g1_v[L + 1], acc->g1_v[L - 1], sk->gamma);
+  element_pow_zn(acc->g1_v[L + 1], acc->g1_v[L - 1], sk->gamma);
   element_init_G2(acc->g2_v[L + 1], pairing);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L - 1], acc->g2_v[0]);
-  element_mul(acc->g2_v[L + 1], acc->g1_v[L + 1], acc->g2_v[0]);
+  element_pow_zn(acc->g2_v[L + 1], acc->g2_v[L - 1], sk->gamma);
+  element_pow_zn(acc->g2_v[L + 1], acc->g2_v[L - 1], sk->gamma);
 
   // continue from (L+3)th element to the end
   i = L + 2;
   while (i < 2 * L) {
     element_init_G1(acc->g1_v[i], pairing);
-    element_mul(acc->g1_v[i], acc->g1_v[i - 1], acc->g1_v[0]);
+    element_pow_zn(acc->g1_v[i], acc->g1_v[i - 1], sk->gamma);
     element_init_G2(acc->g2_v[i], pairing);
-    element_mul(acc->g2_v[i], acc->g2_v[i - 1], acc->g2_v[0]);
+    element_pow_zn(acc->g2_v[i], acc->g2_v[i - 1], sk->gamma);
     ++i;
   }
 
@@ -129,7 +129,7 @@ void compute_w(element_t w, // OUTPUT
 
   while (j < acc->L) {
     if (j != i) {
-      element_mul(w, w, acc->g2_v[acc->L -j + i]);
+      element_mul(w, w, acc->g2_v[acc->L - j + i]);
     }
     
     j = bitmap_scan1(acc->V, j + 1);
