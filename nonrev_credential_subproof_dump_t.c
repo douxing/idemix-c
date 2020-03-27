@@ -99,7 +99,6 @@ void nonrev_credential_subproof_dump_t
   element_pow2_zn(t1,
 		  t1, nrcspa->r_tilde,
 		  t2, nrcspa->r_apos_tilde);
-  element_printf("T4 bar: %B\n", t1);
   pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);
   element_clear(t);
@@ -113,6 +112,7 @@ void nonrev_credential_subproof_dump_t
 		  pk->h_tilde, nrcspa->o_apos_tilde);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
+  element_printf("T5 bar: %B\n", t);
   element_clear(t);
 
   // T6 bar

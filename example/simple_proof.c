@@ -296,129 +296,45 @@ int main(int argc, char *argv[]) {
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
+  /*
   for (unsigned long i = 0; i < mpz_vec_size(checkT); ++i) {
     gmp_printf("%d:\n%Zd\n%Zd\n",
   	       i,
   	       mpz_vec_head(spT) + i,
   	       mpz_vec_head(checkT) + i);
   }
+  */
 
 
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
-  element_t ct, c1, c2, c_zr, g0g0, gamma;
-  element_init_GT(ct, pairing);
-  element_init_G1(c1, pairing);
-  element_init_G2(c2, pairing);
-  element_init_Zr(c_zr, pairing);
-  element_init_GT(g0g0, pairing);
-  element_init_Zr(gamma, pairing);
 
-  element_set_si(c_zr, 2);
-  element_pow_zn(gamma, acc_sk->gamma, c_zr);
-  element_printf("gamma: %B\ngamma^2: %B\n", acc_sk->gamma, gamma);
-  element_pairing(g0g0, acc->g, acc->g_apos);
-  element_pow_zn(g0g0, g0g0, gamma);
-  element_printf("e(g, g')^gamma^ 2: %B\n", g0g0);
-  element_pairing(g0g0, acc->g1_v[0], acc->g2_v[0]);
-  element_printf("e(g0, g'0): %B\n", g0g0);
-
-  element_set_si(c_zr, L + 1);
-  element_pow_zn(gamma, acc_sk->gamma, c_zr);
-  element_pairing(g0g0, acc->g, acc->g_apos);
-  element_pow_zn(g0g0, g0g0, gamma); // e(g, g')^gamma^L+1
-  element_printf("e(g,g')^gamma^L+1: %B\n", g0g0);
-  element_printf("z: %B\n", acc_pk->z);
-
-  //   for (unsigned long i = 0; i < L; ++i) {
-    //    element_pairing(g0g0, acc->g1_v[i], acc->g2_v[L-1-i]);
-    //element_printf("error???: e(g%d, g'%d): %B\n",
-    //		   i, L-1-i, g0g0);
-  //}
-
-  element_pairing(g0g0, acc->g1_v[0], acc->g2_v[1]);
-  element_printf("e(g0, g'1)%B\n", g0g0);  
-  element_pairing(g0g0, acc->g1_v[1], acc->g2_v[0]);
-  element_printf("e(g1, g'0)%B\n", g0g0);  
-
-  element_clear(ct);
-  element_clear(c1);
-  element_clear(c2);
-  element_clear(c_zr);
-  element_clear(gamma);
-  
-  printf("\n\n\n");
-
-  element_t t0_g2, tz_gt;
-  element_init_G2(t0_g2, pairing);
-  element_init_GT(tz_gt, pairing);
-  element_mul(t0_g2, acc->g_apos, acc->acc);
-  element_printf("g_apos: %B\nacc: %B\nv_100: %B\nt0_g2: %B\n",
-		 acc->g_apos, acc->acc, acc->g2_v + L - INDEX, t0_g2);
-
-  element_pow_zn(t0_g2, nr_pk->h_caret, nrcsp_aux->r_apos);
-  element_printf("h_r: %B\n", t0_g2);
-  element_printf("W: %B\n", nrspC->W);
-  element_printf("z: %B\n\n\n", acc_pk->z);
-  element_clear(t0_g2);
-
-  element_t eleCH;
+  element_t eleCH, tbar, tcar;
   element_init_Zr(eleCH, pairing);
+  element_init_G1(tbar, pairing);
+  element_init_G1(tcar, pairing);
   element_set_mpz(eleCH, CH);
-  
-  element_t T4bar, T4car, tt0, tt1, tt2, tt3;
-  element_t g_inv;
-  element_init_GT(T4bar, pairing);
-  element_init_GT(T4car, pairing);
-  element_init_G1(g_inv, pairing);
-  element_init_GT(tt0, pairing);
-  element_init_GT(tt1, pairing);
-  element_init_GT(tt2, pairing);
-  element_init_GT(tt3, pairing);
 
-  element_pairing(tt1, nr_pk->h_tilde, acc->acc);
-  element_invert(g_inv, acc->g);
-  element_pairing(tt2, g_inv, nr_pk->h_caret);
-  element_pow2_zn(T4bar, tt1, nrcsp_aux->r_tilde, tt2, nrcsp_aux->r_apos_tilde);
-  element_printf("T4bar: %B\n", T4bar);
+  element_printf("r: %B\nr~: %B\n",
+		 nrcsp_aux->r, nrcsp_aux->r_tilde);
 
-  element_pairing(tt1, nrspC->G, acc->acc);
-  element_pairing(tt2, acc->g, nrspC->W);
-  element_mul(tt2, tt2, acc_pk->z);
-  element_div(tt1, tt1, tt2);
-  element_pairing(tt2, nr_pk->h_tilde, acc->acc);
-  element_pairing(tt3, g_inv, nr_pk->h_caret);
-  element_pow3_zn(T4car, tt1, eleCH, tt2, X->r_caret, tt3, X->r_apos_caret);
-  element_printf("T4car: %B\n", T4car);
+  element_pow2_zn(tbar,
+		  acc->g,
+		  nrcsp_aux->r_tilde,
+		  nr_pk->h_tilde,
+		  nrcsp_aux->o_apos_tilde);
+  element_printf("tbar: %B\n", tbar);
 
+  element_pow3_zn(tcar,
+		  nrspC->D, eleCH,
+		  g1_gen, X->r_caret,
+		  nr_pk->h_tilde, X->o_apos_caret);
 
-  element_clear(tt0);
-  element_clear(tt1);
-  element_clear(tt2);
-  element_clear(tt3);
-  element_clear(T4bar);
-  element_clear(T4car);
-  element_clear(g_inv);
+  element_printf("tcar: %B\n", tcar);
+
   element_clear(eleCH);
-
-  // dx tesst zone
-
-  element_t a0, a1, a2, a3;
-  element_init_GT(a0, pairing);
-  element_init_GT(a1, pairing);
-  element_init_G1(a2, pairing);
-
-  element_invert(a2, g1_gen);
-  element_pairing(a0, a2, nr_pk->h_caret);
-  element_pairing(a1, g1_gen, nr_pk->h_caret);
-  element_invert(a1, a1);
-
-  element_printf("a0: %B\na1: %B\n\n\n", a0, a1);
-
-  element_clear(a0);
-  element_clear(a1);
-  element_clear(a2);
-
+  
+ 
   printf("-------------------- test zone end --------------------\n");
 
   mpz_t CH1;

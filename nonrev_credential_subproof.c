@@ -62,7 +62,7 @@ void tuple_x_assign
   element_mul(t, eCH, nrc->c);
   element_sub(X->c_caret, nrcspa->c_tilde, t);
   element_mul(t, eCH, nrcspa->o_apos);
-  element_sub(X->o_apos_caret, nrcspa->o_tilde, t);
+  element_sub(X->o_apos_caret, nrcspa->o_apos_tilde, t);
 
   // line 3
   element_mul(t, eCH, nrcspa->m);

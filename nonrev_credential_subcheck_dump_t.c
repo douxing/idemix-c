@@ -104,8 +104,6 @@ void nonrev_credential_subcheck_dump_t
   element_pairing(t2, t, pk->h_caret);
   element_pow2_zn(t1, t1, X->r_caret, t2, X->r_apos_caret);
   element_mul(t1, t3, t1);
-  element_printf("T4 car: %B\n", t1);
-
   pbc_element_to_mpz(z, t1);
   mpz_vec_append(T, z);
   element_clear(t);
@@ -121,6 +119,8 @@ void nonrev_credential_subcheck_dump_t
 		  pk->h_tilde, X->o_apos_caret);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
+  element_printf("T5 car: %B\n", t);
+
   element_clear(t);
 
   // T6^
