@@ -296,41 +296,60 @@ int main(int argc, char *argv[]) {
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
-  /*
   for (unsigned long i = 0; i < mpz_vec_size(checkT); ++i) {
     gmp_printf("%d:\n%Zd\n%Zd\n",
   	       i,
   	       mpz_vec_head(spT) + i,
   	       mpz_vec_head(checkT) + i);
   }
-  */
 
 
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
 
-  element_t eleCH, tbar, tcar;
+  element_t eleCH;
   element_init_Zr(eleCH, pairing);
-  element_init_G1(tbar, pairing);
-  element_init_G1(tcar, pairing);
   element_set_mpz(eleCH, CH);
 
-  element_printf("r: %B\nr~: %B\n",
-		 nrcsp_aux->r, nrcsp_aux->r_tilde);
+  element_t tbar, tcar, tgt1, tgt2, tgt3, tg1, tzr;
+  element_init_GT(tbar, pairing);
+  element_init_GT(tcar, pairing);
+  element_init_GT(tgt1, pairing);
+  element_init_GT(tgt2, pairing);
+  element_init_GT(tgt3, pairing);
+  element_init_G1(tg1, pairing);
+  element_init_Zr(tzr, pairing);
 
-  element_pow2_zn(tbar,
-		  acc->g,
-		  nrcsp_aux->r_tilde,
-		  nr_pk->h_tilde,
-		  nrcsp_aux->o_apos_tilde);
+  element_mul(tg1, nr_pk->pk, nrspC->G);
+  element_pairing(tgt1, tg1, nr_pk->h_caret);
+  element_pairing(tgt2, nr_pk->h_tilde, nr_pk->h_caret);
+  element_neg(tzr, nrcsp_aux->m_apos_tilde);
+  element_pairing(tgt3, nr_pk->h_tilde, nrspC->S);
+  element_pow3_zn(tbar,
+		  tgt1, nrcsp_aux->r_apos2_tilde,
+		  tgt2, tzr,
+		  tgt3, nrcsp_aux->r_tilde);
   element_printf("tbar: %B\n", tbar);
 
+  element_mul(tg1, nr_pk->pk, nrspC->G);
+  element_pairing(tgt1, tg1, nrspC->S);
+  element_pairing(tgt2, g1_gen, g2_gen);
+  element_neg(tzr, eleCH);
+  element_pairing(tgt3, tg1, nr_pk->h_caret);
   element_pow3_zn(tcar,
-		  nrspC->D, eleCH,
-		  g1_gen, X->r_caret,
-		  nr_pk->h_tilde, X->o_apos_caret);
+		  tgt1, eleCH,
+		  tgt2, tzr,
+		  tgt3, X->r_apos2_caret);
 
-  element_printf("tcar: %B\n", tcar);
+  element_pairing(tgt2, nr_pk->h_tilde, nr_pk->h_caret);
+  element_neg(tzr, X->m_apos_caret);
+  element_pairing(tgt3, nr_pk->h_tilde, nrspC->S);
+  element_pow2_zn(tgt1,
+		  tgt2, tzr,
+		  tgt3, X->r_caret);
+
+  element_mul(tcar, tcar, tgt1);
+  element_printf("tcar: %B\n", tcar);  
 
   element_clear(eleCH);
   

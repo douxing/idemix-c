@@ -57,7 +57,7 @@ void nonrev_pre_credential_assign
   // page 5 Eq. (16)
   mpz_t mpz_i;
   mpz_init(mpz_i);
-  mpz_set_ui(mpz_i, i);
+  mpz_set_ui(mpz_i, i + 1);
 
   element_t temp;
   element_init_same_as(temp, nrpc->c); // in Zr

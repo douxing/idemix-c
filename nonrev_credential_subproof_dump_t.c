@@ -112,7 +112,6 @@ void nonrev_credential_subproof_dump_t
 		  pk->h_tilde, nrcspa->o_apos_tilde);
   pbc_element_to_mpz(z, t);
   mpz_vec_append(T, z);
-  element_printf("T5 bar: %B\n", t);
   element_clear(t);
 
   // T6 bar
@@ -137,14 +136,15 @@ void nonrev_credential_subproof_dump_t
   element_init_GT(t2, pairing);
   element_init_GT(t3, pairing);
   element_init_GT(t4, pairing);
+  element_init_Zr(z2, pairing);
   element_mul(t, pk->pk, C->G);
   element_pairing(t1, t, pk->h_caret);
   element_pairing(t2, pk->h_tilde, pk->h_caret);
-  element_invert(t2, t2);
+  element_neg(z2, nrcspa->m_apos_tilde);
   element_pairing(t3, pk->h_tilde, C->S);
   element_pow3_zn(t4,
 		  t1, nrcspa->r_apos2_tilde,
-		  t2, nrcspa->m_apos_tilde,
+		  t2, z2,
 		  t3, nrcspa->r_tilde);
   pbc_element_to_mpz(z, t4);
   mpz_vec_append(T, z);
@@ -153,6 +153,7 @@ void nonrev_credential_subproof_dump_t
   element_clear(t2);
   element_clear(t3);
   element_clear(t4);
+  element_clear(z2);
 
   // T8 bar
   element_init_G1(t, pairing);
