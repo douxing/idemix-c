@@ -11,6 +11,8 @@ struct predicate_subproof_auxiliary_s {
   mpz_t delta;         // determined by op, delta = u1^2 + u2^2 + u3^2 + u4^2
   mpz_t u[4];          // 7.2.(Validity Proof).4.2
 
+  mpz_t a;             // 1 or -1
+
   mpz_t m_tilde;       // 7.2.(Validity Proof).1
 
   mpz_t r_delta;       // 7.2.(Validity Proof).4.3

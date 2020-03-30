@@ -7,6 +7,7 @@ void predicate_subproof_auxiliary_init
 (predicate_subproof_auxiliary_t pspa)
 {
   mpz_inits(pspa->delta,
+	    pspa->a,
 	    pspa->u[0],
 	    pspa->u[1],
 	    pspa->u[2],
@@ -34,6 +35,7 @@ void predicate_subproof_auxiliary_clear
 (predicate_subproof_auxiliary_t pspa)
 {
   mpz_clears(pspa->delta,
+	     pspa->a,
 	     pspa->u[0],
 	     pspa->u[1],
 	     pspa->u[2],
@@ -62,13 +64,16 @@ void predicate_subproof_auxiliary_assign
  predicate_t p,
  mpz_t m_tilde)
 {
+  mpz_set_ui(pspa->a, 1);
   switch (p->op) { // assign delta
   case LESS_THAN_OR_EQUAL_TO:    // m <= z
     mpz_sub(pspa->delta, p->z, p->m);
+    mpz_neg(pspa->a, pspa->a);
     break;
   case LESS_THAN:                // m <  z
     mpz_sub(pspa->delta, p->z, p->m);
     mpz_sub_ui(pspa->delta, pspa->delta, 1);
+    mpz_neg(pspa->a, pspa->a);
     break;
   case GREATER_THAN_OR_EQUAL_TO: // m >= z
     mpz_sub(pspa->delta, p->m, p->z);

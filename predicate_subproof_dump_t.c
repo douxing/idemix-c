@@ -1,4 +1,5 @@
 #include "idemix_predicate_subproof_dump_t.h"
+#include <assert.h>
 
 void predicate_subproof_dump_t
 (mpz_vec_t T,
@@ -20,7 +21,13 @@ void predicate_subproof_dump_t
 
   // T_delta_bar Eq. (39)
   mpz_powm(t1, pk->Z, pspa->m_tilde, pk->n);
-  mpz_powm(t2, pk->S, pspa->r_delta_tilde, pk->n);
+  if (!mpz_cmp_ui(pspa->a, 1)) {
+    mpz_set(t2, pspa->r_delta_tilde);
+  } else {
+    assert(!mpz_cmp_si(pspa->a, -1));
+    mpz_neg(t2, pspa->r_delta_tilde);
+  }
+  mpz_powm(t2, pk->S, t2, pk->n);
   mpz_mul(t1, t1, t2);
   mpz_mod(t1, t1, pk->n);
   mpz_vec_append(T, t1);

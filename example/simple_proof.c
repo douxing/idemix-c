@@ -312,34 +312,31 @@ int main(int argc, char *argv[]) {
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
-  for (unsigned long i = 9; i < mpz_vec_size(spT); ++i)
-  {
-    // unsigned long i = ;
-    gmp_printf("T%dbar: %Zd\nT%dcar: %Zd\n",
-  	       i + 1,
-  	       mpz_vec_head(spT) + i,
-  	       i + 1,
-  	       mpz_vec_head(checkT) + i);
-  }
 
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
 
-  gmp_printf("delta: %Zd\nu1: %Zd\nu2: %Zd\nu3: %Zd\nu4: %Zd\n",
-	     pred_aux->delta,
-	     pred_aux->u[0],
-	     pred_aux->u[1],
-	     pred_aux->u[2],
-	     pred_aux->u[3]);
 
+  for (unsigned long i = 0; i < mpz_vec_size(spT); ++i)
+  {
+    // unsigned long i = ;
+    if (mpz_cmp(mpz_vec_head(spT) + i, mpz_vec_head(checkT) + i)) {
+      gmp_printf("different T:\nT%dbar: %Zd\nT%dcar: %Zd\n",
+		 i + 1,
+		 mpz_vec_head(spT) + i,
+		 i + 1,
+		 mpz_vec_head(checkT) + i);
+      return -1;
+    }
+  }
+  gmp_printf("All Ts are the same.\n");
   
-
-  printf("-------------------- test zone end --------------------\n");
-
   mpz_t CH1;
   mpz_init(CH1);
   sm3_TCn(CH1, checkT, spC, ppc_prep->n1);
   gmp_printf("CH : %Zd\nCH1: %Zd\n", CH, CH1);
+
+  printf("-------------------- test zone end --------------------\n");
 
   gmp_printf("clean up variables...\n");
   mpz_clear(CH1);
