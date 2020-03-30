@@ -54,4 +54,3 @@ void predicate_subcheck_dump_t
 
   mpz_clears(t, t1, NULL);
 }
-

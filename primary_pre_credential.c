@@ -73,7 +73,7 @@ void primary_pre_credential_assign
   mpz_mul(Q, pk->Z, Q);
   mpz_mod(Q, Q, pk->n);
 
-  gmp_printf("Q(11): %Zd\n", Q);
+  // gmp_printf("Q(11): %Zd\n", Q);
 
   // page 5 Eq. (12)
   mpz_t e_inv, n_apos;

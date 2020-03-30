@@ -125,7 +125,7 @@ void compute_w(element_t w, // OUTPUT
   element_set1(w);
   unsigned long j = bitmap_scan1(acc->V, 0);
   
-  element_printf("frist scan: w: %B\nj: %u\n", w, j);
+  // element_printf("frist scan: w: %B\nj: %u\n", w, j);
 
   while (j < acc->L) {
     if (j != i) {

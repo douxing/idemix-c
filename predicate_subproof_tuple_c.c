@@ -27,21 +27,22 @@ void predicate_subproof_tuple_c_assign
  issuer_pk_t pk,
  predicate_subproof_auxiliary_t pspa)
 {
-  mpz_t t;
-  mpz_init(t);
+  mpz_t t0, t1;
+  mpz_inits(t0, t1, NULL);
   for (unsigned long i = 0; i < 4; ++i) {        // Eq. (36)
-    mpz_powm(t, pk->Z, pspa->u[i], pk->n);       // Z^ui
-    mpz_powm(C->T[i], pk->S, pspa->r[i], pk->n); // S^ri
-    mpz_mul(C->T[i], t, C->T[i]);
+    mpz_powm(t0, pk->Z, pspa->u[i], pk->n);       // Z^ui
+    mpz_powm(t1, pk->S, pspa->r[i], pk->n); // S^ri
+    mpz_mul(C->T[i], t0, t1);
     mpz_mod(C->T[i], C->T[i], pk->n);
   }
 
-  // Eq. (36)
-  mpz_powm(t, pk->Z, pspa->delta, pk->n);            // Z^delta
-  mpz_powm(C->T_delta, pk->S, pspa->r_delta, pk->n); // S^r_delta
-  mpz_mul(C->T_delta, t, C->T_delta);
+  // Eq. (37)
+  mpz_powm(t0, pk->Z, pspa->delta, pk->n);            // Z^delta
+  mpz_powm(t1, pk->S, pspa->r_delta, pk->n); // S^r_delta
+  mpz_mul(C->T_delta, t0, t1);
   mpz_mod(C->T_delta, C->T_delta, pk->n);
-  mpz_clear(t);
+
+  mpz_clears(t0, t1, NULL);
 }
 
 void predicate_subproof_tuple_c_into_vec

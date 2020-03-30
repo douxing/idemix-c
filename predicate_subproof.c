@@ -47,12 +47,12 @@ void predicate_subproof_assign
 
   for (unsigned long i = 0; i < 4; ++i) {
     // Eq. (45)
-    mpz_mul(psp->u_caret[i], CH, pspa->u[i]);
-    mpz_add(psp->u_caret[i], pspa->u_tilde[i], psp->u_caret[i]);
+    mpz_mul(t, CH, pspa->u[i]);
+    mpz_add(psp->u_caret[i], pspa->u_tilde[i], t);
 
     // Eq. (46)
-    mpz_mul(psp->r_caret[i], CH, pspa->u[i]);
-    mpz_add(psp->r_caret[i], pspa->r_tilde[i], psp->r_caret[i]);
+    mpz_mul(t, CH, pspa->r[i]);
+    mpz_add(psp->r_caret[i], pspa->r_tilde[i], t);
 
     // Eq. (48) 2 / 3
     mpz_mul(t, pspa->u[i], pspa->r[i]);

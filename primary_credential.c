@@ -81,25 +81,12 @@ int primary_pre_credential_verify
     mpz_mul(Q, pk->Z, Q);
     mpz_mod(Q, Q, pk->n);
 
-    {
-      gmp_printf("Q(20): %Zd\n", Q);
-      gmp_printf("A: %Zd\n", pc->A);
-      mpz_mul(t, sk->p_apos, sk->q_apos);
-      mpz_invert(t, pc->e, t);
-      mpz_powm(t, Q, t, pk->n);
-      gmp_printf("A: %Zd\n", t);
-      mpz_powm(t, t, pc->e, pk->n);
-      gmp_printf("Q: %Zd\n", t);
-    }
-
     // 4. Verify Q = A^e page 4
-    // dx: TODO: how to do this???
-
     mpz_powm(t, pc->A, pc->e, pk->n);
     if (mpz_cmp(Q, t)) {
       gmp_printf("Q != A^e\nA^e: %Zd\nQ : %Zd\n A : %Zd\ne: %Zd\n",
 		 t, Q, pc->A, ppc->e);
-      // retval = -1;
+      retval = -1;
       break;
     }
 
@@ -114,15 +101,12 @@ int primary_pre_credential_verify
     // gmp_printf("verify:\nQ : %Zd\nA : %Zd\nA^: %Zd\nn1: %Zd\n",
     //	       Q, ppc->A, A_caret, n1);
 
-    // dx: TODO: how to check this?
-    /*
     if (mpz_cmp(t, ppc->c_apos)) {
       gmp_printf("c' != H(Q||A||A^||n1)\nc': %Zd\nH : %Zd\n",
 		 ppc->c_apos, t);
       retval = -1;
       break;
     }
-    */
   } while(0);
 
   mpz_clears(Q, A_caret, t, NULL);

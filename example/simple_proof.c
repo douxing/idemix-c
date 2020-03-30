@@ -1,4 +1,4 @@
-#include "assert.h"
+#include <assert.h>
 #include "idemix.h"
 
 // dx: kindly remind don't get confused
@@ -40,9 +40,24 @@ int main(int argc, char *argv[]) {
   schema_attr_set_known(schema, 4);  // age
 
   gmp_printf("4.2: primary credential crypto setup\n");
+  char *p_apos_str = "173628922298686045020428559970675111465203302151827445847908795228013832423228784296158592917582239150796838330441923803511600970530804742977150486806704676486180147030392605390859997909451933124666121832714651567164808132660770837339740693245220964374024614768999085431492435327781011462395999287424603706073";
+  char *q_apos_str = "145046181312680974872097511099498940411577803531108057745262901008932754163706572141412464363559833363924244165374828845964557879722071900654599850885551493617541831654693100926057793145360422594018596283879918139922248607395251741757811601254413148635509570785585942719467320558644620657163707820723344405421";
+
+  mpz_t p_apos, q_apos;
+  mpz_inits(p_apos, q_apos, NULL);
+  if (!gmp_sscanf(p_apos_str, "%Zd", p_apos)) {
+    gmp_printf("error reading p'\n");
+    return -1;
+  }
+  if (!gmp_sscanf(q_apos_str, "%Zd", q_apos)) {
+    gmp_printf("error reading q'\n");
+    return -1;
+  }
+
   issuer_sk_t iss_sk;
   issuer_pk_t iss_pk;
-  issuer_keys_init_assign(iss_sk, iss_pk, L);
+  issuer_keys_init_assign(iss_sk, iss_pk, L, p_apos, q_apos);
+
 
   gmp_printf("4.4 non-revocation credential crypto setup\n");
   element_t g1_gen;
@@ -113,8 +128,8 @@ int main(int argc, char *argv[]) {
 					n0,
 					v_apos,
 					Ah);
-  gmp_printf("n0: %Zd\nv': %Zd\nm1: %Zd\nm3: %Zd\nc(hash): %Zd\n",
-	     n0, v_apos, m1, m3, ppc_prep->c);
+  // gmp_printf("n0: %Zd\nv': %Zd\nm1: %Zd\nm3: %Zd\nc(hash): %Zd\n",
+  // n0, v_apos, m1, m3, ppc_prep->c);
 
   gmp_printf("Holder prepares for non-revocation credential\n");
   element_random(s_apos);
@@ -171,8 +186,8 @@ int main(int argc, char *argv[]) {
 			       acc_pk,
 			       acc_sk,
 			       nrpc_prep);
-  gmp_printf("i: %d\n", nrpc->i);
-  element_printf("w: %B\n", nrpc->wit_i->w);
+  // gmp_printf("i: %d\n", nrpc->i);
+  // element_printf("w: %B\n", nrpc->wit_i->w);
 
   gmp_printf("5.4 Storing Credentials\n");
 
@@ -237,7 +252,7 @@ int main(int argc, char *argv[]) {
   attr_vec_head(Ar_bar)[0].i = 0;
   attr_vec_head(Ar_bar)[1].i = 1;
   attr_vec_head(Ar_bar)[2].i = 2;
-  attr_vec_head(Ar_bar)[3].i = 4;
+  attr_vec_head(Ar_bar)[3].i = 4; // m5_tilde
   primary_credential_subproof_dump_t(spT, iss_pk, Ar_bar, pcsp_aux, pcspC);
 
   mpz_t z5;
@@ -246,7 +261,9 @@ int main(int argc, char *argv[]) {
   predicate_init_assign(pred, LESS_THAN, m5, z5);
   predicate_subproof_auxiliary_t pred_aux;
   predicate_subproof_auxiliary_init(pred_aux);
-  predicate_subproof_auxiliary_assign(pred_aux, pred);
+  predicate_subproof_auxiliary_assign(pred_aux,
+				      pred,
+				      attr_vec_head(Ar_bar)[3].v);
   predicate_subproof_tuple_c_t predC;
   predicate_subproof_tuple_c_init(predC);
   predicate_subproof_tuple_c_assign(predC, iss_pk, pred_aux);
@@ -274,15 +291,13 @@ int main(int argc, char *argv[]) {
   predicate_subproof_init(predsp);
   predicate_subproof_assign(predsp, CH, pred, pred_aux);
 
-  for (unsigned long i = 0; i < mpz_vec_size(spT); ++i) {
-    // gmp_printf("%d: %Zd\n", i, mpz_vec_head(spT) + i);
-  }
-
   gmp_printf("7.2.3 Sending (CH, X, PrC, PrP, C) to the Verifier\n");
   attr_vec_t Ar;
   attr_vec_init(Ar, 1);
   attr_vec_head(Ar)[0].i = 3;
   mpz_set(attr_vec_head(Ar)[0].v, m4);
+
+  gmp_printf("7.3 Verification\n");
 
   mpz_vec_t checkT;
   mpz_vec_init(checkT);
@@ -297,8 +312,9 @@ int main(int argc, char *argv[]) {
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
+  for (unsigned long i = 9; i < mpz_vec_size(spT); ++i)
   {
-    unsigned long i = 8;
+    // unsigned long i = ;
     gmp_printf("T%dbar: %Zd\nT%dcar: %Zd\n",
   	       i + 1,
   	       mpz_vec_head(spT) + i,
@@ -309,21 +325,14 @@ int main(int argc, char *argv[]) {
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
 
-  mpz_t Q, Qag, A, A_apos, S, Z, xz, z0, z1, z2, n1, n_apos, e_inv, two;
-  mpz_inits(Q, Qag, A, A_apos, S, Z, xz, z0, z1, z2, n1, n_apos, e_inv, two, NULL);
+  gmp_printf("delta: %Zd\nu1: %Zd\nu2: %Zd\nu3: %Zd\nu4: %Zd\n",
+	     pred_aux->delta,
+	     pred_aux->u[0],
+	     pred_aux->u[1],
+	     pred_aux->u[2],
+	     pred_aux->u[3]);
 
-  mpz_mul(n_apos, iss_sk->p_apos, iss_sk->q_apos);
-  mpz_invert(e_inv, pc->e, n_apos);
-
-  mpz_set_ui(S, 4);
-
-  mpz_set_ui(two, 2);
-  random_range(xz, two, n_apos);
-  mpz_powm(Q, S, xz, iss_pk->n); // Q == Z
-  mpz_powm(A, Q, e_inv, iss_pk->n);
-  mpz_powm(Qag, A, pc->e, iss_pk->n);
-
-  gmp_printf("QQQ: %Zd\nQag: %Zd\n", Q, Qag);
+  
 
   printf("-------------------- test zone end --------------------\n");
 

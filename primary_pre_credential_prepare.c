@@ -94,8 +94,8 @@ int primary_pre_credential_prepare_verify
 
   do {
     // Eq. (9)
-    mpz_invert(U_caret, ppc_prep->U, pk->n);
-    mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
+    mpz_neg(t, ppc_prep->c);
+    mpz_powm(U_caret, ppc_prep->U, t, pk->n);
     for (unsigned long i = 0; i < attr_vec_size(ppc_prep->m_carets); ++i) {
       attr_ptr ap = attr_vec_head(ppc_prep->m_carets) + i;
       mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
@@ -105,32 +105,6 @@ int primary_pre_credential_prepare_verify
     mpz_powm(t, pk->S, ppc_prep->v_apos_caret, pk->n);
     mpz_mul(U_caret, U_caret, t);
     mpz_mod(U_caret, U_caret, pk->n);
-
-    if (!mpz_cmp_ui(U_caret, 0)) {
-      gmp_printf("zero!!! %d\n", mpz_cmp(ppc_prep->U, pk->n));
-      mpz_invert(U_caret, ppc_prep->U, pk->n);
-      gmp_printf("initial U_caret: %Zd\nU: %Zd\nn->%Zd\n",
-		 U_caret, ppc_prep->U, pk->n);
-
-      /*
-
-      mpz_powm(U_caret, U_caret, ppc_prep->c, pk->n);
-      for (unsigned long i = 0; i < attr_vec_size(ppc_prep->m_carets); ++i) {
-	attr_ptr ap = attr_vec_head(ppc_prep->m_carets) + i;
-	mpz_powm(t, pk->R_v + ap->i, ap->v, pk->n);
-	mpz_mul(U_caret, U_caret, t);
-	mpz_mod(U_caret, U_caret, pk->n);
-
-	gmp_printf("%u: %u - %Zd\nt: %Zd\nU_caret: %Zd\n",
-		   i, ap->i, pk->R_v + ap->i, t, U_caret);
-      }
-      mpz_powm(t, pk->S, ppc_prep->v_apos_caret, pk->n);
-      mpz_mul(U_caret, U_caret, t);
-      mpz_mod(U_caret, U_caret, pk->n);
-      */
-    }
-
-    // gmp_printf("U: %Zd\nU_caret: %Zd\nn0: %Zd\n", ppc_prep->U, U_caret, n0);
 
     sm3_mpzs(t, ppc_prep->U, U_caret, n0, NULL);
     if (mpz_cmp(t, ppc_prep->c)) {

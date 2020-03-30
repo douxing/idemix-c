@@ -36,8 +36,7 @@ void predicate_subproof_auxiliary_clear
 
 void predicate_subproof_auxiliary_assign
 (predicate_subproof_auxiliary_t pspa,
- predicate_t p);
+ predicate_t p,
+ mpz_t m_tilde);
 
 #endif // __IDEMIX_PREDICATE_SUBPROOF_AUXILIARY_H__
-
-

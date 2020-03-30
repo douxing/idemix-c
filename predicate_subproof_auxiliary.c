@@ -1,6 +1,7 @@
 #include "idemix_predicate_subproof_auxiliary.h"
 #include "idemix_random.h"
 #include "idemix_decompose.h"
+#include <assert.h>
 
 void predicate_subproof_auxiliary_init
 (predicate_subproof_auxiliary_t pspa)
@@ -58,7 +59,8 @@ void predicate_subproof_auxiliary_clear
 
 void predicate_subproof_auxiliary_assign
 (predicate_subproof_auxiliary_t pspa,
- predicate_t p)
+ predicate_t p,
+ mpz_t m_tilde)
 {
   switch (p->op) { // assign delta
   case LESS_THAN_OR_EQUAL_TO:    // m <= z
@@ -79,17 +81,16 @@ void predicate_subproof_auxiliary_assign
     printf("unknown operator: %d", p->op);
     return;
   }
-  // assert delta >= 0
+  assert(pspa->delta >= 0);
 
   decompose(pspa->u, pspa->delta); // assgin u1 u2 u3 u4
-
-  random_num_exact_bits(pspa->m_tilde, 592); // 7.2.(Validity Proof).1
+  mpz_set(pspa->m_tilde, m_tilde);
 
   random_num_exact_bits(pspa->r_delta, 2128);
   random_num_exact_bits(pspa->r_delta_tilde, 672);
 
   for (unsigned long i = 0; i < 4; ++i) {
-    random_num_exact_bits(pspa->r[i], 2128);    
+    random_num_exact_bits(pspa->r[i], 2128);
     random_num_exact_bits(pspa->u_tilde[i], 592);
     random_num_exact_bits(pspa->r_tilde[i], 672);
   }

@@ -16,7 +16,7 @@ void nonrev_credential_subcheck_dump_t
   element_t eCH, t, t1, t2, t3, t4, z1, z2, z3;
   element_init_Zr(eCH, pairing);
   element_set_mpz(eCH, CH);
-  gmp_printf("CH: %Zd\n", CH);
+  // gmp_printf("CH: %Zd\n", CH);
 
   // T1^
   element_init_G1(t, pairing);
