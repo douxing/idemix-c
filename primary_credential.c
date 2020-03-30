@@ -82,71 +82,26 @@ int primary_pre_credential_verify
     mpz_mod(Q, Q, pk->n);
 
     {
-      // gmp_printf("in verify:\nQ: %Zd\nA: %Zd\n", Q, pc->A);
+      gmp_printf("Q(20): %Zd\n", Q);
+      gmp_printf("A: %Zd\n", pc->A);
+      mpz_mul(t, sk->p_apos, sk->q_apos);
+      mpz_invert(t, pc->e, t);
+      mpz_powm(t, Q, t, pk->n);
+      gmp_printf("A: %Zd\n", t);
+      mpz_powm(t, t, pc->e, pk->n);
+      gmp_printf("Q: %Zd\n", t);
     }
-
-    /*
-    {
-      mpz_t e_inv, n_apos, tt;
-      mpz_inits(e_inv, n_apos, tt, NULL);
-      mpz_mul(n_apos, sk->p_apos, sk->q_apos);
-      mpz_invert(e_inv, pc->e, n_apos);
-
-      gmp_printf("e_inv: %Zd\n", e_inv);
-      mpz_powm(tt, Q, e_inv, pk->n);
-      gmp_printf("A calculated: %Zd\ncmp(A, A calculated): %d\n",
-		 tt, mpz_cmp(tt, pc->A));
-
-      mpz_mul(tt, pc->e, e_inv);
-      mpz_mod(tt, tt, n_apos);
-
-      gmp_printf("e * e_inv: %Zd\n", tt);
-
-      mpz_mod(tt, pc->e, n_apos);
-      gmp_printf("e: %Zd\nafter mod: %Zd", pc->e, tt);
-      
-      mpz_clears(e_inv, n_apos, tt, NULL);
-    }
-    */
-
-    /*
-    {
-      mpz_t n, n_apos, e, e_inv, A, Q_e_inv, A_e, one;
-      mpz_inits(n, n_apos, e, e_inv, A, Q_e_inv, A_e, one, NULL);
-      mpz_set(n, pk->n);
-      mpz_mul(n_apos, sk->p_apos, sk->q_apos);
-      mpz_set(e, pc->e);
-      mpz_invert(e_inv, e, n_apos);
-      mpz_powm(A, Q, e_inv, n);
-
-      mpz_powm(Q_e_inv, Q, e_inv, n); // Q^e^-1
-      mpz_powm(A_e, A, e, n);         // A^e
-
-      gmp_printf("p': %Zd\nq': %Zd\nn': %Zd\ne: %Zd\ne_inv: %Zd\n",
-		 sk->p_apos, sk->q_apos, n_apos, e, e_inv);
-
-      gmp_printf("Q_e_inv: %Zd\nA: %Zd\nA_e: %Zd\nQ: %Zd\n",
-		 Q_e_inv, A, A_e, Q);
-
-      mpz_mul(one, e, e_inv);
-      mpz_mod(one, one, n_apos);
-      gmp_printf("e * e_inv mod n': %Zd\n", one);
-      
-      mpz_clears(n, n_apos, e, e_inv, A, Q_e_inv, one, NULL);      
-    }
-    */
 
     // 4. Verify Q = A^e page 4
     // dx: TODO: how to do this???
-    /*
+
     mpz_powm(t, pc->A, pc->e, pk->n);
     if (mpz_cmp(Q, t)) {
-      gmp_printf("Q != A^e\nt: %Zd\nQ : %Zd\n A : %Zd\ne: %Zd\n",
+      gmp_printf("Q != A^e\nA^e: %Zd\nQ : %Zd\n A : %Zd\ne: %Zd\n",
 		 t, Q, pc->A, ppc->e);
-      retval = -1;
+      // retval = -1;
       break;
     }
-    */
 
     // 5. Compute A^ = A^(c' + s_e*e) Eq. (21)
     mpz_mul(t, ppc->s_e, pc->e);

@@ -1,3 +1,4 @@
+#include "assert.h"
 #include "idemix.h"
 
 // dx: kindly remind don't get confused
@@ -296,64 +297,39 @@ int main(int argc, char *argv[]) {
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
-  for (unsigned long i = 0; i < mpz_vec_size(checkT); ++i) {
-    gmp_printf("%d:\n%Zd\n%Zd\n",
-  	       i,
+  {
+    unsigned long i = 8;
+    gmp_printf("T%dbar: %Zd\nT%dcar: %Zd\n",
+  	       i + 1,
   	       mpz_vec_head(spT) + i,
+  	       i + 1,
   	       mpz_vec_head(checkT) + i);
   }
-
 
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
 
-  element_t eleCH;
-  element_init_Zr(eleCH, pairing);
-  element_set_mpz(eleCH, CH);
+  mpz_t Q, A, A_apos, z0, z1, z2, n1, n_apos, e_inv;
+  mpz_inits(Q, A, A_apos, z0, z1, z2, n1, n_apos, e_inv, NULL);
 
-  element_t tbar, tcar, tgt1, tgt2, tgt3, tg1, tzr;
-  element_init_GT(tbar, pairing);
-  element_init_GT(tcar, pairing);
-  element_init_GT(tgt1, pairing);
-  element_init_GT(tgt2, pairing);
-  element_init_GT(tgt3, pairing);
-  element_init_G1(tg1, pairing);
-  element_init_Zr(tzr, pairing);
+  mpz_mul(n_apos, iss_sk->p_apos, iss_sk->q_apos);
+  gmp_printf("p'=%Zd\nq'=%Zd\nn'=%Zd\n",
+	     iss_sk->p_apos, iss_sk->q_apos, n_apos);
 
-  element_mul(tg1, nr_pk->pk, nrspC->G);
-  element_pairing(tgt1, tg1, nr_pk->h_caret);
-  element_pairing(tgt2, nr_pk->h_tilde, nr_pk->h_caret);
-  element_neg(tzr, nrcsp_aux->m_apos_tilde);
-  element_pairing(tgt3, nr_pk->h_tilde, nrspC->S);
-  element_pow3_zn(tbar,
-		  tgt1, nrcsp_aux->r_apos2_tilde,
-		  tgt2, tzr,
-		  tgt3, nrcsp_aux->r_tilde);
-  element_printf("tbar: %B\n", tbar);
+  mpz_invert(e_inv, pc->e, n_apos);
+  gmp_printf("e=%Zd\ne_inv=%Zd\n",
+	     pc->e, e_inv);  
 
-  element_mul(tg1, nr_pk->pk, nrspC->G);
-  element_pairing(tgt1, tg1, nrspC->S);
-  element_pairing(tgt2, g1_gen, g2_gen);
-  element_neg(tzr, eleCH);
-  element_pairing(tgt3, tg1, nr_pk->h_caret);
-  element_pow3_zn(tcar,
-		  tgt1, eleCH,
-		  tgt2, tzr,
-		  tgt3, X->r_apos2_caret);
+  mpz_mul(z1, pc->e, e_inv);
+  mpz_mod(z1, z1, n_apos);
+  gmp_printf("e * e_inv mod n': %zZd\n", z1);
 
-  element_pairing(tgt2, nr_pk->h_tilde, nr_pk->h_caret);
-  element_neg(tzr, X->m_apos_caret);
-  element_pairing(tgt3, nr_pk->h_tilde, nrspC->S);
-  element_pow2_zn(tgt1,
-		  tgt2, tzr,
-		  tgt3, X->r_caret);
+  mpz_powm(A, iss_pk->Z, e_inv, iss_pk->n);
+  mpz_powm(z0, A, pc->e, iss_pk->n);
 
-  element_mul(tcar, tcar, tgt1);
-  element_printf("tcar: %B\n", tcar);  
+  gmp_printf("Z: %Zd\nA: %Zd\nZag: %Zd\n",
+	     iss_pk->Z, A, z0);
 
-  element_clear(eleCH);
-  
- 
   printf("-------------------- test zone end --------------------\n");
 
   mpz_t CH1;
