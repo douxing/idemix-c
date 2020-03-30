@@ -309,26 +309,21 @@ int main(int argc, char *argv[]) {
   // dx test zone
   printf("-------------------- test zone ------------------------\n");
 
-  mpz_t Q, A, A_apos, z0, z1, z2, n1, n_apos, e_inv;
-  mpz_inits(Q, A, A_apos, z0, z1, z2, n1, n_apos, e_inv, NULL);
+  mpz_t Q, Qag, A, A_apos, S, Z, xz, z0, z1, z2, n1, n_apos, e_inv, two;
+  mpz_inits(Q, Qag, A, A_apos, S, Z, xz, z0, z1, z2, n1, n_apos, e_inv, two, NULL);
 
   mpz_mul(n_apos, iss_sk->p_apos, iss_sk->q_apos);
-  gmp_printf("p'=%Zd\nq'=%Zd\nn'=%Zd\n",
-	     iss_sk->p_apos, iss_sk->q_apos, n_apos);
-
   mpz_invert(e_inv, pc->e, n_apos);
-  gmp_printf("e=%Zd\ne_inv=%Zd\n",
-	     pc->e, e_inv);  
 
-  mpz_mul(z1, pc->e, e_inv);
-  mpz_mod(z1, z1, n_apos);
-  gmp_printf("e * e_inv mod n': %zZd\n", z1);
+  mpz_set_ui(S, 4);
 
-  mpz_powm(A, iss_pk->Z, e_inv, iss_pk->n);
-  mpz_powm(z0, A, pc->e, iss_pk->n);
+  mpz_set_ui(two, 2);
+  random_range(xz, two, n_apos);
+  mpz_powm(Q, S, xz, iss_pk->n); // Q == Z
+  mpz_powm(A, Q, e_inv, iss_pk->n);
+  mpz_powm(Qag, A, pc->e, iss_pk->n);
 
-  gmp_printf("Z: %Zd\nA: %Zd\nZag: %Zd\n",
-	     iss_pk->Z, A, z0);
+  gmp_printf("QQQ: %Zd\nQag: %Zd\n", Q, Qag);
 
   printf("-------------------- test zone end --------------------\n");
 

@@ -1,5 +1,7 @@
 #include "idemix_issuer_key.h"
 #include "idemix_random.h"
+#include "assert.h"
+
 
 void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
 			     issuer_pk_t pk, // OUTPUT
@@ -20,26 +22,24 @@ void issuer_keys_init_assign(issuer_sk_t sk, // OUTPUT
     random_prime_exact_bits(sk->p_apos, 1024);
     mpz_mul(sk->p, sk->p_apos, two);
     mpz_add_ui(sk->p, sk->p, 1);
-  } while(mpz_probab_prime_p(sk->p, REPS_VAL));
+  } while(!mpz_probab_prime_p(sk->p, REPS_VAL));
 
   // generate q' and q
   do {
     random_prime_exact_bits(sk->q_apos, 1024);
     mpz_mul(sk->q, sk->q_apos, two);
     mpz_add_ui(sk->q, sk->q, 1);
-  } while(mpz_probab_prime_p(sk->q, REPS_VAL));
+  } while(!mpz_probab_prime_p(sk->q, REPS_VAL));
 
   // n = pq (should be at least 2049 bits > 2048bits)
   mpz_mul(n_apos, sk->p_apos, sk->q_apos); // n' = p'q'
   mpz_mul(pk->n, sk->p, sk->q);
     
   // 2. A random quadratic residue S modulo n
-  //  do {
-    // random_num_exact_bits(pk->S, 1024);
-    // mpz_mul(pk->S, pk->S, pk->S);
-    // mpz_mod(pk->S, pk->S, pk->n);
-    // } while (mpz_sizeinbase(pk->S, 2) < 2048);
-  mpz_set_ui(pk->S, 4);
+  random_num_exact_bits(pk->S, 1024);
+  mpz_mul(pk->S, pk->S, pk->S);
+  assert(mpz_sizeinbase(pk->S, 2) <= 2048);
+  assert(mpz_sizeinbase(pk->S, 2) >= 2047);
 
   // 3. Random xZ, xR1, ..., xRl in range [2, p'q' - 1]
   // init temporary variables
