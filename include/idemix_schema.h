@@ -28,9 +28,6 @@ struct schema_s {
   // Chapter 5: in between Holder and Issuer
   //            flag means attribute is hidden to issuer
   //            hidden = 1, known = 0
-  // Chapter 7: in between Prover and Verifier
-  //            flag means attribute is revealed to verifier
-  //            hidden = 1, revealed = 0
   bitmap_t map;
 };
 typedef struct schema_s *schema_ptr;

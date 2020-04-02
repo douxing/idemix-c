@@ -6,7 +6,6 @@
 
 struct attribute_s {
   // subscript index of the m_i or m_j alike
-  // also used by verfier, if hidden = 1, reveal = 0
   unsigned long i;
                    
 
@@ -20,8 +19,9 @@ typedef struct attribute_s *attr_ptr;
 typedef struct attribute_s attr_t[1];
 
 // dx: no encapsulation of attribute for ease of use
-
 void attribute_init(attr_t a);
+
+
 struct attribute_vec_s {
   // number of attributes
   // in 5.1 primary pre-credential prepare - 6

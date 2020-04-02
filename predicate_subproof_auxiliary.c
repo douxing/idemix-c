@@ -86,7 +86,7 @@ void predicate_subproof_auxiliary_assign
     printf("unknown operator: %d", p->op);
     return;
   }
-  assert(pspa->delta >= 0);
+  assert(mpz_sgn(pspa->delta) >= 0);
 
   decompose(pspa->u, pspa->delta); // assgin u1 u2 u3 u4
   mpz_set(pspa->m_tilde, m_tilde);

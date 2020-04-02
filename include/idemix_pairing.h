@@ -23,7 +23,6 @@ static inline int pbc_pairing_init_from_path
   
   return 0;
 }
-#endif // __IDEMIX_PAIRING_H__
 
 static inline void pbc_element_to_mpz(mpz_t z, element_t e)
 {
@@ -33,3 +32,5 @@ static inline void pbc_element_to_mpz(mpz_t z, element_t e)
   mpz_import(z, count, 1, 1, 1, 0, s);
   free(s);
 }
+
+#endif // __IDEMIX_PAIRING_H__

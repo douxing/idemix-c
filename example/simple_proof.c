@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
   // gmp_printf("primary credential:\nA : %Zd\ne : %Zd\n",
   // pc->A, pc->e);
 
-  if (!primary_pre_credential_verify(ppc, iss_pk, iss_sk, ppc_prep->n1, pc)) {
+  if (!primary_pre_credential_verify(ppc, iss_pk, ppc_prep->n1, pc)) {
     gmp_printf("primary pre credential okay\n");
   } else {
     gmp_printf("primary pre credential error\n");

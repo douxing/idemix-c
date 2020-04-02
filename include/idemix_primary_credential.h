@@ -35,7 +35,6 @@ void primary_credential_assign
 int primary_pre_credential_verify
 (primary_pre_credential_t ppc,
  issuer_pk_t pk,
- issuer_sk_t sk,
  mpz_t n1,
  primary_credential_t pc);
 

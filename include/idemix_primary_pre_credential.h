@@ -38,13 +38,4 @@ void primary_pre_credential_assign
  attr_vec_t Ak,
  primary_pre_credential_prepare_t ppc_prep);
 
-/*
-int primary_pre_credential_verify
-(primary_pre_credential_t ppc,
- issuer_pk_t pk,
- mpz_t v_apos,
- mpz_t n1,
- mpz_t m1);
-*/
-
 #endif // __IDEMIX_PRIMARY_PRE_CREDENTIAL_H__
