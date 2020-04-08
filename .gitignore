@@ -59,6 +59,16 @@ doc/
 # emacs intermediate files
 *~
 
+# autotools
+/autoscan.log
+/.deps
+/.libs
+/autom4te.cache
+/Makefile.in
+/config.status
+/m4/
+/stamp-h1
+
 # backup files
 **.backup
 \#**.*\#
