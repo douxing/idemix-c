@@ -80,10 +80,10 @@ void accumulator_init_assign
   // (L+2)th element = (L)th element * g^gamma * g^gamma
   element_init_G1(acc->g1_v[L + 1], pairing);
   element_pow_zn(acc->g1_v[L + 1], acc->g1_v[L - 1], sk->gamma);
-  element_pow_zn(acc->g1_v[L + 1], acc->g1_v[L - 1], sk->gamma);
+  element_pow_zn(acc->g1_v[L + 1], acc->g1_v[L + 1], sk->gamma);
   element_init_G2(acc->g2_v[L + 1], pairing);
   element_pow_zn(acc->g2_v[L + 1], acc->g2_v[L - 1], sk->gamma);
-  element_pow_zn(acc->g2_v[L + 1], acc->g2_v[L - 1], sk->gamma);
+  element_pow_zn(acc->g2_v[L + 1], acc->g2_v[L + 1], sk->gamma);
 
   // continue from (L+3)th element to the end
   i = L + 2;

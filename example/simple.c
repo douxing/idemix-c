@@ -3,10 +3,10 @@
 
 // dx: kindly remind don't get confused
 // use this value both L in accumulator and l in primary credential crypto
-#define L 128
+#define L 16
 
 // index i < L, picked by Issuer, first item in page 5
-#define INDEX 100
+#define INDEX 10
 
 void usage(char *name) {
   gmp_printf("usage:\n  %s param_file\n", name);

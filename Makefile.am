@@ -4,9 +4,13 @@ SO_VERSION = 0:1:0
 
 ACLOCAL_AMFLAGS = -I m4
 
+maintainer-clean-local:
+	-rm -rf Makefile.in config.h.in \
+configure autom4e.cache aclocal.m4 tmp build-aux
+
 lib_LTLIBRARIES = libidemix.la
 
-library_includedir = $(includedir)/idemix123
+library_includedir = $(includedir)/idemix
 library_include_HEADERS = include/idemix.h \
 include/idemix_accumulator.h \
 include/idemix_attribute.h \

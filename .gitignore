@@ -60,14 +60,15 @@ doc/
 *~
 
 # autotools
-/autoscan.log
-/.deps
-/.libs
-/autom4te.cache
-/Makefile.in
-/config.status
-/m4/
-/stamp-h1
+.deps
+.libs
+autoscan.log
+autom4te.cache
+Makefile.in
+config.status
+stamp-h1
+m4/
+build-aux/
 
 # backup files
 **.backup
