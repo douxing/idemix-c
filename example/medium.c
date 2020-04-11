@@ -37,14 +37,6 @@ void init_schemas()
   schema_attr_set_hidden(schema_employee, 5); // 个人薪水
   schema_attr_set_hidden(schema_employee, 6); // 入职日期
 
-  // company schema，共6个属性，三个自定义属性，一个已知，两个隐藏
-  schema_init(schema_company, 6);
-  schema_attr_set_hidden(schema_company, 0);
-  schema_attr_set_known(schema_company, 1);
-  schema_attr_set_hidden(schema_company, 2);
-  schema_attr_set_known(schema_company, 3); // 公司名称(id)
-  schema_attr_set_hidden(schema_company, 4); // 公司现金
-  schema_attr_set_hidden(schema_company, 5); // 公司负债
 }
 
 static mpz_t ZERO, ONE; // 常量
@@ -990,7 +982,6 @@ void setup_proof2() {
 				     p2_alpha_pcsp_aux,
 				     p2_alpha_pcsp_C);
 
-  /*
   // Alice 在alpha的信息，隐藏所有属性
   attr_vec_init(p2_Alice_alpha_Ar, 0);
   attr_vec_init_random(p2_Alice_alpha_m_tildes, 7, 592);
@@ -1005,6 +996,9 @@ void setup_proof2() {
   // 关联个人和公司
   mpz_set(attr_vec_head(p2_Alice_alpha_m_tildes)[4].v,
 	  attr_vec_head(p2_alpha_m_tildes)[3].v);
+
+  mpz_set(attr_vec_head(p2_Alice_alpha_m_tildes)[0].v,
+	  attr_vec_head(p2_alpha_m_tildes)[0].v);
 
   nonrev_credential_update(Alice_alpha_nrc, acc); // 最新的V和A都在acc里面
 
@@ -1035,8 +1029,6 @@ void setup_proof2() {
 				     p2_Alice_alpha_m_tildes,
 				     p2_Alice_alpha_pcsp_aux,
 				     p2_Alice_alpha_pcsp_C);
-
-  */
 
   // 三个谓词
   mpz_set_ui(z, 100000000); // 现金大于1亿
@@ -1079,10 +1071,9 @@ void setup_proof2() {
 			    p2_pred2_aux,
 			    p2_pred2_C);
 
-  /*
-  mpz_set_ui(z, 20200501); // 在2020年5月1日前入职
+  mpz_set_ui(z, 20200430); // 在2020年5月1日前入职
   predicate_init_assign(p2_pred3,
-			LESS_THAN,
+			LESS_THAN_OR_EQUAL_TO,
 			attr_vec_head(Alice_alpha_pc->Cs)[6].v,
 			z);
 
@@ -1099,8 +1090,6 @@ void setup_proof2() {
   predicate_subproof_dump_t(spT, gov_pk,
 			    p2_pred3_aux,
 			    p2_pred3_C);
-
-  */
 
   sm3_TCn(CH, spT, C, alpha_ppc_prep->n1);
   mpz_clear(z);
@@ -1129,28 +1118,26 @@ void finalize_proof2() {
 				     p2_alpha_pcsp_aux,
 				     p2_alpha_pcsp_C->A_apos);
 
-  /*
   tuple_x_init(p2_Alice_alpha_X, pairing);
   tuple_x_assign(p2_Alice_alpha_X, CH,
 		 attr_vec_head(Alice_alpha_pc->Cs)[1].v,
 		 Alice_alpha_nrc,
 		 p2_Alice_alpha_nrcsp_aux);
 
-  primary_credential_subproof_init(p2_Alice_alpha_pcsp, 6);
+  primary_credential_subproof_init(p2_Alice_alpha_pcsp, 7);
   primary_credential_subproof_assign(p2_Alice_alpha_pcsp,
 				     CH,
 				     p2_Alice_alpha_m_tildes,
 				     Alice_alpha_pc,
 				     p2_Alice_alpha_pcsp_aux,
 				     p2_Alice_alpha_pcsp_C->A_apos);
-  */
 
   predicate_subproof_init(p2_pred1_sp);
   predicate_subproof_assign(p2_pred1_sp, CH, p2_pred1, p2_pred1_aux);
   predicate_subproof_init(p2_pred2_sp);
   predicate_subproof_assign(p2_pred2_sp, CH, p2_pred2, p2_pred2_aux);
-  // predicate_subproof_init(p2_pred3_sp);
-  // predicate_subproof_assign(p2_pred3_sp, CH, p2_pred3, p2_pred3_aux);
+  predicate_subproof_init(p2_pred3_sp);
+  predicate_subproof_assign(p2_pred3_sp, CH, p2_pred3, p2_pred3_aux);
 }
 
 void check_proof2() {
@@ -1162,7 +1149,6 @@ void check_proof2() {
 				     p2_alpha_Ar,
 				     p2_alpha_pcsp);
 
-  /*
   nonrev_credential_subcheck_dump_t(scT, pairing, CH,
 				    acc, acc_pk,
 				    nr_pk, p2_Alice_alpha_X,
@@ -1170,14 +1156,13 @@ void check_proof2() {
   primary_credential_subcheck_dump_t(scT, gov_pk, CH,
 				     p2_Alice_alpha_Ar,
 				     p2_Alice_alpha_pcsp);
-  */
 
   predicate_subcheck_dump_t(scT, gov_pk, CH, p2_pred1,
 			    p2_pred1_C, p2_pred1_sp);
   predicate_subcheck_dump_t(scT, gov_pk, CH, p2_pred2,
 			    p2_pred2_C, p2_pred2_sp);
-  // predicate_subcheck_dump_t(scT, gov_pk, CH, p2_pred3,
-  //			    p2_pred3_C, p2_pred3_sp);
+  predicate_subcheck_dump_t(scT, gov_pk, CH, p2_pred3,
+			    p2_pred3_C, p2_pred3_sp);
 
   sm3_TCn(CH1, scT, C, alpha_ppc_prep->n1);
 }
@@ -1255,8 +1240,6 @@ int main(int argc, char *argv[]) {
   // 注意：当前只有Bob的Non-revocation credential中的V和w是最新的
   // 也就是和账本(即这里的acc)中的一致
 
-
-  /*
   printf("第一个证明\n");
   init_subproof_vec();
   setup_proof1();
@@ -1266,7 +1249,6 @@ int main(int argc, char *argv[]) {
   printf("检查第一个证明\n");
   checkCH();
   clear_subproof_vec();
-  */
 
   printf("为公司alpha申请凭证\n");
   if (setup_holder_alpha()) {
@@ -1275,13 +1257,9 @@ int main(int argc, char *argv[]) {
   }
 
   printf("第二个证明\n");
-  printf("1111111\n");
   init_subproof_vec();
-  printf("222222\n");
   setup_proof2();
-  printf("33333333\n");
   finalize_proof2();
-  printf("44444444444\n");
   check_proof2();
 
   printf("检查第二个证明\n");
