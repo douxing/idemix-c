@@ -69,6 +69,13 @@ config.status
 stamp-h1
 m4/
 build-aux/
+libtool
+Makefile
+aclocal.m4
+config.h
+config.h.in
+config.log
+configure
 
 # backup files
 **.backup
