@@ -1246,6 +1246,10 @@ int main(int argc, char *argv[]) {
   finalize_proof1();
 
   printf("检查第一个证明\n");
+  gmp_printf("这里必须先检查Alice的LinkSecret，即m1^必须相同\n"
+	     "Alice在alpha的m1^: %Zd\n Alice在beta的m1^: %Zd\n",
+	     attr_vec_head(p1_Alice_alpha_pcsp->m_carets)[0].v,
+	     attr_vec_head(p1_Alice_beta_pcsp->m_carets)[0].v);
   check_proof1();
   checkCH();
   clear_subproof_vec();
@@ -1278,7 +1282,8 @@ int main(int argc, char *argv[]) {
   printf("检查第三个证明(本例子是错误示范)\n");
   check_proof3();
   checkCH();
-  gmp_printf("因为两个m1^不同，这是check_proof3(验证)的前提条件:\n"
+  gmp_printf("虽然CH和CH1相同，但这个例子是没有现实意义的\n"
+	     "因为两个m1^不同，而这是check_proof3(验证)的前提条件:\n"
 	     "Alice的m1^: %Zd\n  Bob的m1^: %Zd\n",
 	     attr_vec_head(p3_Alice_alpha_pcsp->m_carets)[0].v,
 	     attr_vec_head(p3_Bob_alpha_pcsp->m_carets)[0].v);
