@@ -147,11 +147,7 @@ void revoke_index(accumulator_t acc, // OUT
   bitmap_clrbit(acc->V, index);
   
   // 2. Compute A = A/g'_(L+1-i)
-  element_t temp;
-  element_init(temp, acc->acc->field);
-  element_invert(temp, acc->g2_v[acc->L - index]);
-  element_mul(acc->acc, acc->acc, temp);
-  element_clear(temp);
+  element_div(acc->acc, acc->acc, acc->g2_v[acc->L - index - 1]);
 
   // Publish {V, A}
 }
