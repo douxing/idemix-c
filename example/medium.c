@@ -403,6 +403,22 @@ static predicate_subproof_tuple_c_t p1_pred3_C;
 static predicate_t p1_pred4;
 static predicate_subproof_auxiliary_t p1_pred4_aux;
 static predicate_subproof_tuple_c_t p1_pred4_C;
+
+static attr_vec_t p1_Bob_alpha_Ar;
+static attr_vec_t p1_Bob_alpha_m_tildes;
+static nonrev_credential_subproof_auxiliary_t p1_Bob_alpha_nrcsp_aux;
+static nonrev_credential_subproof_tuple_c_t p1_Bob_alpha_nrcsp_C;
+static primary_credential_subproof_auxiliary_t p1_Bob_alpha_pcsp_aux;
+static primary_credential_subproof_tuple_c_t p1_Bob_alpha_pcsp_C;
+static predicate_t p1_pred5;
+static predicate_subproof_auxiliary_t p1_pred5_aux;
+static predicate_subproof_tuple_c_t p1_pred5_C;
+static predicate_t p1_pred6;
+static predicate_subproof_auxiliary_t p1_pred6_aux;
+static predicate_subproof_tuple_c_t p1_pred6_C;
+static predicate_t p1_pred7;
+static predicate_subproof_auxiliary_t p1_pred7_aux;
+static predicate_subproof_tuple_c_t p1_pred7_C;
 void setup_proof1() {
   mpz_t z;
 
@@ -500,7 +516,54 @@ void setup_proof1() {
 				     p1_Alice_beta_pcsp_aux,
 				     p1_Alice_beta_pcsp_C);
 
-  // 四个谓词
+  // Bob在alpha的员工信息，暴露个人身份id和公司id
+  // 不暴露其他五项信息
+  attr_vec_init(p1_Bob_alpha_Ar, 2);
+  attr_vec_head(p1_Bob_alpha_Ar)[0].i = 3;
+  mpz_set(attr_vec_head(p1_Bob_alpha_Ar)[0].v,
+	  attr_vec_head(Bob_alpha_pc->Cs)[3].v);
+  attr_vec_head(p1_Bob_alpha_Ar)[1].i = 4;
+  mpz_set(attr_vec_head(p1_Bob_alpha_Ar)[1].v,
+	  attr_vec_head(Bob_alpha_pc->Cs)[4].v);
+
+  attr_vec_init_random(p1_Bob_alpha_m_tildes, 5, 592);
+  attr_vec_head(p1_Bob_alpha_m_tildes)[0].i = 0;
+  attr_vec_head(p1_Bob_alpha_m_tildes)[1].i = 1;
+  attr_vec_head(p1_Bob_alpha_m_tildes)[2].i = 2;
+  attr_vec_head(p1_Bob_alpha_m_tildes)[3].i = 5; // 薪资
+  attr_vec_head(p1_Bob_alpha_m_tildes)[4].i = 6; // 入职时间
+  
+  nonrev_credential_update(Bob_alpha_nrc, acc); // 最新的V和A都在acc里面
+  
+  nonrev_credential_subproof_auxiliary_init(p1_Bob_alpha_nrcsp_aux, pairing);
+  nonrev_credential_subproof_auxiliary_assign(p1_Bob_alpha_nrcsp_aux,
+					      Bob_alpha_nrc);
+  nonrev_credential_subproof_tuple_c_init(p1_Bob_alpha_nrcsp_C, pairing);
+  nonrev_credential_subproof_tuple_c_assign(p1_Bob_alpha_nrcsp_C, nr_pk,
+					    Bob_alpha_nrc,
+					    p1_Bob_alpha_nrcsp_aux,
+					    acc);
+  nonrev_credential_subproof_tuple_c_into_vec(C, p1_Bob_alpha_nrcsp_C);
+  nonrev_credential_subproof_dump_t(spT, pairing,
+				    nr_pk, acc,
+				    p1_Bob_alpha_nrcsp_aux,
+				    p1_Bob_alpha_nrcsp_C);
+
+  primary_credential_subproof_auxiliary_init(p1_Bob_alpha_pcsp_aux);
+  primary_credential_subproof_auxiliary_assign(p1_Bob_alpha_pcsp_aux,
+					       Bob_alpha_pc);
+  primary_credential_subproof_tuple_c_init(p1_Bob_alpha_pcsp_C);
+  primary_credential_subproof_tuple_c_assign(p1_Bob_alpha_pcsp_C,
+					     gov_pk,
+					     Bob_alpha_pc,
+					     p1_Bob_alpha_pcsp_aux);
+  primary_credential_subproof_tuple_c_into_vec(C, p1_Bob_alpha_pcsp_C);
+  primary_credential_subproof_dump_t(spT, gov_pk,
+				     p1_Bob_alpha_m_tildes,
+				     p1_Bob_alpha_pcsp_aux,
+				     p1_Bob_alpha_pcsp_C);
+
+  // 七个谓词
   mpz_init_set_ui(z, 9999);
   predicate_init_assign(p1_pred1,
 			GREATER_THAN,
@@ -581,6 +644,66 @@ void setup_proof1() {
 			    p1_pred4_aux,
 			    p1_pred4_C);
 
+  mpz_init_set_ui(z, 0); // Bob在alpha有收入
+  predicate_init_assign(p1_pred5,
+			GREATER_THAN,
+			attr_vec_head(Bob_alpha_pc->Cs)[5].v,
+			z);
+
+  predicate_subproof_auxiliary_init(p1_pred5_aux);
+  predicate_subproof_auxiliary_assign(p1_pred5_aux,
+				      p1_pred5,
+				      attr_vec_head(p1_Bob_alpha_m_tildes)[3].v);
+
+  predicate_subproof_tuple_c_init(p1_pred5_C);
+  predicate_subproof_tuple_c_assign(p1_pred5_C,
+				    gov_pk,
+				    p1_pred5_aux);
+  predicate_subproof_tuple_c_into_vec(C, p1_pred5_C);
+  predicate_subproof_dump_t(spT, gov_pk,
+			    p1_pred5_aux,
+			    p1_pred5_C);
+
+  mpz_init_set_ui(z, 20200401); // Bob是在2020年四月份入职的
+  predicate_init_assign(p1_pred6,
+			GREATER_THAN_OR_EQUAL_TO,
+			attr_vec_head(Bob_alpha_pc->Cs)[6].v,
+			z);
+
+  predicate_subproof_auxiliary_init(p1_pred6_aux);
+  predicate_subproof_auxiliary_assign(p1_pred6_aux,
+				      p1_pred6,
+				      attr_vec_head(p1_Bob_alpha_m_tildes)[4].v);
+
+  predicate_subproof_tuple_c_init(p1_pred6_C);
+  predicate_subproof_tuple_c_assign(p1_pred6_C,
+				    gov_pk,
+				    p1_pred6_aux);
+  predicate_subproof_tuple_c_into_vec(C, p1_pred6_C);
+  predicate_subproof_dump_t(spT, gov_pk,
+			    p1_pred6_aux,
+			    p1_pred6_C);
+
+  mpz_init_set_ui(z, 20200430); // Bob是在2020年四月份入职的
+  predicate_init_assign(p1_pred7,
+			LESS_THAN_OR_EQUAL_TO,
+			attr_vec_head(Bob_alpha_pc->Cs)[6].v,
+			z);
+
+  predicate_subproof_auxiliary_init(p1_pred7_aux);
+  predicate_subproof_auxiliary_assign(p1_pred7_aux,
+				      p1_pred7,
+				      attr_vec_head(p1_Bob_alpha_m_tildes)[4].v);
+
+  predicate_subproof_tuple_c_init(p1_pred7_C);
+  predicate_subproof_tuple_c_assign(p1_pred7_C,
+				    gov_pk,
+				    p1_pred7_aux);
+  predicate_subproof_tuple_c_into_vec(C, p1_pred7_C);
+  predicate_subproof_dump_t(spT, gov_pk,
+			    p1_pred7_aux,
+			    p1_pred7_C);
+
   sm3_TCn(CH, spT, C, Alice_alpha_ppc_prep->n1);
   mpz_clear(z);
 }
@@ -594,6 +717,12 @@ static tuple_x_t p1_Alice_beta_X;
 static primary_credential_subproof_t p1_Alice_beta_pcsp;
 static predicate_subproof_t p1_pred3_sp;
 static predicate_subproof_t p1_pred4_sp;
+
+static tuple_x_t p1_Bob_alpha_X;
+static primary_credential_subproof_t p1_Bob_alpha_pcsp;
+static predicate_subproof_t p1_pred5_sp;
+static predicate_subproof_t p1_pred6_sp;
+static predicate_subproof_t p1_pred7_sp;
 void finalize_proof1() {
   tuple_x_init(p1_Alice_alpha_X, pairing);
   tuple_x_assign(p1_Alice_alpha_X, CH,
@@ -623,6 +752,20 @@ void finalize_proof1() {
 				     p1_Alice_beta_pcsp_aux,
 				     p1_Alice_beta_pcsp_C->A_apos);
 
+  tuple_x_init(p1_Bob_alpha_X, pairing);
+  tuple_x_assign(p1_Bob_alpha_X, CH,
+		 attr_vec_head(Bob_alpha_pc->Cs)[1].v,
+		 Bob_alpha_nrc,
+		 p1_Bob_alpha_nrcsp_aux);
+
+  primary_credential_subproof_init(p1_Bob_alpha_pcsp, 5);
+  primary_credential_subproof_assign(p1_Bob_alpha_pcsp,
+				     CH,
+				     p1_Bob_alpha_m_tildes,
+				     Bob_alpha_pc,
+				     p1_Bob_alpha_pcsp_aux,
+				     p1_Bob_alpha_pcsp_C->A_apos);
+
   predicate_subproof_init(p1_pred1_sp);
   predicate_subproof_assign(p1_pred1_sp, CH, p1_pred1, p1_pred1_aux);
   predicate_subproof_init(p1_pred2_sp);
@@ -631,6 +774,12 @@ void finalize_proof1() {
   predicate_subproof_assign(p1_pred3_sp, CH, p1_pred3, p1_pred3_aux);
   predicate_subproof_init(p1_pred4_sp);
   predicate_subproof_assign(p1_pred4_sp, CH, p1_pred4, p1_pred4_aux);
+  predicate_subproof_init(p1_pred5_sp);
+  predicate_subproof_assign(p1_pred5_sp, CH, p1_pred5, p1_pred5_aux);
+  predicate_subproof_init(p1_pred6_sp);
+  predicate_subproof_assign(p1_pred6_sp, CH, p1_pred6, p1_pred6_aux);
+  predicate_subproof_init(p1_pred7_sp);
+  predicate_subproof_assign(p1_pred7_sp, CH, p1_pred7, p1_pred7_aux);
 }
 
 void check_proof1() {
@@ -650,6 +799,14 @@ void check_proof1() {
 				     p1_Alice_beta_Ar,
 				     p1_Alice_beta_pcsp);
 
+  nonrev_credential_subcheck_dump_t(scT, pairing, CH,
+				    acc, acc_pk,
+				    nr_pk, p1_Bob_alpha_X,
+				    p1_Bob_alpha_nrcsp_C);
+  primary_credential_subcheck_dump_t(scT, gov_pk, CH,
+				     p1_Bob_alpha_Ar,
+				     p1_Bob_alpha_pcsp);
+
   predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred1,
 			    p1_pred1_C, p1_pred1_sp);
   predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred2,
@@ -658,6 +815,13 @@ void check_proof1() {
 			    p1_pred3_C, p1_pred3_sp);
   predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred4,
 			    p1_pred4_C, p1_pred4_sp);
+  predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred5,
+			    p1_pred5_C, p1_pred5_sp);
+  predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred6,
+			    p1_pred6_C, p1_pred6_sp);
+  predicate_subcheck_dump_t(scT, gov_pk, CH, p1_pred7,
+			    p1_pred7_C, p1_pred7_sp);
+
 
   sm3_TCn(CH1, scT, C, Alice_alpha_ppc_prep->n1);
 }
@@ -695,8 +859,6 @@ int main(int argc, char *argv[]) {
   }
   printf("密码学工具准备完毕\n");
 
-  element_printf("acc: %B\n", acc->acc);
-
   printf("初始化schema等常量数据\n");
   init_schemas();
   init_assistant_globals();
@@ -712,13 +874,15 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  /* if (setup_holder_Bob_alpha()) { */
-  /*   printf("个人Bob在alpha凭证生成错误\n"); */
-  /*   return -1; */
-  /* } */
+  if (setup_holder_Bob_alpha()) {
+    printf("个人Bob在alpha凭证生成错误\n");
+    return -1;
+  }
 
   // 注意：当前只有Bob的Non-revocation credential中的V和w是最新的
   // 也就是和账本(即这里的acc)中的一致
+
+  init_subproof_vec();
 
   printf("before setup_proof1\n");
   setup_proof1();
@@ -728,21 +892,6 @@ int main(int argc, char *argv[]) {
 
   printf("before check_proof1\n");
   check_proof1();
-
-  /*
-  {
-    element_t A;
-    element_init_G2(A, pairing);
-    element_mul(A, acc->g2_v[L - 1], acc->g2_v[L - 2]);
-    element_printf("ACC: %B\nacc: %B\n", A, acc->acc);
-
-    element_printf("g'[L-1]: %B\ng'[L+1]: %B\n",
-		   acc->g2_v[L-1], acc->g2_v[L+1]);
-    element_printf("alpha: %B\n beta: %B\n",
-		   Alice_alpha_nrc->wit_i->w,
-		   Alice_beta_nrc->wit_i->w);
-  }
-  */
 
   gmp_printf("CH : %Zd\nCH1: %Zd\n", CH, CH1);
   if (mpz_cmp(CH, CH1)) {
@@ -759,6 +908,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  clear_subproof_vec();
   printf("例子结束，bye!\n");
   return 0;
 }
