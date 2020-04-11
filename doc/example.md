@@ -1,5 +1,18 @@
 # 例子程序
 
+## 工具例子(gen_pq)
+
+因为p'和q'的生成需要花费大量的算力。因此提供了该工具。
+只要运行该工具，就能生成所需要的p'和q'。
+可以将其导入到文件中使用(生成质数可能要花一些时间):
+``` bash
+$ example/gen_pq > example/pq.crypto
+```
+这里已经提前输出了两个p'和q'的值，保存在pq.crypto文件中。
+需要注意的是，在正式环境下，这两个值是必须保密的，
+因此pq.crypto中的值需要重新生成。
+参考medium.c的例子查看如何读取和使用p'和q'。
+
 ## 一个简单而完整的例子(simple)
 
 本例子可以在项目example中找到。
@@ -67,6 +80,11 @@ Verifier拿到数据后，初始化本地T数组并开始计算：
 若本地CH和CH相同，则证明通过，否则证明失败。
 
 ## 一个稍显复杂的例子(medium)
+
+使用方法:
+``` Bash
+$ example/medium example/a.param example/pq.crypto
+```
 
 本例子中的schema定义如下：
 
