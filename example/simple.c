@@ -94,8 +94,6 @@ int main(int argc, char *argv[]) {
  // dx: holder_id is the florished H in 5.1
   mpz_t n0, v_apos, holder_id;
   mpz_inits(n0, v_apos, holder_id, NULL);
-  element_t s_apos;
-  element_init_Zr(s_apos, pairing);
 
   // Holder|Prover set m1 and m3 and Issuer set the rest values
   random_num_bits(m1, 64); // link secret
@@ -132,6 +130,8 @@ int main(int argc, char *argv[]) {
   // n0, v_apos, m1, m3, ppc_prep->c);
 
   gmp_printf("Holder prepares for non-revocation credential\n");
+  element_t s_apos;
+  element_init_Zr(s_apos, pairing);
   element_random(s_apos);
   nonrev_pre_credential_prepare_t nrpc_prep;
   nonrev_pre_credential_prepare_init(nrpc_prep, pairing);
@@ -220,6 +220,12 @@ int main(int argc, char *argv[]) {
 
   /* gmp_printf("update CNR, oldV: %Zd, newV: %Zd\n", */
   /*	     nrc->wit_i->V, acc->V); */
+  attr_vec_t Ar_bar; // m_tildes
+  attr_vec_init_random(Ar_bar, 4, 592); // open m4
+  attr_vec_head(Ar_bar)[0].i = 0;
+  attr_vec_head(Ar_bar)[1].i = 1;
+  attr_vec_head(Ar_bar)[2].i = 2;
+  attr_vec_head(Ar_bar)[3].i = 4; // m5_tilde
 
   mpz_vec_t spT, spC; // T for subproof
   mpz_vec_init(spT);
@@ -247,12 +253,6 @@ int main(int argc, char *argv[]) {
   primary_credential_subproof_tuple_c_assign(pcspC, iss_pk, pc, pcsp_aux);
   primary_credential_subproof_tuple_c_into_vec(spC, pcspC);
 
-  attr_vec_t Ar_bar; // m_tildes
-  attr_vec_init_random(Ar_bar, 4, 592); // open m4
-  attr_vec_head(Ar_bar)[0].i = 0;
-  attr_vec_head(Ar_bar)[1].i = 1;
-  attr_vec_head(Ar_bar)[2].i = 2;
-  attr_vec_head(Ar_bar)[3].i = 4; // m5_tilde
   primary_credential_subproof_dump_t(spT, iss_pk, Ar_bar, pcsp_aux, pcspC);
 
   mpz_t z5;
@@ -319,7 +319,6 @@ int main(int argc, char *argv[]) {
 
   for (unsigned long i = 0; i < mpz_vec_size(spT); ++i)
   {
-    // unsigned long i = ;
     if (mpz_cmp(mpz_vec_head(spT) + i, mpz_vec_head(checkT) + i)) {
       gmp_printf("different T:\nT%dbar: %Zd\nT%dcar: %Zd\n",
 		 i + 1,

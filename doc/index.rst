@@ -13,6 +13,7 @@ Welcome to idemix-c's documentation!
    intro
    interface
    example
+   api
 
 
 Indices and tables

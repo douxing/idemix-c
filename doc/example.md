@@ -15,7 +15,11 @@ $ example/gen_pq > example/pq.crypto
 
 ## 一个简单而完整的例子(simple)
 
-本例子可以在项目example中找到。
+本例子可以在项目example中找到。运行方式：
+``` bash
+$ example/simple example/a.param
+```
+
 其依次做了如下工作：
 
 #### 准备数据，包括schema数据、双线性对数据和密码学数据
