@@ -11,6 +11,7 @@ Welcome to idemix-c's documentation!
    :caption: Contents:
 
    intro
+   flow
    interface
    example
    api

@@ -211,35 +211,35 @@ Ah的第二个属性的下标和值对应m3的下标和值。
   random_num_exact_bits(v_apos, 2128);
 ```
 
-最后生成`预-主凭证的准备`:
+最后生成`主凭证请求`:
 
 ``` C
-  primary_pre_credential_prepare_t ppc_prep;
-  primary_pre_credential_prepare_init(ppc_prep, schema);
-  primary_pre_credential_prepare_assign(ppc_prep, iss_pk, n0, v_apos, Ah);
+  primary_credential_request_t pc_req;
+  primary_credential_request_init(pc_req, schema);
+  primary_credential_request_assign(pc_req, iss_pk, n0, v_apos, Ah);
 ```
 
-Holder接下来生成`预-撤销用凭证的准备`。
+Holder接下来生成`撤销用凭证请求`。
 这里需要用到在Zr中的随机数s'。
 
 ``` C
   element_t s_apos;
   element_init_Zr(s_apos, pairing);
   element_random(s_apos);
-  nonrev_pre_credential_prepare_t nrpc_prep;
-  nonrev_pre_credential_prepare_init(nrpc_prep, pairing);
-  nonrev_pre_credential_prepare_assign(nrpc_prep, s_apos, nr_pk);
+  nonrev_credential_request_t nrc_req;
+  nonrev_credential_request_init(nrc_req, pairing);
+  nonrev_credential_request_assign(nrc_req, s_apos, nr_pk);
 ```
 
-之后将`ppc_prep`和`nrpc_prep`发送给Issuer。本例中忽略。
+之后将`pc_req`和`nrc_req`发送给Issuer。本例中忽略。
 
-### 7. Issuer收到`预-主凭证的准备`，生成`预-主凭证` - 5.2 Primary Credential Issuerance
+### 7. Issuer收到`主凭证请求`，生成`主凭证响应` - 5.2 Primary Credential Issuerance
 
-首先Issuer校验`预-主凭证的准备`:
+首先Issuer校验`主凭证的请求`:
 
 ``` C
   gmp_printf("Issuer veriﬁes the correctness of Holder’s input\n");
-  if (!primary_pre_credential_prepare_verify(ppc_prep, iss_pk, n0)) {
+  if (!primary_credential_request_verify(pc_req, iss_pk, n0)) {
 	gmp_printf("primary pre credential prepare verifyed: okay\n");
   } else {
 	gmp_printf("primary pre credential prepare verifyed: error\n");
@@ -268,29 +268,29 @@ Holder接下来生成`预-撤销用凭证的准备`。
   mpz_set(attr_vec_head(Ak)[2].v, m5);
 ```
 
-使用之前的参数，生成`预-主凭证`
+使用之前的参数，生成`主凭证响应`
 
 ``` C
-  primary_pre_credential_t ppc;
-  primary_pre_credential_init(ppc, schema);
-  primary_pre_credential_assign(ppc, iss_pk, iss_sk, Ak, ppc_prep);
+  primary_credential_response_t pc_res;
+  primary_credential_response_init(pc_res, schema);
+  primary_credential_response_assign(pc_res, iss_pk, iss_sk, Ak, pc_req);
 ```
 
 将其发送给Holder，本例子中忽略。
 
-### 8. Issuer收到`预-撤销用凭证的准备`，生成`预-撤销用凭证` - 5.3. Non-revocation Credential Issuerance
+### 8. Issuer收到`撤销用凭证请求`，生成`撤销用凭证响应` - 5.3. Non-revocation Credential Issuerance
 
 ``` C
-  nonrev_pre_credential_t nrpc;
-  nonrev_pre_credential_init(nrpc, pairing);
-  nonrev_pre_credential_assign(nrpc, m2, INDEX, nr_pk, nr_sk,
-                               acc, acc_pk, acc_sk, nrpc_prep);
+  nonrev_credential_response_t nrc_res;
+  nonrev_credential_response_init(nrc_res, pairing);
+  nonrev_credential_response_assign(nrc_res, m2, INDEX, nr_pk, nr_sk,
+                                    acc, acc_pk, acc_sk, nrc_req);
 ```
 
 将其发送给Holder，本例子中忽略。
 这个函数同时更新了累加器acc中的值(acc->acc)和累加器容器(acc->A)
 
-### 9. Holder收到`预-主凭证`和`预-撤销用凭证`，生成并`主凭证`和`撤销用凭证` - 5.4 Storing Credentials
+### 9. Holder收到`主凭证响应`和`撤销用凭证响应`，生成并`主凭证`和`撤销用凭证` - 5.4 Storing Credentials
 
 首先生成`主凭证`，然后用主凭证去检查Issuer发过来的数据是否合法。
 之后再生成`撤销用凭证`。
@@ -298,9 +298,9 @@ Holder接下来生成`预-撤销用凭证的准备`。
 ``` C
   primary_credential_t pc;
   primary_credential_init(pc, schema);
-  primary_credential_assign(pc, v_apos, Ah, ppc);
+  primary_credential_assign(pc, v_apos, Ah, pc_res);
 
-  if (!primary_pre_credential_verify(ppc, iss_pk, ppc_prep->n1, pc)) {
+  if (!primary_credential_response_verify(pc_res, iss_pk, pc_req->n1, pc)) {
 	gmp_printf("primary pre credential okay\n");
   } else {
 	gmp_printf("primary pre credential error\n");
@@ -309,7 +309,7 @@ Holder接下来生成`预-撤销用凭证的准备`。
 
   nonrev_credential_t nrc;
   nonrev_credential_init(nrc, pairing);
-  nonrev_credential_assign(nrc, s_apos, nrpc);
+  nonrev_credential_assign(nrc, s_apos, nrc_res);
 ```
 
 ### 10. 证明请求 - 7.1 Proof Request
@@ -416,7 +416,7 @@ simple.c中包含一个谓词证明，要求证明凭证中的年龄小于20。
 ``` C
   mpz_t CH;
   mpz_init(CH);
-  sm3_TCn(CH, spT, spC, ppc_prep->n1);
+  sm3_TCn(CH, spT, spC, pc_req->n1);
 ```
 
 最终准备(7.2.2)
@@ -461,5 +461,5 @@ Verifier使用Prover发送的数据导出T的值，
 
   mpz_t CH1;
   mpz_init(CH1);
-  sm3_TCn(CH1, checkT, spC, ppc_prep->n1);
+  sm3_TCn(CH1, checkT, spC, pc_req->n1);
 ```
