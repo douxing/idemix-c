@@ -58,6 +58,8 @@ venv/
 
 # emacs intermediate files
 *~
+*\#*
+*backup
 
 # autotools
 .deps
@@ -76,8 +78,3 @@ config.h
 config.h.in
 config.log
 configure
-
-# backup files
-**.backup
-\#**.*\#
-\.\#**.*

@@ -88,10 +88,7 @@ void predicate_subproof_auxiliary_assign
   }
   assert(mpz_sgn(pspa->delta) >= 0);
 
-  mpz_t delta;
-  mpz_init_set(delta, pspa->delta);
-  decompose(pspa->u, delta); // assgin u1 u2 u3 u4
-  mpz_clear(delta);
+  decompose(pspa->u, pspa->delta); // assgin u1 u2 u3 u4
 
   mpz_set(pspa->m_tilde, m_tilde);
 
