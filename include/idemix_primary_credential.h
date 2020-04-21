@@ -5,7 +5,7 @@
 #include "idemix_schema.h"
 #include "idemix_issuer_key.h"
 #include "idemix_attribute.h"
-#include "idemix_primary_pre_credential.h"
+#include "idemix_primary_credential_response.h"
 
 // 5.4 Storing Credentials
 
@@ -30,10 +30,10 @@ void primary_credential_assign
 (primary_credential_t pr,
  mpz_t v_apos,
  attr_vec_t Ah,
- primary_pre_credential_t ppc);
+ primary_credential_response_t pc_res);
 
-int primary_pre_credential_verify
-(primary_pre_credential_t ppc,
+int primary_credential_response_verify
+(primary_credential_response_t pc_res,
  issuer_pk_t pk,
  mpz_t n1,
  primary_credential_t pc);

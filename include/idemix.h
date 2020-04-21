@@ -14,8 +14,8 @@
 #include "idemix_witness.h"
 
 #include "idemix_issuer_key.h"
-#include "idemix_primary_pre_credential_prepare.h"
-#include "idemix_primary_pre_credential.h"
+#include "idemix_primary_credential_request.h"
+#include "idemix_primary_credential_response.h"
 #include "idemix_primary_credential.h"
 #include "idemix_primary_credential_subproof_auxiliary.h"
 #include "idemix_primary_credential_subproof_tuple_c.h"
@@ -24,8 +24,8 @@
 #include "idemix_primary_credential_subcheck_dump_t.h"
 
 #include "idemix_nonrev_key.h"
-#include "idemix_nonrev_pre_credential_prepare.h"
-#include "idemix_nonrev_pre_credential.h"
+#include "idemix_nonrev_credential_request.h"
+#include "idemix_nonrev_credential_response.h"
 #include "idemix_nonrev_credential.h"
 #include "idemix_nonrev_credential_subproof_auxiliary.h"
 #include "idemix_nonrev_credential_subproof_tuple_c.h"

@@ -25,10 +25,10 @@ int main(int argc, char *argv[]) {
   }
 
   gmp_printf("length in bytes: (GT, G1, G2, Zr): (%d, %d, %d, %d).\n",
-	     pairing_length_in_bytes_GT(pairing),
-	     pairing_length_in_bytes_G1(pairing),
-	     pairing_length_in_bytes_G2(pairing),
-	     pairing_length_in_bytes_Zr(pairing));
+             pairing_length_in_bytes_GT(pairing),
+             pairing_length_in_bytes_G1(pairing),
+             pairing_length_in_bytes_G2(pairing),
+             pairing_length_in_bytes_Zr(pairing));
 
   gmp_printf("4.1: defines the primary credential schema S\n");
   schema_t schema;
@@ -77,8 +77,8 @@ int main(int argc, char *argv[]) {
   accumulator_sk_t acc_sk;
   accumulator_pk_t acc_pk;
   accumulator_init_assign(acc, acc_sk, acc_pk,
-			  pairing, L,
-			  g1_gen, g2_gen);
+                          pairing, L,
+                          g1_gen, g2_gen);
 
   // assistant values:
   mpz_t zero, hundred, t0, t1;
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   mpz_t m1, m2, m3, m4, m5; // five value as said
   mpz_inits(m1, m2, m3, m4, m5, NULL);
 
- // dx: holder_id is the florished H in 5.1
+  // dx: holder_id is the florished H in 5.1
   mpz_t n0, v_apos, holder_id;
   mpz_inits(n0, v_apos, holder_id, NULL);
 
@@ -118,28 +118,28 @@ int main(int argc, char *argv[]) {
   gmp_printf("1. Generate random 2128-bit v0.\n");
   random_num_exact_bits(v_apos, 2128);
 
-  primary_pre_credential_prepare_t ppc_prep;
-  primary_pre_credential_prepare_init(ppc_prep, schema);
+  primary_credential_request_t pc_req;
+  primary_credential_request_init(pc_req, schema);
 
-  primary_pre_credential_prepare_assign(ppc_prep,
-					iss_pk,
-					n0,
-					v_apos,
-					Ah);
+  primary_credential_request_assign(pc_req,
+                                    iss_pk,
+                                    n0,
+                                    v_apos,
+                                    Ah);
   // gmp_printf("n0: %Zd\nv': %Zd\nm1: %Zd\nm3: %Zd\nc(hash): %Zd\n",
-  // n0, v_apos, m1, m3, ppc_prep->c);
+  // n0, v_apos, m1, m3, pc_req->c);
 
   gmp_printf("Holder prepares for non-revocation credential\n");
   element_t s_apos;
   element_init_Zr(s_apos, pairing);
   element_random(s_apos);
-  nonrev_pre_credential_prepare_t nrpc_prep;
-  nonrev_pre_credential_prepare_init(nrpc_prep, pairing);
-  nonrev_pre_credential_prepare_assign(nrpc_prep, s_apos, nr_pk);
+  nonrev_credential_request_t nrc_req;
+  nonrev_credential_request_init(nrc_req, pairing);
+  nonrev_credential_request_assign(nrc_req, s_apos, nr_pk);
 
   gmp_printf("5.2 Primary Credential Issuance\n");
   gmp_printf("Issuer veriﬁes the correctness of Holder’s input\n");
-  if (!primary_pre_credential_prepare_verify(ppc_prep, iss_pk, n0)) {
+  if (!primary_credential_request_verify(pc_req, iss_pk, n0)) {
     gmp_printf("primary pre credential prepare verifyed: okay\n");
   } else {
     gmp_printf("primary pre credential prepare verifyed: error\n");
@@ -166,28 +166,28 @@ int main(int argc, char *argv[]) {
   attr_vec_head(Ak)[2].i = 4;
   mpz_set(attr_vec_head(Ak)[2].v, m5);
 
-  primary_pre_credential_t ppc;
-  primary_pre_credential_init(ppc, schema);
-  primary_pre_credential_assign(ppc, iss_pk, iss_sk, Ak, ppc_prep);
+  primary_credential_response_t pc_res;
+  primary_credential_response_init(pc_res, schema);
+  primary_credential_response_assign(pc_res, iss_pk, iss_sk, Ak, pc_req);
 
   gmp_printf("primary pre credential:\nA : %Zd\ne : %Zd\n",
-	     ppc->A, ppc->e);
+             pc_res->A, pc_res->e);
 
 
   gmp_printf("5.3 Non-revocation Credential Issuance\n");
-  nonrev_pre_credential_t nrpc;
-  nonrev_pre_credential_init(nrpc, pairing);
-  nonrev_pre_credential_assign(nrpc,
-			       m2,
-			       INDEX,
-			       nr_pk,
-			       nr_sk,
-			       acc,
-			       acc_pk,
-			       acc_sk,
-			       nrpc_prep);
-  // gmp_printf("i: %d\n", nrpc->i);
-  // element_printf("w: %B\n", nrpc->wit_i->w);
+  nonrev_credential_response_t nrc_res;
+  nonrev_credential_response_init(nrc_res, pairing);
+  nonrev_credential_response_assign(nrc_res,
+                                    m2,
+                                    INDEX,
+                                    nr_pk,
+                                    nr_sk,
+                                    acc,
+                                    acc_pk,
+                                    acc_sk,
+                                    nrc_req);
+  // gmp_printf("i: %d\n", nrc_res->i);
+  // element_printf("w: %B\n", nrc_res->wit_i->w);
 
   gmp_printf("5.4 Storing Credentials\n");
 
@@ -197,12 +197,12 @@ int main(int argc, char *argv[]) {
   //      directly from primary credential
   primary_credential_t pc;
   primary_credential_init(pc, schema);
-  primary_credential_assign(pc, v_apos, Ah, ppc);
+  primary_credential_assign(pc, v_apos, Ah, pc_res);
 
   // gmp_printf("primary credential:\nA : %Zd\ne : %Zd\n",
   // pc->A, pc->e);
 
-  if (!primary_pre_credential_verify(ppc, iss_pk, ppc_prep->n1, pc)) {
+  if (!primary_credential_response_verify(pc_res, iss_pk, pc_req->n1, pc)) {
     gmp_printf("primary pre credential okay\n");
   } else {
     gmp_printf("primary pre credential error\n");
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
 
   nonrev_credential_t nrc;
   nonrev_credential_init(nrc, pairing);
-  nonrev_credential_assign(nrc, s_apos, nrpc);
+  nonrev_credential_assign(nrc, s_apos, nrc_res);
 
   gmp_printf("7.2 Proof preparation\n");
   gmp_printf("Holder prepares all credential pairs to submit\n");
@@ -262,8 +262,8 @@ int main(int argc, char *argv[]) {
   predicate_subproof_auxiliary_t pred_aux;
   predicate_subproof_auxiliary_init(pred_aux);
   predicate_subproof_auxiliary_assign(pred_aux,
-				      pred,
-				      attr_vec_head(Ar_bar)[3].v);
+                                      pred,
+                                      attr_vec_head(Ar_bar)[3].v);
   predicate_subproof_tuple_c_t predC;
   predicate_subproof_tuple_c_init(predC);
   predicate_subproof_tuple_c_assign(predC, iss_pk, pred_aux);
@@ -273,7 +273,7 @@ int main(int argc, char *argv[]) {
   gmp_printf("7.2.1 Hashing\n");
   mpz_t CH;
   mpz_init(CH);
-  sm3_TCn(CH, spT, spC, ppc_prep->n1);
+  sm3_TCn(CH, spT, spC, pc_req->n1);
 
   gmp_printf("7.2.2 final preparation\n");
   tuple_x_t X; // subproof for non revocation
@@ -282,11 +282,11 @@ int main(int argc, char *argv[]) {
   primary_credential_subproof_t pcsp;
   primary_credential_subproof_init(pcsp, 4);
   primary_credential_subproof_assign(pcsp,
-				     CH,
-				     Ar_bar,
-				     pc,
-				     pcsp_aux,
-				     pcspC->A_apos);
+                                     CH,
+                                     Ar_bar,
+                                     pc,
+                                     pcsp_aux,
+                                     pcspC->A_apos);
   predicate_subproof_t predsp;
   predicate_subproof_init(predsp);
   predicate_subproof_assign(predsp, CH, pred, pred_aux);
@@ -302,13 +302,13 @@ int main(int argc, char *argv[]) {
   mpz_vec_t checkT;
   mpz_vec_init(checkT);
   nonrev_credential_subcheck_dump_t(checkT,
-				    pairing,
-				    CH,
-				    acc,
-				    acc_pk,
-				    nr_pk,
-				    X,
-				    nrspC);
+                                    pairing,
+                                    CH,
+                                    acc,
+                                    acc_pk,
+                                    nr_pk,
+                                    X,
+                                    nrspC);
   primary_credential_subcheck_dump_t(checkT, iss_pk, CH, Ar, pcsp);
   predicate_subcheck_dump_t(checkT, iss_pk, CH, pred, predC, predsp);
 
@@ -318,21 +318,21 @@ int main(int argc, char *argv[]) {
 
 
   for (unsigned long i = 0; i < mpz_vec_size(spT); ++i)
-  {
-    if (mpz_cmp(mpz_vec_head(spT) + i, mpz_vec_head(checkT) + i)) {
-      gmp_printf("different T:\nT%dbar: %Zd\nT%dcar: %Zd\n",
-		 i + 1,
-		 mpz_vec_head(spT) + i,
-		 i + 1,
-		 mpz_vec_head(checkT) + i);
-      return -1;
+    {
+      if (mpz_cmp(mpz_vec_head(spT) + i, mpz_vec_head(checkT) + i)) {
+        gmp_printf("different T:\nT%dbar: %Zd\nT%dcar: %Zd\n",
+                   i + 1,
+                   mpz_vec_head(spT) + i,
+                   i + 1,
+                   mpz_vec_head(checkT) + i);
+        return -1;
+      }
     }
-  }
   gmp_printf("All Ts are the same.\n");
   
   mpz_t CH1;
   mpz_init(CH1);
-  sm3_TCn(CH1, checkT, spC, ppc_prep->n1);
+  sm3_TCn(CH1, checkT, spC, pc_req->n1);
   gmp_printf("CH : %Zd\nCH1: %Zd\n", CH, CH1);
 
   printf("-------------------- test zone end --------------------\n");
@@ -361,12 +361,12 @@ int main(int argc, char *argv[]) {
 
   nonrev_credential_clear(nrc);
   primary_credential_clear(pc);
-  nonrev_pre_credential_clear(nrpc);
-  primary_pre_credential_clear(ppc);
+  nonrev_credential_response_clear(nrc_res);
+  primary_credential_response_clear(pc_res);
   attr_vec_clear(Ak);
   mpz_clear(index);
-  nonrev_pre_credential_prepare_clear(nrpc_prep);
-  primary_pre_credential_prepare_clear(ppc_prep);
+  nonrev_credential_request_clear(nrc_req);
+  primary_credential_request_clear(pc_req);
   attr_vec_clear(Ah);
   element_clear(s_apos);
   mpz_clears(n0, v_apos, holder_id, NULL);

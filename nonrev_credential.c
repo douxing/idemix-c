@@ -2,7 +2,7 @@
 #include "idemix_random.h"
 
 void nonrev_credential_init(nonrev_credential_t nrc,
-			    pairing_t pairing)
+                            pairing_t pairing)
 {
   // initialized pairing members
   element_init_GT(nrc->IA, pairing);
@@ -32,18 +32,18 @@ void nonrev_credential_clear(nonrev_credential_t nrc)
 void nonrev_credential_assign
 (nonrev_credential_t nrc,
  element_t s_apos,
- nonrev_pre_credential_t nrpc)
+ nonrev_credential_response_t nrc_res)
 {
-  element_set(nrc->IA, nrpc->IA);
-  element_set(nrc->sigma, nrpc->sigma);
-  element_set(nrc->c, nrpc->c);
-  element_add(nrc->s, s_apos, nrpc->s_apos_apos);
+  element_set(nrc->IA, nrc_res->IA);
+  element_set(nrc->sigma, nrc_res->sigma);
+  element_set(nrc->c, nrc_res->c);
+  element_add(nrc->s, s_apos, nrc_res->s_apos_apos);
 
-  witness_set(nrc->wit_i, nrpc->wit_i);
+  witness_set(nrc->wit_i, nrc_res->wit_i);
   
-  element_set(nrc->g_i, nrpc->g_i);
-  element_set(nrc->g_apos_i, nrpc->g_apos_i);
-  nrc->i = nrpc->i;
+  element_set(nrc->g_i, nrc_res->g_i);
+  element_set(nrc->g_apos_i, nrc_res->g_apos_i);
+  nrc->i = nrc_res->i;
 }
 
 // 7.2 item.4 page 7

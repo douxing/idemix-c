@@ -8,7 +8,7 @@
 #include "idemix_witness.h"
 #include "idemix_accumulator.h"
 #include "idemix_nonrev_key.h"
-#include "idemix_nonrev_pre_credential.h"
+#include "idemix_nonrev_credential_response.h"
 
 // Chapter 5:
 
@@ -36,7 +36,7 @@ void nonrev_credential_clear(nonrev_credential_t nrc);
 void nonrev_credential_assign
 (nonrev_credential_t nrc,
  element_t s_apos,
- nonrev_pre_credential_t nrpc);
+ nonrev_credential_response_t nrc_res);
 
 // end of 5.4
 
