@@ -2,7 +2,6 @@
 #define __IDEMIX_ISSUER_KEY_H__
 
 #include <gmp.h>
-#include "idemix_accumulator.h"
 
 // Chapter 4
 

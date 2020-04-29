@@ -8,6 +8,25 @@ maintainer-clean-local:
 	-rm -rf Makefile.in config.h.in \
 configure autom4e.cache aclocal.m4 tmp build-aux
 
+.PHONY: eff
+eff:
+	@echo "counter = 0" > stat.py
+	@echo "issue_time = 0" >> stat.py
+	@echo "prove_time = 0" >> stat.py
+	@echo "verify_time = 0" >> stat.py
+	number=1 ; while [[ $$number -le ${COUNTER} ]] ; do \
+		echo "# iteration: $$number" >> stat.py ; \
+		example/eff example/a.param example/pq.crypto ${ATTR_NUM} ${PRED_NUM} ; \
+		((number = number + 1)) ; \
+	done
+	@echo "issue_avg = issue_time // counter" >> stat.py
+	@echo "prove_avg = prove_time // counter" >> stat.py
+	@echo "verify_avg = verify_time // counter" >> stat.py
+	@echo "print('issue_avg: {}.{}'.format(*divmod(issue_avg, 1000)))" >> stat.py
+	@echo "print('prove_avg: {}.{}'.format(*divmod(prove_avg, 1000)))" >> stat.py
+	@echo "print('verify_avg: {}.{}'.format(*divmod(verify_avg, 1000)))" >> stat.py
+	python stat.py
+
 lib_LTLIBRARIES = libidemix.la
 
 library_includedir = $(includedir)/idemix
